@@ -72,7 +72,7 @@ U 1 1 59FEEA64
 P 3650 1400
 F 0 "D1" H 3650 1500 50  0000 C CNN
 F 1 "LED" H 3650 1300 50  0000 C CNN
-F 2 "LEDs:LED-3MM" H 3650 1400 50  0001 C CNN
+F 2 "LEDs:LED_D3.0mm_Horizontal_O1.27mm_Z2.0mm" H 3650 1400 50  0001 C CNN
 F 3 "" H 3650 1400 50  0001 C CNN
 	1    3650 1400
 	0    -1   -1   0   
@@ -237,7 +237,7 @@ U 1 1 59FF5D46
 P 1550 1150
 F 0 "JP1" H 1550 1230 50  0000 C CNN
 F 1 "I_SENSE" H 1560 1090 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x02_Pitch2.54mm" H 1550 1150 50  0001 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x02_Pitch1.27mm" H 1550 1150 50  0001 C CNN
 F 3 "" H 1550 1150 50  0001 C CNN
 	1    1550 1150
 	1    0    0    -1  
@@ -383,7 +383,7 @@ U 1 1 59FFB685
 P 7250 3200
 F 0 "TP2" H 7250 3500 50  0000 C BNN
 F 1 "TEST" H 7250 3450 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x01" H 7250 3200 50  0001 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x01_Pitch1.27mm" H 7250 3200 50  0001 C CNN
 F 3 "" H 7250 3200 50  0001 C CNN
 	1    7250 3200
 	1    0    0    -1  
@@ -394,7 +394,7 @@ U 1 1 59FFB782
 P 7050 3350
 F 0 "TP1" H 7050 3650 50  0000 C BNN
 F 1 "TEST" H 7050 3600 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x01" H 7050 3350 50  0001 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x01_Pitch1.27mm" H 7050 3350 50  0001 C CNN
 F 3 "" H 7050 3350 50  0001 C CNN
 	1    7050 3350
 	1    0    0    -1  
@@ -405,7 +405,7 @@ U 1 1 59FFBC93
 P 7450 1550
 F 0 "JP2" H 7450 1630 50  0000 C CNN
 F 1 "I_SENSE" H 7460 1490 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x02_Pitch2.54mm" H 7450 1550 50  0001 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x02_Pitch1.27mm" H 7450 1550 50  0001 C CNN
 F 3 "" H 7450 1550 50  0001 C CNN
 	1    7450 1550
 	1    0    0    -1  
@@ -435,7 +435,7 @@ U 1 1 59FFCFC3
 P 10300 3050
 F 0 "J4" H 10300 3350 50  0000 C CNN
 F 1 "TOF_DIST_SENS" H 10300 2750 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x05_Pitch2.54mm" H 10300 3050 50  0001 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x05_Pitch2.00mm" H 10300 3050 50  0001 C CNN
 F 3 "" H 10300 3050 50  0001 C CNN
 	1    10300 3050
 	1    0    0    -1  
@@ -648,7 +648,7 @@ U 1 1 5A044983
 P 10300 2150
 F 0 "J3" H 10300 2350 50  0000 C CNN
 F 1 "ANALOG_CONN" H 10300 1950 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x03_Pitch2.54mm" H 10300 2150 50  0001 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x03_Pitch2.00mm" H 10300 2150 50  0001 C CNN
 F 3 "" H 10300 2150 50  0001 C CNN
 	1    10300 2150
 	1    0    0    -1  
@@ -672,7 +672,7 @@ U 1 1 5A0459F4
 P 7700 4850
 F 0 "TP3" H 7700 5150 50  0000 C BNN
 F 1 "TEST" H 7700 5100 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x01" H 7700 4850 50  0001 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x01_Pitch1.27mm" H 7700 4850 50  0001 C CNN
 F 3 "" H 7700 4850 50  0001 C CNN
 	1    7700 4850
 	1    0    0    -1  
@@ -683,7 +683,7 @@ U 1 1 5A045AFD
 P 7700 5750
 F 0 "TP4" H 7700 6050 50  0000 C BNN
 F 1 "TEST" H 7700 6000 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x01" H 7700 5750 50  0001 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x01_Pitch1.27mm" H 7700 5750 50  0001 C CNN
 F 3 "" H 7700 5750 50  0001 C CNN
 	1    7700 5750
 	1    0    0    -1  
@@ -742,30 +742,6 @@ Wire Wire Line
 Connection ~ 9600 5100
 Text Notes 9600 5850 0    60   ~ 0
 Temperature sensor\naddress:\n0x48 (7bit)
-$Comp
-L Conn_01x02 J1
-U 1 1 5A0486B1
-P 1450 2050
-F 0 "J1" H 1450 2150 50  0000 C CNN
-F 1 "V_BAT_1S" H 1450 1850 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x02_Pitch2.54mm" H 1450 2050 50  0001 C CNN
-F 3 "" H 1450 2050 50  0001 C CNN
-	1    1450 2050
-	1    0    0    -1  
-$EndComp
-$Comp
-L GND #PWR021
-U 1 1 5A048EAB
-P 1050 2150
-F 0 "#PWR021" H 1050 1900 50  0001 C CNN
-F 1 "GND" H 1050 2000 50  0000 C CNN
-F 2 "" H 1050 2150 50  0001 C CNN
-F 3 "" H 1050 2150 50  0001 C CNN
-	1    1050 2150
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	1050 2150 1250 2150
 Text Label 650  2050 0    60   ~ 0
 V_BAT_SENSE
 Wire Wire Line
@@ -778,7 +754,7 @@ U 1 1 5A0498AC
 P 10300 1250
 F 0 "J2" H 10300 1550 50  0000 C CNN
 F 1 "PROG/DEBUG" H 10300 850 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x06_Pitch2.54mm" H 10300 1250 50  0001 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x06_Pitch2.00mm" H 10300 1250 50  0001 C CNN
 F 3 "" H 10300 1250 50  0001 C CNN
 	1    10300 1250
 	1    0    0    -1  
@@ -803,10 +779,10 @@ F 3 "" H 10850 4500 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L GND #PWR022
+L GND #PWR021
 U 1 1 5A04A9A0
 P 10850 4650
-F 0 "#PWR022" H 10850 4400 50  0001 C CNN
+F 0 "#PWR021" H 10850 4400 50  0001 C CNN
 F 1 "GND" H 10850 4500 50  0000 C CNN
 F 2 "" H 10850 4650 50  0001 C CNN
 F 3 "" H 10850 4650 50  0001 C CNN
@@ -816,4 +792,65 @@ $EndComp
 Wire Wire Line
 	10850 4200 10850 4350
 Connection ~ 10150 4200
+$Comp
+L Conn_01x01 J7
+U 1 1 5A046ABF
+P 6000 7350
+F 0 "J7" H 6000 7450 50  0000 C CNN
+F 1 "M3" H 6000 7250 50  0000 C CNN
+F 2 "Mounting_Holes:MountingHole_3.2mm_M3" H 6000 7350 50  0001 C CNN
+F 3 "" H 6000 7350 50  0001 C CNN
+	1    6000 7350
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Conn_01x01 J6
+U 1 1 5A046B30
+P 6300 7350
+F 0 "J6" H 6300 7450 50  0000 C CNN
+F 1 "M3" H 6300 7250 50  0000 C CNN
+F 2 "Mounting_Holes:MountingHole_3.2mm_M3" H 6300 7350 50  0001 C CNN
+F 3 "" H 6300 7350 50  0001 C CNN
+	1    6300 7350
+	0    -1   -1   0   
+$EndComp
+$Comp
+L Conn_01x01 J5
+U 1 1 5A046BA2
+P 6600 7350
+F 0 "J5" H 6600 7450 50  0000 C CNN
+F 1 "M3" H 6600 7250 50  0000 C CNN
+F 2 "Mounting_Holes:MountingHole_3.2mm_M3" H 6600 7350 50  0001 C CNN
+F 3 "" H 6600 7350 50  0001 C CNN
+	1    6600 7350
+	0    -1   -1   0   
+$EndComp
+Text Notes 5600 7200 0    60   ~ 0
+Mounting holes
+$Comp
+L Conn_01x01 J8
+U 1 1 5A0469DA
+P 5700 7350
+F 0 "J8" H 5700 7450 50  0000 C CNN
+F 1 "M3" H 5700 7250 50  0000 C CNN
+F 2 "Mounting_Holes:MountingHole_3.2mm_M3" H 5700 7350 50  0001 C CNN
+F 3 "" H 5700 7350 50  0001 C CNN
+	1    5700 7350
+	0    -1   -1   0   
+$EndComp
+NoConn ~ 6600 7550
+NoConn ~ 6300 7550
+NoConn ~ 6000 7550
+NoConn ~ 5700 7550
+$Comp
+L Conn_01x01 J1
+U 1 1 5A049A8A
+P 1450 2050
+F 0 "J1" H 1450 2150 50  0000 C CNN
+F 1 "V_BAT_1S" H 1450 1950 50  0000 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x01_Pitch2.54mm" H 1450 2050 50  0001 C CNN
+F 3 "" H 1450 2050 50  0001 C CNN
+	1    1450 2050
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
