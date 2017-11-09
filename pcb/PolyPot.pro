@@ -1,4 +1,4 @@
-update=2017 November 05, Sunday 18:35:25
+update=2017 November 09, Thursday 14:27:06
 version=1
 last_client=kicad
 [pcbnew]
@@ -27,7 +27,7 @@ NetIExt=net
 version=1
 [eeschema]
 version=1
-LibDir=ESP32-kiCAD-Footprints/ESP32-Footprints
+LibDir=lib_sch
 [eeschema/libraries]
 LibName1=power
 LibName2=device
@@ -58,6 +58,14 @@ LibName26=opto
 LibName27=atmel
 LibName28=contrib
 LibName29=valves
-LibName30=ESP32-kiCAD-Footprints/ESP32-Footprints/ESP32-footprints-Shem-Lib
-LibName31=Switch
-LibName32=Motor
+LibName30=lib_sch/PolyPot
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=pdf/
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
