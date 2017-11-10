@@ -1,0 +1,7 @@
+DEBUG = True
+TESTING = True
+
+JSON_AS_ASCII = False
+JSONIFY_PRETTYPRINT_REGULAR = True
+
+SQLALCHEMY_DATABASE_URI = 'sqlite:///polypot.db'
