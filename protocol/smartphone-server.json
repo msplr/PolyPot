@@ -1,0 +1,13 @@
+{
+    "commands": [
+        {
+            "type": "water"
+        }
+    ], 
+    "configuration": {
+        "logging_interval": 900, 
+        "sending_interval": 3600, 
+        "target_soil_moisture": 50, 
+        "water_volume_pumped": 250
+    }
+}
