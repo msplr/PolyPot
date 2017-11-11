@@ -30,6 +30,7 @@ The JSON file follows the following convention:
 The root JSON object has the following members:
  - "data": an array containing objects representing all the data recorded by the Pot stored on the Server. See "Data object" section for details.
  - "notifications": an array containing notifications. See "Notification object" section for details.
+ - "configuration": an object containing the configuration. See "Configuration object" section for details.
  
 ### Smartphone to Server communication
 
@@ -48,7 +49,7 @@ The root JSON object has the following members:
 ### Data object
 
 Each data object has the following members:
- - "datetime": a string representing the date and the time when the measures where made, following the ISO 8601 standard.
+ - "datetime": a string representing the date and the time (UTC) when the measures where made, following the ISO 8601 standard.
  - "soil_moisture": a float number representing the soil moisture, in percents.
  - "temperature": a float number representing the temperature, in degree Celsius.
  - "luminosity": an integer number representing the luminosity, in lux.

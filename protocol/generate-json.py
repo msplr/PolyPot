@@ -58,6 +58,7 @@ with open('server-smartphone.json', 'w+') as f:
     json_content = {}
     json_content['data'] = generate_data(4*24)
     json_content['notifications'] = generate_notifications()
+    json_content['configuration'] = generate_configuration()
     f.write(json.dumps(json_content, sort_keys=True, indent=4))
     
 with open('smartphone-server.json', 'w+') as f:
