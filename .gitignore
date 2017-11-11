@@ -1,2 +1,5 @@
 # SQLite DBs
 *.db
+
+# Python cache
+__pycache__

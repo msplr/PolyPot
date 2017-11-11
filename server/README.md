@@ -13,7 +13,7 @@ virtualenv-3.6 ~/.virtualenv/polypot
 source ~/.virtualenv/polypot/bin/activate
 cd app
 pip install -r requirements.txt
-POLYPOT_SETTINGS=config-dev.py python polypot_server.py
+PYTHONDONTWRITEBYTECODE=True POLYPOT_SETTINGS=config-dev.py python polypot_server.py
 ```
 
 ## Docker
@@ -30,6 +30,8 @@ docker run --rm -it -p 127.0.0.1:5000:5000 -v $(pwd):/polypot/db:Z polypot
 You can test the server using the following commands:
 
 ```
-curl -v localhost:5000/send-data -d @../protocol/pot-server.json -H "Content-Type: application/json"
-curl -v localhost:5000/get-data
+curl -v localhost:5000/setup
+curl -v localhost:5000/send-commands-and-configuration/1 -d @../protocol/smartphone-server.json -H "Content-Type: application/json"
+curl -v localhost:5000/send-data/1 -d @../protocol/pot-server.json -H "Content-Type: application/json"
+curl -v localhost:5000/get-data/1
 ```
