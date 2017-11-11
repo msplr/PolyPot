@@ -8,7 +8,7 @@ import datetime
 def generate_data(tot):
     data = []
     today = datetime.datetime.utcnow()
-    
+
     for i in range(0,tot):
         measure = {}
         measure['datetime']      = (today + datetime.timedelta(seconds=15*60*i)).strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -17,9 +17,9 @@ def generate_data(tot):
         measure['luminosity']    = int(random.uniform(900, 1100))
         measure['water_level']   = int(80 - 40*i/tot + random.uniform(-20/tot, 20/tot))
         measure['plant_watered'] = True if random.uniform(0, 1) >= 0.9 else False
-        
+
         data.append(measure)
-        
+
     return data
 
 def generate_notifications():
@@ -53,14 +53,14 @@ with open('pot-server.json', 'w+') as f:
     json_content = {}
     json_content['data'] = generate_data(4)
     f.write(json.dumps(json_content, sort_keys=True, indent=4))
-    
+
 with open('server-smartphone.json', 'w+') as f:
     json_content = {}
     json_content['data'] = generate_data(4*24)
     json_content['notifications'] = generate_notifications()
     json_content['configuration'] = generate_configuration()
     f.write(json.dumps(json_content, sort_keys=True, indent=4))
-    
+
 with open('smartphone-server.json', 'w+') as f:
     json_content = {}
     json_content['configuration'] = generate_configuration()
