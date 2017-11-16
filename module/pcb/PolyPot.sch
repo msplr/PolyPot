@@ -478,16 +478,22 @@ $EndComp
 Wire Wire Line
 	1100 1150 1450 1150
 Wire Wire Line
-	1650 1150 2000 1150
+	1650 1150 1850 1150
+Wire Wire Line
+	1850 1150 2000 1150
 Connection ~ 1850 1150
 Connection ~ 2750 1150
 Connection ~ 2300 1450
 Wire Wire Line
-	1850 1450 2750 1450
+	1850 1450 2300 1450
+Wire Wire Line
+	2300 1450 2750 1450
 Wire Wire Line
 	2300 1550 2300 1450
 Wire Wire Line
-	2600 1150 2950 1150
+	2600 1150 2750 1150
+Wire Wire Line
+	2750 1150 2950 1150
 Wire Wire Line
 	2650 4150 2650 4250
 Wire Wire Line
@@ -503,7 +509,11 @@ Wire Wire Line
 Wire Wire Line
 	7450 5850 7450 5950
 Wire Wire Line
-	7250 5950 8150 5950
+	7250 5950 7450 5950
+Wire Wire Line
+	7450 5950 7700 5950
+Wire Wire Line
+	7700 5950 8150 5950
 Wire Wire Line
 	1750 4350 2650 4350
 Wire Wire Line
@@ -521,7 +531,9 @@ Wire Wire Line
 Wire Wire Line
 	9400 2150 10100 2150
 Wire Wire Line
-	7600 2850 7800 2850
+	7600 2850 7700 2850
+Wire Wire Line
+	7700 2850 7800 2850
 Wire Wire Line
 	7700 2850 7700 2650
 Wire Wire Line
@@ -530,11 +542,15 @@ Connection ~ 7700 2850
 Wire Wire Line
 	7600 3150 7600 3350
 Wire Wire Line
-	7050 3350 8250 3350
+	7050 3350 7600 3350
+Wire Wire Line
+	7600 3350 8250 3350
 Wire Wire Line
 	7800 3150 7800 3200
 Wire Wire Line
-	7250 3200 8250 3200
+	7250 3200 7800 3200
+Wire Wire Line
+	7800 3200 8250 3200
 Wire Wire Line
 	6650 1450 6650 1550
 Wire Wire Line
@@ -589,7 +605,11 @@ F 3 "" H 7450 4700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	7200 5050 8150 5050
+	7200 5050 7450 5050
+Wire Wire Line
+	7450 5050 7700 5050
+Wire Wire Line
+	7700 5050 8150 5050
 $Comp
 L GND #PWR017
 U 1 1 59FFF399
@@ -704,7 +724,9 @@ $EndComp
 Text Label 9100 5150 0    60   ~ 0
 3V3_SENSORS
 Wire Wire Line
-	9100 5150 10450 5150
+	9100 5150 9750 5150
+Wire Wire Line
+	9750 5150 10450 5150
 Wire Wire Line
 	9750 5150 9750 5200
 Text Label 8650 5500 0    60   ~ 0
@@ -727,7 +749,9 @@ F 3 "" H 9200 5950 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	9200 5800 9200 5950
+	9200 5800 9200 5900
+Wire Wire Line
+	9200 5900 9200 5950
 Connection ~ 9200 5900
 Text Notes 10200 6350 0    60   ~ 0
 Temperature sensor\naddress:\n0x48 (7bit)
@@ -937,7 +961,11 @@ $EndComp
 Wire Wire Line
 	6700 4250 6800 4250
 Wire Wire Line
-	7200 4250 8350 4250
+	7200 4250 7400 4250
+Wire Wire Line
+	7400 4250 7650 4250
+Wire Wire Line
+	7650 4250 8350 4250
 $Comp
 L R R9
 U 1 1 5A0B64BA
@@ -1026,8 +1054,6 @@ F 3 "" H 10300 1300 50  0001 C CNN
 $EndComp
 Text Label 1750 4950 0    60   ~ 0
 SENS_LUMINOSITY
-Text Notes 1050 7100 0    60   ~ 0
-TODO:\n- choose motor NMOS
 $Comp
 L AP7365-XXEG_SOT223 U1
 U 1 1 5A0DAEAA
