@@ -2,13 +2,34 @@
 
 ## Setup
 
+### Pot and Smartphone
+
+When the Pot is started for the first time, it MUST setup a Wi-Fi Access Point (AP) with the ssid "PolyPot" and the password "setup".
+(Note: a default password, even known by other parties, allow to have an encrypted communication between the Pot and the Smartphone.)
+
+The Pot IP MUST be 192.168.1.1.
+
+The Smartphone configure the Pot through the AP and send an HTTP POST request containing a JSON-encoded payload.
+
+The Smartphone MUST generate an UUID for the Pot.
+
+The URL to be called is /wifi-ssid-and-password.
+
+The JSON request MUST have the following top-level members:
+ - "ssid": the ssid of the User's Wi-Fi.
+ - "password": the password of the User's Wi-Fi.
+ - "uuid": the UUID the pot will use.
+
+### Pot and Server
+
 The Pot registers with the Server through an HTTP GET request. The response is a JSON response containing the configuration and the Pot ID.
 
-The URL to be called is /setup
+The URL to be called is /setup/<uuid:pot_id>
+
+If the UUID already exist in the database, the Server MUST return an error and the Pot MUST restart the setup procedure.
 
 The JSON response MUST have the following top-level members:
  - "configuration": an Configuration object, containing the configuration of the Pot. See "Configuration object" section for details.
- - "id": the ID the Pot will use for all subsequent requests.
 
 ## Communications paths
 
@@ -16,7 +37,7 @@ The JSON response MUST have the following top-level members:
 
 The Pot send new data to the Server through an HTTP POST request containing a JSON-encoded payload. The response is a JSON response containing the configuration and the pending commands.
 
-The URL to be called is /send-data/<int:pot_id>
+The URL to be called is /send-data/<uuid:pot_id>
 
 The JSON request MAY have the following top-level members:
  - "data": a single Data object or an array of Data objects, representing the data recorded by the Pot. See "Data object" section for details.
@@ -27,20 +48,19 @@ The JSON response MUST have the following top-level members:
 
 ### Server to Smartphone communication
 
-The Smartphone ask for the data to the Server through an HTTP GET request. The response is a JSON response containing the data, the configuration of the Pot and notifications.
+The Smartphone ask for the data to the Server through an HTTP GET request. The response is a JSON response containing the data and the configuration of the Pot.
 
-The URL to be called is /get-data/<int:pot_id>
+The URL to be called is /get-data/<uuid:pot_id>
 
 The JSON response MUST have the following top-level members:
  - "data": an array of Data objects, representing all the data recorded by the Pot stored on the Server. See "Data object" section for details.
- - "notifications": an array of Notifications objects. See "Notification object" section for details.
  - "configuration": an Configuration object, containing the configuration of the Pot. See "Configuration object" section for details.
 
 ### Smartphone to Server communication
 
 The Smartphone send new commands to the Server through an HTTP POST request containing a JSON-encoded payload.
 
-The URL to be called is /send-commands-and-configuration/<int:pot_id>
+The URL to be called is /send-c-and-c/<uuid:pot_id>
 
 The JSON request MAY have the following top-level members:
  - "configuration": an Configuration object, containing the configuration of the Pot. See "Configuration object" section for details.
@@ -76,9 +96,3 @@ A Command object MAY have the following members:
 
 The following type are available:
  - "water": water the plant immediately.
-
-### Notification object
-
-A Notification object MUST have the following members:
- - "text": a string representing the text the Smartphone should show to the user.
- - "level": a string representing the notification level, can be: "info", "alert".
