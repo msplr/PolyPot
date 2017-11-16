@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class Config(db.Model):
-    pot_id               = db.Column(db.Integer, primary_key=True)
+    pot_id               = db.Column(db.String(length=32), primary_key=True)
     target_soil_moisture = db.Column(db.Float, default=50, nullable=False)
     water_volume_pumped  = db.Column(db.Integer, default=150, nullable=False)
     logging_interval     = db.Column(db.Integer, default=900, nullable=False)
@@ -30,7 +30,7 @@ class Config(db.Model):
 
 class Measure(db.Model):
     id            = db.Column(db.Integer, primary_key=True)
-    pot_id        = db.Column(db.Integer, nullable=False, index=True)
+    pot_id        = db.Column(db.String(length=32), nullable=False, index=True)
     datetime      = db.Column(db.DateTime, nullable=False)
     soil_moisture = db.Column(db.Float, nullable=False)
     temperature   = db.Column(db.Float, nullable=False)
@@ -58,7 +58,7 @@ class Measure(db.Model):
 
 class Command(db.Model):
     id     = db.Column(db.Integer, primary_key=True)
-    pot_id = db.Column(db.Integer, nullable=False, index=True)
+    pot_id = db.Column(db.String(length=32), nullable=False, index=True)
     type   = db.Column(db.Text, nullable=False)
     args   = db.Column(db.PickleType, nullable=True)
 

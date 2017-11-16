@@ -1,13 +1,16 @@
 FROM alpine:3.6
 
-ENV POLYPOT_SETTINGS=config-prod.py
+ENV POLYPOT_SETTINGS=config-prod.py GID=1000 UID=1000
 
 RUN BUILD_DEPS="python-dev" \
  && apk -U add \
     $BUILD_DEPS \
-    py-pip
+    py-pip \
+    su-exec
 
 COPY app /polypot
+COPY docker/run.sh /polypot/run.sh
+RUN chmod +x /polypot/run.sh
 
 RUN pip install -r /polypot/requirements.txt \
  && apk del $BUILD_DEPS \
@@ -17,6 +20,4 @@ VOLUME /polypot/db
 
 EXPOSE 5000
 
-WORKDIR /polypot
-ENTRYPOINT ["python"]
-CMD ["polypot_server.py"]
+CMD ["/polypot/run.sh"]

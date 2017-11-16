@@ -30,8 +30,8 @@ docker run --rm -it -p 127.0.0.1:5000:5000 -v $(pwd):/polypot/db:Z polypot
 You can test the server using the following commands:
 
 ```
-curl -v localhost:5000/setup
-curl -v localhost:5000/send-commands-and-configuration/1 -d @../protocol/smartphone-server.json -H "Content-Type: application/json"
-curl -v localhost:5000/send-data/1 -d @../protocol/pot-server.json -H "Content-Type: application/json"
-curl -v localhost:5000/get-data/1
+curl -v localhost:5000/setup/c52562b7-a1f1-4729-8a0f-7ee82aae6a10
+curl -v localhost:5000/send-c-and-c/c52562b7-a1f1-4729-8a0f-7ee82aae6a10 -d @../protocol/smartphone-server.json -H "Content-Type: application/json"
+curl -v localhost:5000/send-data/c52562b7-a1f1-4729-8a0f-7ee82aae6a10 -d @../protocol/pot-server.json -H "Content-Type: application/json"
+curl -v localhost:5000/get-data/c52562b7-a1f1-4729-8a0f-7ee82aae6a10
 ```

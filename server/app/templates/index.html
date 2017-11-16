@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <title>PolyPot</title>
+</head>
+<body>
+    <header>
+        <h1><a href="/"> <img src="{{ url_for('static', filename='logo-title-color.png') }}" alt="PolyPot Logo" height="200"> </a></h1>
+    </header>
+    <main>
+        <p>Welcome to PolyPot!</p>
+
+        <p>Some stats:
+        <ul>
+            <li>Number of pots: {{ stats['pots'] }}</li>
+            <li>Number of measure points: {{ stats['measures'] }}</li>
+            <li>Number of commands: {{ stats['commands'] }}</li>
+        </ul>
+        </p>
+
+        <p>
+        Source code can be found on <a href="//github.com/nuft/PolyPot">Github</a>.<br/>
+        See <a href="//github.com/nuft/PolyPot/blob/master/protocol/Protocol%20specification.md">Protocol specification</a> to know how to use this web site.
+        </p>
+    </main>
+</body>
+</html>
