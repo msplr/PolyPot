@@ -51,7 +51,7 @@ def send_data(pot_id):
 
     # Send commands & configuration
     json_content = {}
-    json_content['configuration'] = Config.query.get(pot_id.hex).to_dict()
+    json_content['configuration'] = Config.query.filter_by(pot_id=pot_id.hex).one().to_dict()
     json_content['commands'] = []
 
     for command in Command.query.filter_by(pot_id=pot_id.hex).all():
@@ -73,7 +73,7 @@ def get_data(pot_id):
         json_content['data'].append(measure.to_dict())
 
     # Send configuration
-    json_content['configuration'] = Config.query.get(pot_id.hex).to_dict()
+    json_content['configuration'] = Config.query.filter_by(pot_id=pot_id.hex).one().to_dict()
 
     return jsonify(json_content)
 
@@ -89,7 +89,7 @@ def send_commands_and_configuration(pot_id):
 
     # Store configuration
     if 'configuration' in json_content:
-        config = Config.query.get(pot_id.hex)
+        config = Config.query.filter_by(pot_id=pot_id.hex).one()
         config.from_dict(json_content['configuration'])
 
     # Store commands

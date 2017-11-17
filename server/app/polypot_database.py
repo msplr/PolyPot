@@ -8,7 +8,8 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class Config(db.Model):
-    pot_id               = db.Column(db.String(length=32), primary_key=True)
+    id                   = db.Column(db.Integer, primary_key=True)
+    pot_id               = db.Column(db.String(length=32), nullable=False, index=True, unique=True)
     target_soil_moisture = db.Column(db.Float, default=50, nullable=False)
     water_volume_pumped  = db.Column(db.Integer, default=150, nullable=False)
     logging_interval     = db.Column(db.Integer, default=900, nullable=False)
