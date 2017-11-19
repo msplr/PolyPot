@@ -50,7 +50,9 @@ The JSON response MUST have the following top-level members:
 
 The Smartphone ask for the data to the Server through an HTTP GET request. The response is a JSON response containing the data and the configuration of the Pot.
 
-The URL to be called is /get-data/<uuid:pot_id>
+The URL to be called is /get-data/<uuid:pot_id>?from=<from_datetime>&to=<to_datetime>
+
+The "from" and "to" fields are optional, are used to limit the data returned by the Server and follow the ISO 8601 standard.
 
 The JSON response MUST have the following top-level members:
  - "data": an array of Data objects, representing all the data recorded by the Pot stored on the Server. See "Data object" section for details.

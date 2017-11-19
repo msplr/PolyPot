@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import datetime
+
 from flask import Flask, request, jsonify, render_template
 from polypot_database import *
 
@@ -51,10 +53,13 @@ def send_data(pot_id):
 
     # Send commands & configuration
     json_content = {}
-    json_content['configuration'] = Config.query.filter_by(pot_id=pot_id.hex).one().to_dict()
-    json_content['commands'] = []
 
-    for command in Command.query.filter_by(pot_id=pot_id.hex).all():
+    config = Config.query.filter_by(pot_id=pot_id.hex).one()
+    json_content['configuration'] = config.to_dict()
+
+    json_content['commands'] = []
+    commands = Command.query.filter_by(pot_id=pot_id.hex).all()
+    for command in commands:
         json_content['commands'].append(command.to_dict())
         db.session.delete(command)
 
@@ -67,13 +72,21 @@ def send_data(pot_id):
 def get_data(pot_id):
     json_content = {}
 
-    # Send all data stored
+    begin = request.args.get('from')
+    end   = request.args.get('to')
+
+    begin = datetime.datetime.strptime(begin, '%Y-%m-%dT%H:%M:%SZ') if begin else datetime.datetime(datetime.MINYEAR, 1, 1, 0, 0, 0)
+    end   = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')   if end   else datetime.datetime(datetime.MAXYEAR, 12, 31, 23, 59, 59)
+
+    # Send data stored
     json_content['data'] = []
-    for measure in Measure.query.filter_by(pot_id=pot_id.hex).order_by(Measure.datetime.asc()).all():
+    measures = Measure.query.filter(Measure.pot_id == pot_id.hex, Measure.datetime >= begin, Measure.datetime < end).order_by(Measure.datetime.asc()).all()
+    for measure in measures:
         json_content['data'].append(measure.to_dict())
 
     # Send configuration
-    json_content['configuration'] = Config.query.filter_by(pot_id=pot_id.hex).one().to_dict()
+    config = Config.query.filter_by(pot_id=pot_id.hex).one()
+    json_content['configuration'] = config.to_dict()
 
     return jsonify(json_content)
 
