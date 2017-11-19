@@ -9,23 +9,42 @@
 </head>
 <body>
     <header>
-        <h1><a href="/"> <img src="{{ url_for('static', filename='logo-title-color.png') }}" alt="PolyPot Logo" height="200"> </a></h1>
+        <a href="/"><img src="{{ url_for('static', filename='logo-title-color.png') }}" alt="PolyPot Logo" id="logo"></a>
     </header>
     <main>
-        <p>Welcome to PolyPot!</p>
+        <div id="welcome">
+            <h1>Welcome to PolyPot!</h1>
+        </div>
 
-        <p>Some stats:
-        <ul>
-            <li>Number of pots: {{ stats['pots'] }}</li>
-            <li>Number of measure points: {{ stats['measures'] }}</li>
-            <li>Number of commands: {{ stats['commands'] }}</li>
-        </ul>
-        </p>
+        <div id="stats">
+            <h2>Some stats</h2>
+            <p>
+            <ul>
+                <li>Number of pots: {{ stats['pots'] }}</li>
+                <li>Number of measure points: {{ stats['measures'] }}</li>
+                <li>Number of commands: {{ stats['commands'] }}</li>
+            </ul>
+            </p>
+        </div>
 
-        <p>
-        Source code can be found on <a href="//github.com/nuft/PolyPot">Github</a>.<br/>
-        See <a href="//github.com/nuft/PolyPot/blob/master/protocol/Protocol%20specification.md">Protocol specification</a> to know how to use this web site.
-        </p>
+         <div id="design">
+            <h2>The design</h2>
+            <p>
+            Soon.
+            </p>
+        </div>
+
+        <div id="mobile">
+            <h2>Mobile App</h2>
+            <p>
+            A Mobile App will soon be available.
+            </p>
+        </div>
     </main>
+    <footer>
+        <p>
+        Source code can be found on <a href="//github.com/nuft/PolyPot">Github</a>. See <a href="//github.com/nuft/PolyPot/blob/master/protocol/Protocol%20specification.md">Protocol specification</a> to know how to use this web site.
+        </p>
+    </footer>
 </body>
 </html>

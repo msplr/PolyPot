@@ -1,0 +1,120 @@
+html {
+    font-size: 62.5%;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    background: #ffffff;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+/*     height: 8rem; */
+    background: #eeeeee;
+    margin: 0;
+    padding: 1rem;
+
+    text-align: center;
+    vertical-align: center;
+
+    flex-shrink: 0;
+}
+
+#logo {
+    width: 500px;
+    max-width: 90vw;
+}
+
+
+main {
+    padding: 0.4rem;
+
+    flex-grow: 1;
+    flex-shrink: 0;
+
+    display: grid;
+
+    grid-template-columns: auto auto;
+    grid-template-rows: min-content auto auto;
+}
+
+footer {
+/*     height: 8rem; */
+    background: #eeeeee;
+    margin: 0;
+    padding: 0.8rem;
+
+    text-align: center;
+
+    flex-shrink: 0;
+}
+
+div {
+    background: #eeeeee;
+    padding: 0.8rem 1.6rem;
+    border-radius: 0.8rem;
+    margin: 0.4rem;
+}
+
+#welcome {
+    grid-row: 1 / span 1;
+    grid-column: 1 / span 2;
+}
+
+#stats {
+    grid-row: 2 / span 1;
+    grid-column: 1 / span 1;
+}
+
+#design {
+    grid-row: 3 / span 1;
+    grid-column: 1 / span 1;
+}
+
+
+#mobile {
+    grid-row: 2 / span 2;
+    grid-column: 2 / span 1;
+}
+
+
+h1 {
+    text-align: center;
+    font-size: 4.8rem;
+    margin: 0;
+}
+
+h2 {
+    font-size: 3.2rem;
+    margin: 0;
+    margin-bottom: 0.8rem;
+}
+
+p {
+    font-size: 1.6rem;
+    margin: 0;
+    padding: 0;
+}
+
+ul {
+    font-size: 1.6rem;
+}
+
+a {
+    text-decoration: none;
+    font-style: italic;
+    color: black;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+
