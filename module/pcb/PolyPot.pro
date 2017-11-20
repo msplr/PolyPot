@@ -1,4 +1,4 @@
-update=2017 November 09, Thursday 14:27:06
+update=20.11.2017 19:04:01
 version=1
 last_client=kicad
 [pcbnew]
@@ -25,9 +25,19 @@ version=1
 NetIExt=net
 [general]
 version=1
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=pdf/
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceForceRefPrefix=0
+SpiceUseNetNumbers=0
+LabSize=60
 [eeschema]
 version=1
-LibDir=lib_sch
+LibDir=lib_sch;ESP32-kiCAD-Footprints-master/ESP32-Footprints
 [eeschema/libraries]
 LibName1=power
 LibName2=device
@@ -59,13 +69,5 @@ LibName27=atmel
 LibName28=contrib
 LibName29=valves
 LibName30=lib_sch/PolyPot
-[schematic_editor]
-version=1
-PageLayoutDescrFile=
-PlotDirectoryName=pdf/
-SubpartIdSeparator=0
-SubpartFirstId=65
-NetFmtName=
-SpiceForceRefPrefix=0
-SpiceUseNetNumbers=0
-LabSize=60
+LibName31=ESP32-kiCAD-Footprints-master/ESP32-Footprints/ESP32-footprints-Shem-Lib
+LibName32=ESP32-kiCAD-Footprints-master/ESP32-Footprints/espressif-xess
