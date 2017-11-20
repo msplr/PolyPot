@@ -909,7 +909,7 @@ Text Notes 1200 4750 0    60   ~ 0
 Text Label 1750 5050 0    60   ~ 0
 USER_BTN
 Text Label 8350 4250 2    60   ~ 0
-USER_BUTTON
+USER_BTN
 Wire Wire Line
 	1750 5050 2650 5050
 $Comp
