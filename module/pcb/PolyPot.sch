@@ -29,6 +29,7 @@ LIBS:atmel
 LIBS:contrib
 LIBS:valves
 LIBS:PolyPot
+LIBS:PolyPot-cache
 EELAYER 25 0
 EELAYER END
 $Descr A4 11693 8268
@@ -49,7 +50,7 @@ U 1 1 59FEEA16
 P 1100 1350
 F 0 "BT1" H 1200 1450 50  0000 L CNN
 F 1 "Battery" H 1200 1350 50  0000 L CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x02_Pitch2.54mm" V 1100 1410 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" V 1100 1410 50  0001 C CNN
 F 3 "" V 1100 1410 50  0001 C CNN
 	1    1100 1350
 	1    0    0    -1  
@@ -192,7 +193,7 @@ U 1 1 59FF5D46
 P 1550 1150
 F 0 "JP1" H 1550 1230 50  0000 C CNN
 F 1 "I_SENSE" H 1560 1090 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x02_Pitch1.27mm" H 1550 1150 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 1550 1150 50  0001 C CNN
 F 3 "" H 1550 1150 50  0001 C CNN
 	1    1550 1150
 	1    0    0    -1  
@@ -275,9 +276,9 @@ F 3 "" H 7800 3000 50  0001 C CNN
 	1    7800 3000
 	1    0    0    -1  
 $EndComp
-Text Label 8250 3350 2    60   ~ 0
+Text Label 7050 3300 0    60   ~ 0
 I2C_SDA
-Text Label 8250 3200 2    60   ~ 0
+Text Label 7050 3200 0    60   ~ 0
 I2C_SCL
 $Comp
 L Q_PMOS_GSD Q2
@@ -285,7 +286,7 @@ U 1 1 59FF9CBF
 P 7750 1400
 F 0 "Q2" H 7950 1450 50  0000 L CNN
 F 1 "PMV250EPEAR" H 7950 1350 50  0000 L CNN
-F 2 "TO_SOT_Packages_SMD:SOT-23" H 7950 1500 50  0001 C CNN
+F 2 "TO_SOT_Packages_SMD:SOT-23_Handsoldering" H 7950 1500 50  0001 C CNN
 F 3 "" H 7750 1400 50  0001 C CNN
 	1    7750 1400
 	0    1    -1   0   
@@ -317,34 +318,12 @@ F 3 "" H 7400 1200 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L TEST TP2
-U 1 1 59FFB685
-P 7250 3200
-F 0 "TP2" H 7250 3500 50  0000 C BNN
-F 1 "TEST" H 7250 3450 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x01_Pitch1.27mm" H 7250 3200 50  0001 C CNN
-F 3 "" H 7250 3200 50  0001 C CNN
-	1    7250 3200
-	1    0    0    -1  
-$EndComp
-$Comp
-L TEST TP1
-U 1 1 59FFB782
-P 7050 3350
-F 0 "TP1" H 7050 3650 50  0000 C BNN
-F 1 "TEST" H 7050 3600 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x01_Pitch1.27mm" H 7050 3350 50  0001 C CNN
-F 3 "" H 7050 3350 50  0001 C CNN
-	1    7050 3350
-	1    0    0    -1  
-$EndComp
-$Comp
 L Jumper_NC_Small JP2
 U 1 1 59FFBC93
 P 8200 1300
 F 0 "JP2" H 8200 1380 50  0000 C CNN
 F 1 "I_SENSE" H 8210 1240 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x02_Pitch1.27mm" H 8200 1300 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 8200 1300 50  0001 C CNN
 F 3 "" H 8200 1300 50  0001 C CNN
 	1    8200 1300
 	1    0    0    -1  
@@ -374,7 +353,7 @@ U 1 1 59FFCFC3
 P 10300 3050
 F 0 "J4" H 10300 3350 50  0000 C CNN
 F 1 "TOF_DIST_SENS" H 10300 2750 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x05_Pitch2.00mm" H 10300 3050 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x05_Pitch2.54mm" H 10300 3050 50  0001 C CNN
 F 3 "" H 10300 3050 50  0001 C CNN
 	1    10300 3050
 	1    0    0    -1  
@@ -387,7 +366,7 @@ U 1 1 59FFE87B
 P 6100 1500
 F 0 "M1" H 6200 1600 50  0000 L CNN
 F 1 "DC_WATER_PUMP" H 6200 1300 50  0000 L TNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x02_Pitch2.54mm" H 6100 1410 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 6100 1410 50  0001 C CNN
 F 3 "" H 6100 1410 50  0001 C CNN
 	1    6100 1500
 	1    0    0    -1  
@@ -466,31 +445,9 @@ U 1 1 5A044983
 P 10300 2150
 F 0 "J3" H 10300 2350 50  0000 C CNN
 F 1 "HUMIDITY_CONN" H 10300 1950 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x03_Pitch2.00mm" H 10300 2150 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm" H 10300 2150 50  0001 C CNN
 F 3 "" H 10300 2150 50  0001 C CNN
 	1    10300 2150
-	1    0    0    -1  
-$EndComp
-$Comp
-L TEST TP3
-U 1 1 5A0459F4
-P 7700 5050
-F 0 "TP3" H 7700 5350 50  0000 C BNN
-F 1 "TEST" H 7700 5300 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x01_Pitch1.27mm" H 7700 5050 50  0001 C CNN
-F 3 "" H 7700 5050 50  0001 C CNN
-	1    7700 5050
-	1    0    0    -1  
-$EndComp
-$Comp
-L TEST TP4
-U 1 1 5A045AFD
-P 7700 5950
-F 0 "TP4" H 7700 6250 50  0000 C BNN
-F 1 "TEST" H 7700 6200 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x01_Pitch1.27mm" H 7700 5950 50  0001 C CNN
-F 3 "" H 7700 5950 50  0001 C CNN
-	1    7700 5950
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -542,7 +499,7 @@ U 1 1 5A0498AC
 P 10300 4250
 F 0 "J2" H 10300 4550 50  0000 C CNN
 F 1 "PROG/DEBUG" H 10300 3850 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x06_Pitch2.00mm" H 10300 4250 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x06_Pitch2.00mm" H 10300 4250 50  0001 C CNN
 F 3 "" H 10300 4250 50  0001 C CNN
 	1    10300 4250
 	1    0    0    -1  
@@ -629,7 +586,7 @@ U 1 1 5A049A8A
 P 1450 2050
 F 0 "J1" H 1450 2150 50  0000 C CNN
 F 1 "V_BAT_1S" H 1450 1950 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x01_Pitch2.54mm" H 1450 2050 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x01" H 1450 2050 50  0001 C CNN
 F 3 "" H 1450 2050 50  0001 C CNN
 	1    1450 2050
 	1    0    0    -1  
@@ -719,17 +676,6 @@ F 3 "" H 7400 3950 50  0001 C CNN
 	1    7400 3950
 	1    0    0    -1  
 $EndComp
-$Comp
-L TEST TP5
-U 1 1 5A0B64C6
-P 7650 4250
-F 0 "TP5" H 7650 4550 50  0000 C BNN
-F 1 "TEST" H 7650 4500 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x01_Pitch1.27mm" H 7650 4250 50  0001 C CNN
-F 3 "" H 7650 4250 50  0001 C CNN
-	1    7650 4250
-	1    0    0    -1  
-$EndComp
 Text Label 9300 1200 0    60   ~ 0
 3V3_SENSORS
 $Comp
@@ -751,7 +697,7 @@ U 1 1 5A0B929C
 P 10300 1300
 F 0 "J9" H 10300 1500 50  0000 C CNN
 F 1 "LUMINOSITY_CONN" H 10300 1100 50  0000 C CNN
-F 2 "Socket_Strips:Socket_Strip_Straight_1x03_Pitch2.00mm" H 10300 1300 50  0001 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x03_Pitch2.54mm" H 10300 1300 50  0001 C CNN
 F 3 "" H 10300 1300 50  0001 C CNN
 	1    10300 1300
 	1    0    0    -1  
@@ -996,8 +942,6 @@ Wire Wire Line
 Wire Wire Line
 	7450 5850 7450 5950
 Wire Wire Line
-	7250 5950 8150 5950
-Wire Wire Line
 	9650 4150 10100 4150
 Wire Wire Line
 	9650 4250 10100 4250
@@ -1019,13 +963,13 @@ Wire Wire Line
 	7700 2650 8300 2650
 Connection ~ 7700 2850
 Wire Wire Line
-	7600 3150 7600 3350
+	7600 3150 7600 3300
 Wire Wire Line
-	7050 3350 8250 3350
+	7050 3300 8100 3300
 Wire Wire Line
 	7800 3150 7800 3200
 Wire Wire Line
-	7250 3200 8250 3200
+	7050 3200 8100 3200
 Wire Wire Line
 	7400 1200 7400 1300
 Wire Wire Line
@@ -1039,7 +983,7 @@ Connection ~ 7750 1600
 Wire Wire Line
 	7750 1800 7100 1800
 Connection ~ 7800 3200
-Connection ~ 7600 3350
+Connection ~ 7600 3300
 Wire Wire Line
 	9050 1300 8300 1300
 Wire Wire Line
@@ -1062,8 +1006,6 @@ Wire Wire Line
 Wire Wire Line
 	6700 5050 6800 5050
 Connection ~ 7450 5050
-Connection ~ 7700 5950
-Connection ~ 7700 5050
 Wire Wire Line
 	9100 5150 10450 5150
 Wire Wire Line
@@ -1086,10 +1028,7 @@ Wire Wire Line
 	4400 5550 4400 5700
 Wire Wire Line
 	6700 4250 6800 4250
-Wire Wire Line
-	7200 4250 8350 4250
 Connection ~ 7400 4250
-Connection ~ 7650 4250
 Wire Wire Line
 	9300 1200 10100 1200
 Wire Wire Line
@@ -1188,4 +1127,19 @@ NoConn ~ 3000 4800
 NoConn ~ 3000 5000
 Wire Wire Line
 	2900 3700 3000 3700
+Wire Wire Line
+	7200 4250 8350 4250
+Wire Wire Line
+	7250 5950 8150 5950
+$Comp
+L Conn_01x02 J10
+U 1 1 5A17AFB6
+P 8300 3200
+F 0 "J10" H 8300 3300 50  0000 C CNN
+F 1 "I2C_TEST" H 8300 3000 50  0000 C CNN
+F 2 "Pin_Headers:Pin_Header_Straight_1x02_Pitch2.54mm" H 8300 3200 50  0001 C CNN
+F 3 "" H 8300 3200 50  0001 C CNN
+	1    8300 3200
+	1    0    0    -1  
+$EndComp
 $EndSCHEMATC
