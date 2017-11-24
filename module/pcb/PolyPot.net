@@ -1,7 +1,7 @@
 (export (version D)
   (design
     (source "/Users/mi/workspace/EPFL/MICRO-406 Products Design and System Engineering/PolyPot/polypot/module/pcb/PolyPot.sch")
-    (date "2017 November 24, Friday 02:15:11")
+    (date "2017 November 24, Friday 02:21:40")
     (tool "Eeschema 4.0.7")
     (sheet (number 1) (name /) (tstamps /)
       (title_block
@@ -489,10 +489,10 @@
         (pin (num 1) (name 1) (type passive))
         (pin (num 2) (name 2) (type passive)))))
   (libraries
-    (library (logical conn)
-      (uri "/Library/Application Support/kicad/library/conn.lib"))
     (library (logical device)
       (uri "/Library/Application Support/kicad/library/device.lib"))
+    (library (logical conn)
+      (uri "/Library/Application Support/kicad/library/conn.lib"))
     (library (logical PolyPot)
       (uri "/Users/mi/workspace/EPFL/MICRO-406 Products Design and System Engineering/PolyPot/polypot/module/pcb/lib_sch/PolyPot.lib")))
   (nets
@@ -556,14 +556,14 @@
       (node (ref U2) (pin 37))
       (node (ref R9) (pin 2)))
     (net (code 10) (name /SENS_LUMINOSITY)
-      (node (ref U2) (pin 9))
+      (node (ref U2) (pin 7))
       (node (ref J9) (pin 2)))
     (net (code 11) (name /SENS_HUMIDITY)
       (node (ref J3) (pin 2))
       (node (ref U2) (pin 8)))
     (net (code 12) (name /V_BAT_SENSE)
       (node (ref J1) (pin 1))
-      (node (ref U2) (pin 7)))
+      (node (ref U2) (pin 9)))
     (net (code 13) (name /EN)
       (node (ref J2) (pin 4))
       (node (ref U2) (pin 3))

@@ -758,11 +758,11 @@ Text Label 5700 5150 2    60   ~ 0
 GPIO0
 Text Label 2150 4000 0    60   ~ 0
 EN
-Text Label 2150 4400 0    60   ~ 0
+Text Label 2150 4600 0    60   ~ 0
 V_BAT_SENSE
 Text Label 2150 4500 0    60   ~ 0
 SENS_HUMIDITY
-Text Label 2150 4600 0    60   ~ 0
+Text Label 2150 4400 0    60   ~ 0
 SENS_LUMINOSITY
 Text Label 5700 3950 2    60   ~ 0
 USER_BTN
