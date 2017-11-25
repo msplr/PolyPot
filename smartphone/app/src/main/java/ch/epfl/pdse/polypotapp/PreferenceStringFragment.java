@@ -6,9 +6,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView.BufferType;
 
-public class PreferenceNumberFragment extends PreferenceDialogFragmentCompat {
+public class PreferenceStringFragment extends PreferenceDialogFragmentCompat {
 
-    private EditText mNumberEditText;
+    private EditText mStringEditText;
 
     /**
      * Creates a new Instance of the PreferenceEditTextDialogFragment and stores the key of the
@@ -17,8 +17,8 @@ public class PreferenceNumberFragment extends PreferenceDialogFragmentCompat {
      * @param key The key of the related Preference
      * @return A new Instance of the PreferenceEditTextDialogFragment
      */
-    public static PreferenceNumberFragment newInstance(String key) {
-        final PreferenceNumberFragment fragment = new PreferenceNumberFragment();
+    public static PreferenceStringFragment newInstance(String key) {
+        final PreferenceStringFragment fragment = new PreferenceStringFragment();
         final Bundle b = new Bundle(1);
         b.putString(ARG_KEY, key);
         fragment.setArguments(b);
@@ -33,12 +33,12 @@ public class PreferenceNumberFragment extends PreferenceDialogFragmentCompat {
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
 
-        mNumberEditText = (EditText) view.findViewById(R.id.number);
+        mStringEditText = (EditText) view.findViewById(R.id.string);
 
         // Get the value from the related Preference
-        String value = ((PreferenceNumber) getPreference()).getmValue();
+        String value = ((PreferenceString) getPreference()).getmValue();
 
-        mNumberEditText.setText(value, BufferType.EDITABLE);
+        mStringEditText.setText(value, BufferType.EDITABLE);
     }
 
     /**
@@ -50,10 +50,10 @@ public class PreferenceNumberFragment extends PreferenceDialogFragmentCompat {
     public void onDialogClosed(boolean positiveResult) {
         if (positiveResult) {
             // Generate value to save
-            String value = mNumberEditText.getText().toString();
+            String value = mStringEditText.getText().toString();
 
             // Save the value
-            PreferenceNumber preference = (PreferenceNumber) getPreference();
+            PreferenceString preference = (PreferenceString) getPreference();
             preference.setmValue(value);
 
             // Update the summary

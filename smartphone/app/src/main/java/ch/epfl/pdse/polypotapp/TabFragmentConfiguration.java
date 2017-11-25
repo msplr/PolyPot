@@ -29,6 +29,9 @@ public class TabFragmentConfiguration extends PreferenceFragmentCompat {
         } else if (preference instanceof PreferenceNumber) {
             // Create a new instance of the fragment with the key of the related Preference
             dialogFragment = PreferenceNumberFragment.newInstance(preference.getKey());
+        } else if (preference instanceof PreferenceString) {
+            // Create a new instance of the fragment with the key of the related Preference
+            dialogFragment = PreferenceStringFragment.newInstance(preference.getKey());
         }
 
         if (dialogFragment != null) {
