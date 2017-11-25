@@ -39,16 +39,16 @@ public class TabFragmentSummary extends Fragment{
 
     }
 
-    public static void initDataUpdate(JSONArray initData) {
+    public static void initDataUpdate(JSONObject initData) {
         try {
-            JSONObject data = initData.getJSONObject(0);
-            int soilMoisture = (int) Float.parseFloat(data.getString("soil_moisture"));
+
+            int soilMoisture = (int) Float.parseFloat(initData.getString("soil_moisture"));
             mHumidityText.setText(soilMoisture);
-            int temperature = (int) Float.parseFloat(data.getString("temperature"));
+            int temperature = (int) Float.parseFloat(initData.getString("temperature"));
             mTemperatureText.setText(temperature);
-            int water_level = (int) Float.parseFloat(data.getString("water_level"));
+            int water_level = (int) Float.parseFloat(initData.getString("water_level"));
             mWaterLevelText.setText(water_level);
-            int luminosity = (int) Float.parseFloat(data.getString("luminosity"));
+            int luminosity = (int) Float.parseFloat(initData.getString("luminosity"));
             mLuminosityText.setText(luminosity);
 
 

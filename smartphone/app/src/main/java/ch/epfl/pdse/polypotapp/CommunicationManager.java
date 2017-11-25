@@ -23,7 +23,7 @@ public class CommunicationManager {
     private static Context mContext;
 
     private static JSONArray mSensorData;
-    private static JSONArray mInitData;
+    private static JSONObject mInitData;
     private static String mUuid;
     private static String mServer;
 
@@ -54,7 +54,7 @@ public class CommunicationManager {
                     public void onResponse(String response) {
                         try {
                             JSONObject reader = new JSONObject(response.toString());
-                            mInitData = reader.getJSONArray("init");
+                            mInitData = reader.getJSONObject("init");
                             TabFragmentSummary.initDataUpdate(mInitData);
                         }catch (final JSONException e) {
                         }
