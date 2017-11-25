@@ -9,6 +9,6 @@
     <string name="previous_day">Previous day</string>
     <string name="next_day">Next day</string>
     <string name="current_day">Current day</string>
-    <string name="default_uuid">c52562b7-a1f1-4729-8a0f-7ee82aae6a10</string>
-    <string name="default_server">https://polypot.0xf00.ch/</string>
+    <string name="default_uuid">01234567-89ab-cdef-0123-456789abcdef</string>
+    <string name="default_server">https://polypot.0xf00.ch</string>
 </resources>

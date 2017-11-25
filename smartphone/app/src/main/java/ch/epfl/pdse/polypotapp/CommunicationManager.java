@@ -48,13 +48,13 @@ public class CommunicationManager {
     }
 
     public void getLatestData() {
-        StringRequest initRequest = new StringRequest(Request.Method.GET, mServer + "/get-data/" + mUuid,
+        StringRequest initRequest = new StringRequest(Request.Method.GET, mServer + "/get-latest/" + mUuid,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
                             JSONObject reader = new JSONObject(response.toString());
-                            mInitData = reader.getJSONObject("init");
+                            mInitData = reader.getJSONObject("data");
                             TabFragmentSummary.initDataUpdate(mInitData);
                         }catch (final JSONException e) {
                         }
@@ -69,7 +69,7 @@ public class CommunicationManager {
     }
 
     public void getData() {
-        StringRequest dataRequest = new StringRequest(Request.Method.GET, mServer + "get-latest/" + mUuid,
+        StringRequest dataRequest = new StringRequest(Request.Method.GET, mServer + "/get-data/" + mUuid,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -88,7 +88,7 @@ public class CommunicationManager {
         mRequestQueue.add(dataRequest);
     }
 
-    private JSONArray getInitData(){
+    private JSONObject getInitData(){
         return mInitData;
     }
 

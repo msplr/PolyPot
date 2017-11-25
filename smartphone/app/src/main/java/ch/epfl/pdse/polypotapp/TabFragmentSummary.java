@@ -1,7 +1,6 @@
 package ch.epfl.pdse.polypotapp;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,10 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 public class TabFragmentSummary extends Fragment{
 
@@ -37,24 +34,22 @@ public class TabFragmentSummary extends Fragment{
         mLuminosityText = (TextView) getView().findViewById(R.id.luminosity_text);
         mHumidityText = (TextView) getView().findViewById(R.id.humidity_text);
 
+        CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
+        communicationManager.getLatestData();
     }
 
     public static void initDataUpdate(JSONObject initData) {
         try {
-
             int soilMoisture = (int) Float.parseFloat(initData.getString("soil_moisture"));
-            mHumidityText.setText(soilMoisture);
+            mHumidityText.setText(Integer.toString(soilMoisture));
             int temperature = (int) Float.parseFloat(initData.getString("temperature"));
-            mTemperatureText.setText(temperature);
+            mTemperatureText.setText(Integer.toString(temperature));
             int water_level = (int) Float.parseFloat(initData.getString("water_level"));
-            mWaterLevelText.setText(water_level);
+            mWaterLevelText.setText(Integer.toString(water_level));
             int luminosity = (int) Float.parseFloat(initData.getString("luminosity"));
-            mLuminosityText.setText(luminosity);
-
-
+            mLuminosityText.setText(Integer.toString(luminosity));
         }
         catch (final JSONException e) {
             Log.e("ServiceHandler", "No data received from HTTP request");}
     }
-
 }
