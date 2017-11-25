@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.jjoe64.graphview.series.DataPoint;
 
@@ -43,7 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem mPreviousDay;
     private MenuItem mCurrentDay;
     private MenuItem mNextDay;
-    
+
+
     private GregorianCalendar mDate;
     private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -216,15 +218,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static void initDataUpdate(JSONArray initData) {
-        try {
-            JSONObject data = initData.getJSONObject(0);
-            int soilMoisture = (int) Float.parseFloat(data.getString("soil_moisture"));
-
-
-        }
-        catch (final JSONException e) {
-            Log.e("ServiceHandler", "No data received from HTTP request");}
-    }
 
 }

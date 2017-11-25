@@ -55,7 +55,7 @@ public class CommunicationManager {
                         try {
                             JSONObject reader = new JSONObject(response.toString());
                             mInitData = reader.getJSONArray("init");
-                            MainActivity.initDataUpdate(mInitData);
+                            TabFragmentSummary.initDataUpdate(mInitData);
                         }catch (final JSONException e) {
                         }
                     }
@@ -127,7 +127,7 @@ public class CommunicationManager {
     private class mRequestFinishedListener<StringRequest> implements RequestQueue.RequestFinishedListener<StringRequest> {
         @Override
         public void onRequestFinished(Request<StringRequest> request) {
-            MainActivity.initDataUpdate(mInitData);
+    //        MainActivity.initDataUpdate(mInitData);
         }
     }
 
