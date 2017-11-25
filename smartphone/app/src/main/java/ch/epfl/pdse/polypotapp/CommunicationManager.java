@@ -1,8 +1,9 @@
 package ch.epfl.pdse.polypotapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -21,10 +22,10 @@ public class CommunicationManager {
     private static CommunicationManager mInstance;
     private static Context mContext;
 
-    private static JSONArray sensorData;
-    private static JSONArray initData;
-    private static String uuid = "c52562b7-a1f1-4729-8a0f-7ee82aae6a10";
-    private static String get_url ="https://polypot.0xf00.ch/get-data/";
+    private static JSONArray mSensorData;
+    private static JSONArray mInitData;
+    private static String mUuid;
+    private static String mServer;
 
 
     private RequestQueue mRequestQueue;
@@ -32,8 +33,11 @@ public class CommunicationManager {
     private CommunicationManager(Context context) {
         mContext = context;
         mRequestQueue = Volley.newRequestQueue(context);
+    //    mRequestQueue.addRequestFinishedListener(new mRequestFinishedListener());
 
-        mRequestQueue.add(dataRequest);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        mUuid = preferences.getString("uuid", mContext.getString(R.string.default_uuid));
+        mServer = preferences.getString("server", mContext.getString(R.string.default_server));
     }
 
     public static synchronized CommunicationManager getInstance(Context context) {
@@ -43,46 +47,62 @@ public class CommunicationManager {
         return mInstance;
     }
 
-    private StringRequest dataRequest = new StringRequest(Request.Method.GET, get_url+uuid,
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    try {
-                        JSONObject reader = new JSONObject(response.toString());
-                        sensorData = reader.getJSONArray("data");
-                        initData = reader.getJSONArray("init");
-                    }catch (final JSONException e) {
+    public void getLatestData() {
+        StringRequest initRequest = new StringRequest(Request.Method.GET, mServer + "/get-data/" + mUuid,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject reader = new JSONObject(response.toString());
+                            mInitData = reader.getJSONArray("init");
+                            MainActivity.initDataUpdate(mInitData);
+                        }catch (final JSONException e) {
+                        }
                     }
-                }
-            }, new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-        }
-    });
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
 
-
-    private void setUUID(String new_uuid){
-        uuid = new_uuid;
+        mRequestQueue.add(initRequest);
     }
-    private void setGetURL(String new_url){
-        get_url = new_url;
+
+    public void getData() {
+        StringRequest dataRequest = new StringRequest(Request.Method.GET, mServer + "get-latest/" + mUuid,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject reader = new JSONObject(response.toString());
+                            mSensorData = reader.getJSONArray("data");
+                        }catch (final JSONException e) {
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+            }
+        });
+
+        mRequestQueue.add(dataRequest);
     }
 
     private JSONArray getInitData(){
-        return initData;
+        return mInitData;
     }
 
     private JSONArray getSensorData(){
-        return sensorData;
+        return mSensorData;
     }
 
 
     private LineGraphSeries<DataPoint> getGraphSeries(String date, String sensoryInput) {
 
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>();
-        for (int j = 0; j < sensorData.length(); j++){
+        for (int j = 0; j < mSensorData.length(); j++){
             try {
-                JSONObject data = sensorData.getJSONObject(j);
+                JSONObject data = mSensorData.getJSONObject(j);
                 String datadate = data.getString("datetime");
                 String datadateExtract = datadate.substring(0,10);
                 if (datadateExtract.equals(date)){
@@ -101,5 +121,15 @@ public class CommunicationManager {
         }
         return series;
     }
+
+
+
+    private class mRequestFinishedListener<StringRequest> implements RequestQueue.RequestFinishedListener<StringRequest> {
+        @Override
+        public void onRequestFinished(Request<StringRequest> request) {
+            MainActivity.initDataUpdate(mInitData);
+        }
+    }
+
 
 }

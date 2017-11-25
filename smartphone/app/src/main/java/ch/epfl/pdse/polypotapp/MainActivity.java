@@ -12,9 +12,16 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.jjoe64.graphview.series.DataPoint;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -208,4 +215,16 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+
+    public static void initDataUpdate(JSONArray initData) {
+        try {
+            JSONObject data = initData.getJSONObject(0);
+            int soilMoisture = (int) Float.parseFloat(data.getString("soil_moisture"));
+
+
+        }
+        catch (final JSONException e) {
+            Log.e("ServiceHandler", "No data received from HTTP request");}
+    }
+
 }
