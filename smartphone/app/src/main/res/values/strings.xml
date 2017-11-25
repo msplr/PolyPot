@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">PolyPot</string>
+    <string name="tab_text_0">Summary</string>
+    <string name="tab_text_1">Water level</string>
+    <string name="tab_text_2">Temperature</string>
+    <string name="tab_text_3">Humidity</string>
+    <string name="tab_text_4">Luminosity</string>
+    <string name="tab_text_5">Configuration</string>
+    <string name="previous_day">Previous day</string>
+    <string name="next_day">Next day</string>
+    <string name="current_day">Current day</string>
+</resources>
