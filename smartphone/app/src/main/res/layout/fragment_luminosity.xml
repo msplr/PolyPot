@@ -24,7 +24,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.jjoe64.graphview.GraphView
+        <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/graph_luminosity"
             android:layout_width="match_parent"
             android:layout_height="200dip"
@@ -33,8 +33,7 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title_luminosity"
-            app:seriesType="line" />
+            app:layout_constraintTop_toBottomOf="@+id/title_luminosity" />
 
         <TextView
             android:id="@+id/textView3"

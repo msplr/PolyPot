@@ -1,13 +1,15 @@
 package ch.epfl.pdse.polypotapp;
 
+import android.os.Bundle;
 import android.support.v7.preference.PreferenceDialogFragmentCompat;
 import android.view.View;
-import android.os.Bundle;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 public class PreferenceSeekBarFragment extends PreferenceDialogFragmentCompat {
 
     private SeekBar seekBar;
+    private TextView text;
 
     /**
      * Creates a new Instance of the PreferenceSeekBarDialogFragment and stores the key of the
@@ -33,13 +35,24 @@ public class PreferenceSeekBarFragment extends PreferenceDialogFragmentCompat {
         super.onBindDialogView(view);
 
         seekBar = (SeekBar) view.findViewById(R.id.seekBar);
+        text = (TextView) view.findViewById(R.id.text);
 
         // Get the value from the related Preference
         Integer value = ((PreferenceSeekBar) getPreference()).getmValue();
 
         seekBar.setProgress(value);
+        text.setText(Integer.toString(value));
 
-        //TODO: min/max, show current value
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                text.setText(Integer.toString(progress));
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
+        //TODO: min/max
     }
 
     /**

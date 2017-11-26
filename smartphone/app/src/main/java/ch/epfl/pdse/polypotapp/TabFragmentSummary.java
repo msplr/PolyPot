@@ -61,7 +61,7 @@ public class TabFragmentSummary extends Fragment {
                     SimpleDateFormat inputDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ssXXXXX");
                     SimpleDateFormat outputDateFormat = new SimpleDateFormat("'Data from 'YYYY-MM-dd' 'HH:mm:ss'.'");
 
-                    Calendar date = new GregorianCalendar();
+                    Calendar date = GregorianCalendar.getInstance();
                     inputDateFormat.parse(summaryDataData.getString("datetime"), date, new ParsePosition(0));
                     date.setTimeZone(TimeZone.getDefault());
 

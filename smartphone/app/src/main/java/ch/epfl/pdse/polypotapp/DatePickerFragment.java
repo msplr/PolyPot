@@ -2,6 +2,7 @@ package ch.epfl.pdse.polypotapp;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -10,7 +11,6 @@ import android.view.MenuItem;
 import android.widget.DatePicker;
 
 public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
-
     private MenuItem mCurrentDay;
     private Calendar mDate;
     private SimpleDateFormat mDateFormat;
@@ -34,11 +34,12 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
         // Update date
-        mDate.set(Calendar.YEAR, year);
-        mDate.set(Calendar.MONTH, month);
-        mDate.set(Calendar.DAY_OF_MONTH, day);
+        mDate.set(year, month, day);
 
         // Update date in toolbar
         mCurrentDay.setTitle(mDateFormat.format(mDate));
+
+        // Update data and graphs
+        CommunicationManager.getInstance(getContext()).getData();
     }
 }

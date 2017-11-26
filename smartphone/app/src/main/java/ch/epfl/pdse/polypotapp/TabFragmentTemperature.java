@@ -1,5 +1,7 @@
 package ch.epfl.pdse.polypotapp;
 
+import android.icu.util.Calendar;
+import android.icu.util.TimeZone;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -7,12 +9,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import java.util.ArrayList;
 
 public class TabFragmentTemperature extends Fragment{
     CommunicationManager.DataReadyListener mListener;
@@ -26,25 +34,54 @@ public class TabFragmentTemperature extends Fragment{
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        final GraphView graph = (GraphView) getView().findViewById(R.id.graph_temperature);
+        final LineChart chart = (LineChart) view.findViewById(R.id.graph_temperature);
+        final int color = getResources().getColor(android.R.color.holo_red_light);
 
-        graph.getGridLabelRenderer().setLabelFormatter(new GraphHelper.DateFormatter());
-        graph.getGridLabelRenderer().setNumHorizontalLabels(6);
+        YAxis yAxis = chart.getAxisLeft();
+        yAxis.setAxisMinimum(0);
+        yAxis.setAxisMaximum(30);
 
-        //graph.getViewport().setMinY(0);
-        //graph.getViewport().setMaxY(30);
-        //graph.getViewport().setYAxisBoundsManual(true);
-        graph.getGridLabelRenderer().setNumVerticalLabels(5);
+        XAxis xAxis = chart.getXAxis();
+        xAxis.setValueFormatter(new GraphHelper.DateAxisFormatter());
+        xAxis.setLabelCount(7,true);
+
+        Description description = new Description();
+        description.setText("");
+        chart.setDescription(description);
+
+        chart.getLegend().setEnabled(false);
+        chart.getAxisRight().setEnabled(false);
+        chart.setNoDataTextColor(color);
 
         CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
-
         mListener = new CommunicationManager.DataReadyListener() {
-            public void onDataReady(JSONArray data) {
+            public void onDataReady(JSONArray data, Calendar fromDate, Calendar toDate) {
                 try {
-                    LineGraphSeries<DataPoint> series = GraphHelper.extractSeries(data, "temperature");
-                    series.setColor(getResources().getColor(android.R.color.holo_red_light));
-                    graph.removeAllSeries();
-                    graph.addSeries(series);
+                    fromDate.setTimeZone(TimeZone.getDefault());
+                    fromDate.add(Calendar.MINUTE, 5);
+                    toDate.setTimeZone(TimeZone.getDefault());
+                    toDate.add(Calendar.MINUTE, 5);
+
+                    ArrayList<Entry> entries = GraphHelper.extractSeries(data, "temperature");
+
+                    if(entries.size() == 0) {
+                        chart.clear();
+                    } else {
+                        LineDataSet dataSet = new LineDataSet(entries, "Label");
+                        dataSet.setColor(color);
+                        dataSet.setDrawValues(false);
+                        dataSet.setLineWidth(2f);
+                        dataSet.setDrawCircles(false);
+
+                        LineData lineData = new LineData(dataSet);
+                        chart.setData(lineData);
+                    }
+
+                    XAxis xAxis = chart.getXAxis();
+                    xAxis.setAxisMinimum(fromDate.getTimeInMillis());
+                    xAxis.setAxisMaximum(toDate.getTimeInMillis());
+
+                    chart.invalidate();
                 } catch (final JSONException e) {
                     Snackbar.make(getView(), getString(R.string.error_reception_data), Snackbar.LENGTH_LONG).show();
                 }
@@ -62,3 +99,4 @@ public class TabFragmentTemperature extends Fragment{
         communicationManager.removeDataReadyListener(mListener);
     }
 }
+

@@ -4,10 +4,11 @@ import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.icu.util.GregorianCalendar;
 import android.icu.util.TimeZone;
+import android.util.Log;
 
-import com.jjoe64.graphview.DefaultLabelFormatter;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,39 +18,37 @@ import java.text.ParsePosition;
 import java.util.ArrayList;
 
 public class GraphHelper {
-    public static LineGraphSeries<DataPoint> extractSeries(JSONArray data, String keyword) throws JSONException {
-        ArrayList<DataPoint> series = new ArrayList<DataPoint>();
+    public static ArrayList<Entry> extractSeries(JSONArray data, String keyword) throws JSONException {
+        ArrayList<Entry> entries = new ArrayList<Entry>();
 
-        for (int i = 0; i < data.length(); i++) {
+        for(int i = 0; i < data.length(); i++) {
             JSONObject point = data.getJSONObject(i);
 
             float value = Float.parseFloat(point.getString(keyword));
 
             SimpleDateFormat inputDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ssXXXXX");
-            Calendar date = new GregorianCalendar();
-            inputDateFormat.parse(point.getString("datetime"), date, new ParsePosition(0));
+            Calendar date = GregorianCalendar.getInstance();
+            inputDateFormat.parse(point.getString("datetime"), date, new ParsePosition(0)); //TODO: don't work without, try to understand and correct
+            Log.e("FFFFFFFF1", inputDateFormat.format(date));
             date.setTimeZone(TimeZone.getDefault());
 
-            DataPoint dataPoint = new DataPoint(date.getTime(), value);
-            series.add(dataPoint);
+            entries.add(new Entry(date.getTimeInMillis(), value));
         }
 
-        return new LineGraphSeries<>(series.toArray(new DataPoint[0]));
+        return entries;
     }
 
-    public static class DateFormatter extends DefaultLabelFormatter {
+    public static class DateAxisFormatter implements IAxisValueFormatter {
         protected final Calendar mCalendar = Calendar.getInstance();
-        protected final SimpleDateFormat mDateFormat = new SimpleDateFormat("HH:mm");
+        protected final SimpleDateFormat mDateFormat = new SimpleDateFormat("HH:'00'");
 
         @Override
-        public String formatLabel(double value, boolean isValueX) {
-            if (isValueX) {
-                // format as date
-                mCalendar.setTimeInMillis((long) value);
-                return mDateFormat.format(mCalendar.getTimeInMillis());
-            } else {
-                return super.formatLabel(value, isValueX);
-            }
+        public String getFormattedValue(float value, AxisBase axis) {
+            mCalendar.setTimeInMillis((long) value);
+            return mDateFormat.format(mCalendar.getTimeInMillis());
         }
+
+        /** this is only needed if numbers are returned, else return 0 */
+        public int getDecimalDigits() { return 0; }
     }
 }

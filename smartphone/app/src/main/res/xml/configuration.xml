@@ -8,6 +8,7 @@
             android:key="target_soil_moisture"
             android:title="Soil moisture threshold"
             android:summary="Threshold at which the pot waters the plant.\nCurrent value: %s"
+            android:max="20"
             style="@style/AppTheme.DialogPreference"/>
 
         <ch.epfl.pdse.polypotapp.PreferenceNumber

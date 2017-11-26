@@ -2,9 +2,13 @@ package ch.epfl.pdse.polypotapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
+import android.icu.util.TimeZone;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.util.ArraySet;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -29,12 +33,14 @@ public class CommunicationManager {
     private ArraySet<SummaryDataReadyListener> mSummaryDataReadyList;
     private ArraySet<DataReadyListener> mDataReadyList;
 
+    private SimpleDateFormat mDateFormat;
+
     interface SummaryDataReadyListener {
         void onDataReady(JSONObject summaryData);
     }
 
     interface DataReadyListener {
-        void onDataReady(JSONArray data);
+        void onDataReady(JSONArray data, Calendar fromDate, Calendar toDate);
     }
 
     public boolean addSummaryDataReadyListener(SummaryDataReadyListener listener) {
@@ -59,6 +65,8 @@ public class CommunicationManager {
 
         mSummaryDataReadyList = new ArraySet<SummaryDataReadyListener>();
         mDataReadyList = new ArraySet<DataReadyListener>();
+
+        mDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss'Z'");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         mUuid = preferences.getString("uuid", mContext.getString(R.string.default_uuid));
@@ -98,7 +106,24 @@ public class CommunicationManager {
     }
 
     public void getData() {
-        StringRequest dataRequest = new StringRequest(Request.Method.GET, mServer + "/get-data/" + mUuid,
+        Calendar date = ((MainActivity) mContext).getDate();
+
+        if(date == null) {
+            return;
+        }
+
+        final Calendar fromDate = (Calendar) date.clone();
+        Log.e("EEEEEEEEEEEEEEE", mDateFormat.format(fromDate)); //TODO: don't work without, try to understand and correct
+        fromDate.setTimeZone(TimeZone.GMT_ZONE);
+        String from = "from=" + mDateFormat.format(fromDate);
+
+        final Calendar toDate = (Calendar) date.clone();
+        Log.e("GGGGGGGGGGGGGGG", mDateFormat.format(toDate)); //TODO: don't work without, try to understand and correct
+        toDate.setTimeZone(TimeZone.GMT_ZONE);
+        toDate.add(Calendar.DAY_OF_MONTH, 1);
+        String to = "to=" + mDateFormat.format(toDate);
+
+        StringRequest dataRequest = new StringRequest(Request.Method.GET, mServer + "/get-data/" + mUuid + "?" + from + "&" + to,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -107,7 +132,7 @@ public class CommunicationManager {
                             JSONArray data = reader.getJSONArray("data");
 
                             for(DataReadyListener listener : mDataReadyList) {
-                                listener.onDataReady(data);
+                                listener.onDataReady(data, (Calendar) fromDate.clone(), (Calendar) toDate.clone());
                             }
                         } catch (final JSONException e) {
                             Snackbar.make(((MainActivity) mContext).getView(), R.string.error_reception_data, Snackbar.LENGTH_LONG).show();

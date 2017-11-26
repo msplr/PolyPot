@@ -3,7 +3,9 @@ package ch.epfl.pdse.polypotapp;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.icu.util.GregorianCalendar;
+import android.icu.util.TimeZone;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -15,6 +17,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParsePosition;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,13 +44,17 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem mCurrentDay;
     private MenuItem mNextDay;
 
-    private GregorianCalendar mDate;
+    private Calendar mDate;
     private SimpleDateFormat mDateFormat = new SimpleDateFormat("YYYY-MM-dd");
+
+    private CommunicationManager mCommunicationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mCommunicationManager = CommunicationManager.getInstance(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -86,8 +97,37 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        // Save date for internal use
-        mDate = new GregorianCalendar();
+        // Use today by default
+        mDate = GregorianCalendar.getInstance();
+
+        // Set everything more specific than day to zero
+        mDate.set(Calendar.HOUR_OF_DAY, 0);
+        mDate.set(Calendar.MINUTE, 0);
+        mDate.set(Calendar.SECOND, 0);
+        mDate.set(Calendar.MILLISECOND, 0);
+
+        CommunicationManager.SummaryDataReadyListener listener = new CommunicationManager.SummaryDataReadyListener() {
+            public void onDataReady(JSONObject summaryDataData) {
+                try {
+                    // Switch to latest data date
+                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ssXXXXX");
+                    inputDateFormat.parse(summaryDataData.getString("datetime"), mDate, new ParsePosition(0));
+                    mDate.setTimeZone(TimeZone.getDefault());
+
+                    mDate.set(Calendar.HOUR_OF_DAY, 0);
+                    mDate.set(Calendar.MINUTE, 0);
+                    mDate.set(Calendar.SECOND, 0);
+                    mDate.set(Calendar.MILLISECOND, 0);
+
+                    mCurrentDay.setTitle(mDateFormat.format(mDate));
+
+                    mCommunicationManager.getData();
+                } catch (final JSONException e) {
+                    Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+                }
+            }
+        };
+        mCommunicationManager.addSummaryDataReadyListener(listener);
 
         return true;
     }
@@ -103,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         // Update date in toolbar
         mCurrentDay.setTitle(mDateFormat.format(mDate));
 
-        // Hide date on Summary and Configuration tabs
+        // Hide date if on Summary and Configuration tabs
         if(mViewPager.getCurrentItem() == Tabs.SUMMARY || mViewPager.getCurrentItem() == Tabs.CONFIGURATION) {
             mPreviousDay.setVisible(false);
             mCurrentDay.setVisible(false);
@@ -111,6 +151,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    public Calendar getDate() {
+        return mDate;
     }
 
     @Override
@@ -125,6 +169,9 @@ public class MainActivity extends AppCompatActivity {
 
                 // Update date in toolbar
                 mCurrentDay.setTitle(mDateFormat.format(mDate));
+
+                // Update data and graphs
+                mCommunicationManager.getData();
 
                 return true;
 
@@ -141,6 +188,9 @@ public class MainActivity extends AppCompatActivity {
 
                 // Update date in toolbar
                 mCurrentDay.setTitle(mDateFormat.format(mDate));
+
+                // Update data and graphs
+                mCommunicationManager.getData();
 
                 return true;
 
