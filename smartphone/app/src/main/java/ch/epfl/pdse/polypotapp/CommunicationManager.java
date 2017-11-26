@@ -73,7 +73,7 @@ public class CommunicationManager {
     }
 
     public void getLatestData() {
-        StringRequest initRequest = new StringRequest(Request.Method.GET, mServer + "/get-latest/" + mUuid,
+        StringRequest latestRequest = new StringRequest(Request.Method.GET, mServer + "/get-latest/" + mUuid,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -94,7 +94,7 @@ public class CommunicationManager {
                         Snackbar.make(((MainActivity) mContext).getView(), R.string.error_reception_summary, Snackbar.LENGTH_LONG).show();
                     }
                 });
-        mRequestQueue.add(initRequest);
+        mRequestQueue.add(latestRequest);
     }
 
     public void getData() {

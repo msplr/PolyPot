@@ -53,7 +53,7 @@
                 android:id="@+id/tabItem3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@drawable/ic_humidity" />
+                android:icon="@drawable/ic_soil_moisture" />
 
             <android.support.design.widget.TabItem
                 android:id="@+id/tabItem4"

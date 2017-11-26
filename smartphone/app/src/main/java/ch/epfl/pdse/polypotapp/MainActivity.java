@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
                 case Tabs.TEMPERATURE:
                     return new TabFragmentTemperature();
                 case Tabs.HUMIDITY:
-                    return new TabFragmentHumidity();
+                    return new TabFragmentSoilMoisture();
                 case Tabs.LUMINOSITY:
                     return new TabFragmentLuminosity();
                 case Tabs.CONFIGURATION:
@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.temperature_card:
                 mViewPager.setCurrentItem(Tabs.TEMPERATURE);
                 break;
-            case R.id.humidity_card:
+            case R.id.soil_moisture_card:
                 mViewPager.setCurrentItem(Tabs.HUMIDITY);
                 break;
             case R.id.luminosity_card:

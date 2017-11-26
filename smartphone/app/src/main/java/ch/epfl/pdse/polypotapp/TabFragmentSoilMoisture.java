@@ -14,19 +14,19 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-public class TabFragmentHumidity extends Fragment{
+public class TabFragmentSoilMoisture extends Fragment{
     CommunicationManager.DataReadyListener mListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_humidity, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_soil_moisture, container, false);
         return rootView;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        final GraphView graph = (GraphView) getView().findViewById(R.id.graph_humidity);
+        final GraphView graph = (GraphView) getView().findViewById(R.id.graph_soil_moisture);
 
         graph.getGridLabelRenderer().setLabelFormatter(new GraphHelper.DateFormatter());
         graph.getGridLabelRenderer().setNumHorizontalLabels(6);

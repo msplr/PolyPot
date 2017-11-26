@@ -33,28 +33,28 @@ public class TabFragmentSummary extends Fragment {
         final TextView waterLevelText = (TextView) view.findViewById(R.id.water_level_text);
         final TextView temperatureText = (TextView) view.findViewById(R.id.temperature_text);
         final TextView luminosityText = (TextView) view.findViewById(R.id.luminosity_text);
-        final TextView humidityText = (TextView) view.findViewById(R.id.humidity_text);
+        final TextView soil_moistureText = (TextView) view.findViewById(R.id.soil_moisture_text);
         final TextView dataDateText = (TextView) view.findViewById(R.id.data_date_text);
 
         CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
 
         mListener = new CommunicationManager.SummaryDataReadyListener() {
-            public void onDataReady(JSONObject initData) {
+            public void onDataReady(JSONObject summaryDataData) {
                 try {
                     // Soil Moisture
-                    int soilMoisture = Math.round(Float.parseFloat(initData.getString("soil_moisture")));
-                    humidityText.setText(Integer.toString(soilMoisture));
+                    int soilMoisture = Math.round(Float.parseFloat(summaryDataData.getString("soil_moisture")));
+                    soil_moistureText.setText(Integer.toString(soilMoisture));
 
                     // Temperature
-                    int temperature = Math.round(Float.parseFloat(initData.getString("temperature")));
+                    int temperature = Math.round(Float.parseFloat(summaryDataData.getString("temperature")));
                     temperatureText.setText(Integer.toString(temperature));
 
                     // Water Level
-                    int water_level = Math.round(Float.parseFloat(initData.getString("water_level")));
+                    int water_level = Math.round(Float.parseFloat(summaryDataData.getString("water_level")));
                     waterLevelText.setText(Integer.toString(water_level));
 
                     // Luminosity
-                    int luminosity = Math.round(Float.parseFloat(initData.getString("luminosity")));
+                    int luminosity = Math.round(Float.parseFloat(summaryDataData.getString("luminosity")));
                     luminosityText.setText(Integer.toString(luminosity));
 
                     // Date and Time
@@ -62,7 +62,7 @@ public class TabFragmentSummary extends Fragment {
                     SimpleDateFormat outputDateFormat = new SimpleDateFormat("'Data from 'YYYY-MM-dd' 'HH:mm:ss'.'");
 
                     Calendar date = new GregorianCalendar();
-                    inputDateFormat.parse(initData.getString("datetime"), date, new ParsePosition(0));
+                    inputDateFormat.parse(summaryDataData.getString("datetime"), date, new ParsePosition(0));
                     date.setTimeZone(TimeZone.getDefault());
 
                     dataDateText.setText(outputDateFormat.format(date));

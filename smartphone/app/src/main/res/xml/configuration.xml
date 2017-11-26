@@ -6,7 +6,7 @@
 
         <ch.epfl.pdse.polypotapp.PreferenceSeekBar
             android:key="target_soil_moisture"
-            android:title="Humidity threshold"
+            android:title="Soil moisture threshold"
             android:summary="Threshold at which the pot waters the plant.\nCurrent value: %s"
             style="@style/AppTheme.DialogPreference"/>
 
