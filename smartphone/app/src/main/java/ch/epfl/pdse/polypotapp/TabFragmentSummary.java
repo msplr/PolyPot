@@ -1,9 +1,5 @@
 package ch.epfl.pdse.polypotapp;
 
-import android.icu.text.SimpleDateFormat;
-import android.icu.util.Calendar;
-import android.icu.util.GregorianCalendar;
-import android.icu.util.TimeZone;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -15,7 +11,12 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class TabFragmentSummary extends Fragment {
     CommunicationManager.SummaryDataReadyListener mListener;
@@ -58,15 +59,16 @@ public class TabFragmentSummary extends Fragment {
                     luminosityText.setText(Integer.toString(luminosity));
 
                     // Date and Time
-                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ssXXXXX");
-                    SimpleDateFormat outputDateFormat = new SimpleDateFormat("'Data from 'YYYY-MM-dd' 'HH:mm:ss'.'");
+                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    SimpleDateFormat outputDateFormat = new SimpleDateFormat("'Data from 'yyyy-MM-dd' 'HH:mm:ss'.'");
 
                     Calendar date = GregorianCalendar.getInstance();
-                    inputDateFormat.parse(summaryData.getString("datetime"), date, new ParsePosition(0));
+                    date.setTime(inputDateFormat.parse(summaryData.getString("datetime")));
                     date.setTimeZone(TimeZone.getDefault());
 
-                    dataDateText.setText(outputDateFormat.format(date));
-                } catch (final JSONException e) {
+                    dataDateText.setText(outputDateFormat.format(date.getTime()));
+                } catch (JSONException|ParseException e) {
                     Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
                 }
             }

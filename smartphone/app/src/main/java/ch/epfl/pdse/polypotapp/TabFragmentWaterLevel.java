@@ -1,6 +1,5 @@
 package ch.epfl.pdse.polypotapp;
 
-import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -12,6 +11,9 @@ import com.github.mikephil.charting.charts.LineChart;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+
+import java.text.ParseException;
+import java.util.Calendar;
 
 public class TabFragmentWaterLevel extends Fragment {
     CommunicationManager.DataReadyListener mListener;
@@ -35,7 +37,7 @@ public class TabFragmentWaterLevel extends Fragment {
             public void onDataReady(JSONArray data, Calendar fromDate, Calendar toDate) {
                 try {
                     GraphHelper.updateChartWithData(chart, color, "water_level", data, fromDate, toDate);
-                } catch (final JSONException e) {
+                } catch (JSONException|ParseException e) {
                     Snackbar.make(getView(), getString(R.string.error_reception_data), Snackbar.LENGTH_LONG).show();
                 }
             }

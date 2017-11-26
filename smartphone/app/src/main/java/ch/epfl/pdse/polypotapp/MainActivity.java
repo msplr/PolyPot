@@ -1,9 +1,5 @@
 package ch.epfl.pdse.polypotapp;
 
-import android.icu.text.SimpleDateFormat;
-import android.icu.util.Calendar;
-import android.icu.util.GregorianCalendar;
-import android.icu.util.TimeZone;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -21,7 +17,13 @@ import android.view.View;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParsePosition;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
+;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem mNextDay;
 
     private Calendar mDate;
-    private SimpleDateFormat mDateFormat = new SimpleDateFormat("YYYY-MM-dd");
+    private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private CommunicationManager mCommunicationManager;
 
@@ -111,8 +113,9 @@ public class MainActivity extends AppCompatActivity {
             public void onDataReady(JSONObject summaryData) {
                 try {
                     // Switch to latest data date
-                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ssXXXXX");
-                    inputDateFormat.parse(summaryData.getString("datetime"), mDate, new ParsePosition(0));
+                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                    mDate.setTime(inputDateFormat.parse(summaryData.getString("datetime")));
                     mDate.setTimeZone(TimeZone.getDefault());
 
                     // Set everything more specific than day to zero
@@ -122,14 +125,14 @@ public class MainActivity extends AppCompatActivity {
                     mDate.set(Calendar.MILLISECOND, 0);
 
                     // Update date in toolbar
-                    mCurrentDay.setTitle(mDateFormat.format(mDate));
+                    mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
                     // Only switch the first time
                     mCommunicationManager.removeSummaryDataReadyListener("mainActivityListener");
 
                     // Update graphs
                     mCommunicationManager.getData();
-                } catch (final JSONException e) {
+                } catch (JSONException|ParseException e) {
                     Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
                 }
             }
@@ -148,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         mNextDay = menu.findItem(R.id.next_day);
 
         // Update date in toolbar
-        mCurrentDay.setTitle(mDateFormat.format(mDate));
+        mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
         // Hide date if on Summary and Configuration tabs
         if(mViewPager.getCurrentItem() == Tabs.SUMMARY || mViewPager.getCurrentItem() == Tabs.CONFIGURATION) {
@@ -176,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
                 mDate.add(Calendar.DAY_OF_MONTH, -1);
 
                 // Update date in toolbar
-                mCurrentDay.setTitle(mDateFormat.format(mDate));
+                mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
                 // Update data and graphs
                 mCommunicationManager.getData();
@@ -195,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
                 mDate.add(Calendar.DAY_OF_MONTH, 1);
 
                 // Update date in toolbar
-                mCurrentDay.setTitle(mDateFormat.format(mDate));
+                mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
                 // Update data and graphs
                 mCommunicationManager.getData();

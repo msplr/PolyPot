@@ -2,9 +2,6 @@ package ch.epfl.pdse.polypotapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.icu.text.SimpleDateFormat;
-import android.icu.util.Calendar;
-import android.icu.util.TimeZone;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 
@@ -19,7 +16,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.TimeZone;
 
 public class CommunicationManager {
     private static CommunicationManager mInstance;
@@ -66,8 +66,8 @@ public class CommunicationManager {
         mSummaryDataReadyList = new HashMap<>();
         mDataReadyList = new HashMap<>();
 
-        mDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss'Z'");
-        mDateFormat.setTimeZone(TimeZone.GMT_ZONE);
+        mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         mUuid = preferences.getString("uuid", mContext.getString(R.string.default_uuid));
@@ -118,13 +118,13 @@ public class CommunicationManager {
         }
 
         final Calendar fromDate = (Calendar) date.clone();
-        fromDate.setTimeZone(TimeZone.GMT_ZONE);
-        String from = "from=" + mDateFormat.format(fromDate);
+        fromDate.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String from = "from=" + mDateFormat.format(fromDate.getTime());
 
         final Calendar toDate = (Calendar) date.clone();
-        toDate.setTimeZone(TimeZone.GMT_ZONE);
+        toDate.setTimeZone(TimeZone.getTimeZone("UTC"));
         toDate.add(Calendar.DAY_OF_MONTH, 1);
-        String to = "to=" + mDateFormat.format(toDate);
+        String to = "to=" + mDateFormat.format(toDate.getTime());
 
         StringRequest dataRequest = new StringRequest(Request.Method.GET, mServer + "/get-data/" + mUuid + "?" + from + "&" + to,
                 new Response.Listener<String>() {

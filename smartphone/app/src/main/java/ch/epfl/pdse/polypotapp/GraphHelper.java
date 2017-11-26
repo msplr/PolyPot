@@ -1,10 +1,5 @@
 package ch.epfl.pdse.polypotapp;
 
-import android.icu.text.SimpleDateFormat;
-import android.icu.util.Calendar;
-import android.icu.util.GregorianCalendar;
-import android.icu.util.TimeZone;
-
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -19,8 +14,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParsePosition;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class GraphHelper {
     public static void configureChart(LineChart chart, int color, float min, float max) {
@@ -41,7 +40,7 @@ public class GraphHelper {
         chart.setNoDataTextColor(color);
     }
 
-    public static void updateChartWithData(LineChart chart, int color, String keyword, JSONArray data, Calendar fromDate, Calendar toDate) throws JSONException {
+    public static void updateChartWithData(LineChart chart, int color, String keyword, JSONArray data, Calendar fromDate, Calendar toDate) throws JSONException, ParseException {
         fromDate.setTimeZone(TimeZone.getDefault());
         fromDate.add(Calendar.MINUTE, 5);
         toDate.setTimeZone(TimeZone.getDefault());
@@ -56,8 +55,9 @@ public class GraphHelper {
 
             Calendar date = GregorianCalendar.getInstance();
 
-            SimpleDateFormat inputDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ssXXXXX");
-            inputDateFormat.parse(point.getString("datetime"), date, new ParsePosition(0));
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            date.setTime(inputDateFormat.parse(point.getString("datetime")));
 
             entries.add(new Entry(date.getTimeInMillis(), value));
         }
@@ -90,7 +90,7 @@ public class GraphHelper {
         public String getFormattedValue(float value, AxisBase axis) {
             mCalendar.setTimeInMillis((long) value);
             mCalendar.setTimeZone(TimeZone.getDefault());
-            return mDateFormat.format(mCalendar);
+            return mDateFormat.format(mCalendar.getTime());
         }
 
         /** this is only needed if numbers are returned, else return 0 */
