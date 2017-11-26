@@ -3,7 +3,8 @@ package ch.epfl.pdse.polypotapp;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
+import android.support.design.widget.Snackbar;
+import android.support.v4.util.ArraySet;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -11,8 +12,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.jjoe64.graphview.series.DataPoint;
-import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,20 +19,46 @@ import org.json.JSONObject;
 
 public class CommunicationManager {
     private static CommunicationManager mInstance;
-    private static Context mContext;
 
-    private static JSONArray mSensorData;
-    private static JSONObject mInitData;
-    private static String mUuid;
-    private static String mServer;
-
-
+    private Context mContext;
     private RequestQueue mRequestQueue;
+
+    private String mUuid;
+    private String mServer;
+
+    private ArraySet<SummaryDataReadyListener> mSummaryDataReadyList;
+    private ArraySet<DataReadyListener> mDataReadyList;
+
+    interface SummaryDataReadyListener {
+        void onDataReady(JSONObject summaryData);
+    }
+
+    interface DataReadyListener {
+        void onDataReady(JSONArray data);
+    }
+
+    public boolean addSummaryDataReadyListener(SummaryDataReadyListener listener) {
+        return mSummaryDataReadyList.add(listener);
+    }
+
+    public boolean removeSummaryDataReadyListener(SummaryDataReadyListener listener) {
+        return mSummaryDataReadyList.remove(listener);
+    }
+
+    public boolean addDataReadyListener(DataReadyListener listener) {
+        return mDataReadyList.add(listener);
+    }
+
+    public boolean removeDataReadyListener(DataReadyListener listener) {
+        return mDataReadyList.remove(listener);
+    }
 
     private CommunicationManager(Context context) {
         mContext = context;
         mRequestQueue = Volley.newRequestQueue(context);
-    //    mRequestQueue.addRequestFinishedListener(new mRequestFinishedListener());
+
+        mSummaryDataReadyList = new ArraySet<SummaryDataReadyListener>();
+        mDataReadyList = new ArraySet<DataReadyListener>();
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         mUuid = preferences.getString("uuid", mContext.getString(R.string.default_uuid));
@@ -54,17 +79,21 @@ public class CommunicationManager {
                     public void onResponse(String response) {
                         try {
                             JSONObject reader = new JSONObject(response.toString());
-                            mInitData = reader.getJSONObject("data");
-                            TabFragmentSummary.initDataUpdate(mInitData);
-                        }catch (final JSONException e) {
+                            JSONObject summaryData = reader.getJSONObject("data");
+
+                            for(SummaryDataReadyListener listener : mSummaryDataReadyList) {
+                                listener.onDataReady(summaryData);
+                            }
+                        } catch (final JSONException e) {
+                            Snackbar.make(((MainActivity) mContext).getView(), mContext.getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
                         }
                     }
                 }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
-        });
-
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Snackbar.make(((MainActivity) mContext).getView(), R.string.error_reception_summary, Snackbar.LENGTH_LONG).show();
+                    }
+                });
         mRequestQueue.add(initRequest);
     }
 
@@ -75,61 +104,22 @@ public class CommunicationManager {
                     public void onResponse(String response) {
                         try {
                             JSONObject reader = new JSONObject(response.toString());
-                            mSensorData = reader.getJSONArray("data");
-                        }catch (final JSONException e) {
+                            JSONArray data = reader.getJSONArray("data");
+
+                            for(DataReadyListener listener : mDataReadyList) {
+                                listener.onDataReady(data);
+                            }
+                        } catch (final JSONException e) {
+                            Snackbar.make(((MainActivity) mContext).getView(), R.string.error_reception_data, Snackbar.LENGTH_LONG).show();
                         }
                     }
                 }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-            }
-        });
+                    @Override
+                        public void onErrorResponse(VolleyError error) {
+                        Snackbar.make(((MainActivity) mContext).getView(), R.string.error_reception_data, Snackbar.LENGTH_LONG).show();
+                    }
+                });
 
         mRequestQueue.add(dataRequest);
     }
-
-    private JSONObject getInitData(){
-        return mInitData;
-    }
-
-    private JSONArray getSensorData(){
-        return mSensorData;
-    }
-
-
-    private LineGraphSeries<DataPoint> getGraphSeries(String date, String sensoryInput) {
-
-        LineGraphSeries<DataPoint> series = new LineGraphSeries<>();
-        for (int j = 0; j < mSensorData.length(); j++){
-            try {
-                JSONObject data = mSensorData.getJSONObject(j);
-                String datadate = data.getString("datetime");
-                String datadateExtract = datadate.substring(0,10);
-                if (datadateExtract.equals(date)){
-                    String hour = datadate.substring(11,13);
-                    String minutes = datadate.substring(14,16);
-                    int x1 = Integer.parseInt(hour);
-                    int x2 = Integer.parseInt(minutes);
-                    float x = (float)x1 + (float)x2 / 60;
-                    int y = (int)Float.parseFloat(data.getString(sensoryInput));
-
-                    series.appendData(new DataPoint(x,y),true, 250);
-                }
-            }
-            catch (final JSONException e) {
-                Log.e("ServiceHandler", "No data received from HTTP request");}
-        }
-        return series;
-    }
-
-
-
-    private class mRequestFinishedListener<StringRequest> implements RequestQueue.RequestFinishedListener<StringRequest> {
-        @Override
-        public void onRequestFinished(Request<StringRequest> request) {
-    //        MainActivity.initDataUpdate(mInitData);
-        }
-    }
-
-
 }

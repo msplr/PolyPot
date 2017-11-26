@@ -1,8 +1,12 @@
 package ch.epfl.pdse.polypotapp;
 
+import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
+import android.icu.util.GregorianCalendar;
+import android.icu.util.TimeZone;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +15,10 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class TabFragmentSummary extends Fragment{
+import java.text.ParsePosition;
 
-    private static TextView mWaterLevelText;
-    private static TextView mTemperatureText;
-    private static TextView mLuminosityText;
-    private static TextView mHumidityText;
-
-
+public class TabFragmentSummary extends Fragment {
+    CommunicationManager.SummaryDataReadyListener mListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -29,27 +29,57 @@ public class TabFragmentSummary extends Fragment{
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        mWaterLevelText = (TextView) getView().findViewById(R.id.water_level_text);
-        mTemperatureText = (TextView) getView().findViewById(R.id.temperature_text);
-        mLuminosityText = (TextView) getView().findViewById(R.id.luminosity_text);
-        mHumidityText = (TextView) getView().findViewById(R.id.humidity_text);
+        // Save for later use
+        final TextView waterLevelText = (TextView) view.findViewById(R.id.water_level_text);
+        final TextView temperatureText = (TextView) view.findViewById(R.id.temperature_text);
+        final TextView luminosityText = (TextView) view.findViewById(R.id.luminosity_text);
+        final TextView humidityText = (TextView) view.findViewById(R.id.humidity_text);
+        final TextView dataDateText = (TextView) view.findViewById(R.id.data_date_text);
 
         CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
+
+        mListener = new CommunicationManager.SummaryDataReadyListener() {
+            public void onDataReady(JSONObject initData) {
+                try {
+                    // Soil Moisture
+                    int soilMoisture = Math.round(Float.parseFloat(initData.getString("soil_moisture")));
+                    humidityText.setText(Integer.toString(soilMoisture));
+
+                    // Temperature
+                    int temperature = Math.round(Float.parseFloat(initData.getString("temperature")));
+                    temperatureText.setText(Integer.toString(temperature));
+
+                    // Water Level
+                    int water_level = Math.round(Float.parseFloat(initData.getString("water_level")));
+                    waterLevelText.setText(Integer.toString(water_level));
+
+                    // Luminosity
+                    int luminosity = Math.round(Float.parseFloat(initData.getString("luminosity")));
+                    luminosityText.setText(Integer.toString(luminosity));
+
+                    // Date and Time
+                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ssXXXXX");
+                    SimpleDateFormat outputDateFormat = new SimpleDateFormat("'Data from 'YYYY-MM-dd' 'HH:mm:ss'.'");
+
+                    Calendar date = new GregorianCalendar();
+                    inputDateFormat.parse(initData.getString("datetime"), date, new ParsePosition(0));
+                    date.setTimeZone(TimeZone.getDefault());
+
+                    dataDateText.setText(outputDateFormat.format(date));
+                } catch (final JSONException e) {
+                    Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+                }
+            }
+        };
+
+        communicationManager.addSummaryDataReadyListener(mListener);
         communicationManager.getLatestData();
     }
 
-    public static void initDataUpdate(JSONObject initData) {
-        try {
-            int soilMoisture = (int) Float.parseFloat(initData.getString("soil_moisture"));
-            mHumidityText.setText(Integer.toString(soilMoisture));
-            int temperature = (int) Float.parseFloat(initData.getString("temperature"));
-            mTemperatureText.setText(Integer.toString(temperature));
-            int water_level = (int) Float.parseFloat(initData.getString("water_level"));
-            mWaterLevelText.setText(Integer.toString(water_level));
-            int luminosity = (int) Float.parseFloat(initData.getString("luminosity"));
-            mLuminosityText.setText(Integer.toString(luminosity));
-        }
-        catch (final JSONException e) {
-            Log.e("ServiceHandler", "No data received from HTTP request");}
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
+        communicationManager.removeSummaryDataReadyListener(mListener);
     }
 }

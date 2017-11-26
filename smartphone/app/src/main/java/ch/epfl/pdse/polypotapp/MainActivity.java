@@ -12,17 +12,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-
-import com.jjoe64.graphview.series.DataPoint;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,9 +38,8 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem mCurrentDay;
     private MenuItem mNextDay;
 
-
     private GregorianCalendar mDate;
-    private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat mDateFormat = new SimpleDateFormat("YYYY-MM-dd");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,18 +64,20 @@ public class MainActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
                 super.onTabSelected(tab);
 
-                if(tab.getPosition() == 0 || tab.getPosition() == 5) {
-                    // Hide date on Summary and Configuration tabs
-                    mPreviousDay.setVisible(false);
-                    mCurrentDay.setVisible(false);
-                    mNextDay.setVisible(false);
-                } else {
-                    // Show date on others
-                    mPreviousDay.setVisible(true);
-                    mCurrentDay.setVisible(true);
-                    mNextDay.setVisible(true);
+                // In case onPrepareOptionsMenu was not currently called
+                if(mCurrentDay != null) {
+                    if(tab.getPosition() == Tabs.SUMMARY || tab.getPosition() == Tabs.CONFIGURATION) {
+                        // Hide date on Summary and Configuration tabs
+                        mPreviousDay.setVisible(false);
+                        mCurrentDay.setVisible(false);
+                        mNextDay.setVisible(false);
+                    } else {
+                        // Show date on others
+                        mPreviousDay.setVisible(true);
+                        mCurrentDay.setVisible(true);
+                        mNextDay.setVisible(true);
+                    }
                 }
-
             }
         });
     }
@@ -110,10 +104,12 @@ public class MainActivity extends AppCompatActivity {
         // Update date in toolbar
         mCurrentDay.setTitle(mDateFormat.format(mDate));
 
-        // Hide date on by default (Summary tab)
-        mPreviousDay.setVisible(false);
-        mCurrentDay.setVisible(false);
-        mNextDay.setVisible(false);
+        // Hide date on Summary and Configuration tabs
+        if(mViewPager.getCurrentItem() == Tabs.SUMMARY || mViewPager.getCurrentItem() == Tabs.CONFIGURATION) {
+            mPreviousDay.setVisible(false);
+            mCurrentDay.setVisible(false);
+            mNextDay.setVisible(false);
+        }
 
         return true;
     }
@@ -156,12 +152,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Fet tabs from Fragment or elsewhere
+    public View getView() {
+        return mViewPager;
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -170,24 +170,18 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             switch (position) {
-                case 0:
-                    TabFragmentSummary tab0 = new TabFragmentSummary();
-                    return tab0;
-                case 1:
-                    TabFragmentWaterLevel tab1 = new TabFragmentWaterLevel();
-                    return tab1;
-                case 2:
-                    TabFragmentTemperature tab2 = new TabFragmentTemperature();
-                    return tab2;
-                case 3:
-                    TabFragmentHumidity tab3 = new TabFragmentHumidity();
-                    return tab3;
-                case 4:
-                    TabFragmentLuminosity tab4 = new TabFragmentLuminosity();
-                    return tab4;
-                case 5:
-                    TabFragmentConfiguration tab5 = new TabFragmentConfiguration();
-                    return tab5;
+                case Tabs.SUMMARY:
+                    return new TabFragmentSummary();
+                case Tabs.WATER_LEVEL:
+                    return new TabFragmentWaterLevel();
+                case Tabs.TEMPERATURE:
+                    return new TabFragmentTemperature();
+                case Tabs.HUMIDITY:
+                    return new TabFragmentHumidity();
+                case Tabs.LUMINOSITY:
+                    return new TabFragmentLuminosity();
+                case Tabs.CONFIGURATION:
+                    return new TabFragmentConfiguration();
                 default:
                     return null;
             }
@@ -204,19 +198,17 @@ public class MainActivity extends AppCompatActivity {
     public void cardClick(View v) {
         switch(v.getId()) {
             case R.id.water_level_card:
-                mViewPager.setCurrentItem(1);
+                mViewPager.setCurrentItem(Tabs.WATER_LEVEL);
                 break;
             case R.id.temperature_card:
-                mViewPager.setCurrentItem(2);
+                mViewPager.setCurrentItem(Tabs.TEMPERATURE);
                 break;
             case R.id.humidity_card:
-                mViewPager.setCurrentItem(3);
+                mViewPager.setCurrentItem(Tabs.HUMIDITY);
                 break;
             case R.id.luminosity_card:
-                mViewPager.setCurrentItem(4);
+                mViewPager.setCurrentItem(Tabs.LUMINOSITY);
                 break;
         }
     }
-
-
 }

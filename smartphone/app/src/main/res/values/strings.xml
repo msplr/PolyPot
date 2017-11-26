@@ -11,4 +11,6 @@
     <string name="current_day">Current day</string>
     <string name="default_uuid">01234567-89ab-cdef-0123-456789abcdef</string>
     <string name="default_server">https://polypot.0xf00.ch</string>
+    <string name="error_reception_summary">An error occurred during the reception of the summary\'s data.</string>
+    <string name="error_reception_data">An error occurred during the reception of the data.</string>
 </resources>
