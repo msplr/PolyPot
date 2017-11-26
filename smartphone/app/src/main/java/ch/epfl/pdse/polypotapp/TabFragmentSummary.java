@@ -12,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -31,11 +30,11 @@ public class TabFragmentSummary extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         // Save for later use
-        final TextView waterLevelText = (TextView) view.findViewById(R.id.water_level_text);
-        final TextView temperatureText = (TextView) view.findViewById(R.id.temperature_text);
-        final TextView luminosityText = (TextView) view.findViewById(R.id.luminosity_text);
-        final TextView soil_moistureText = (TextView) view.findViewById(R.id.soil_moisture_text);
-        final TextView dataDateText = (TextView) view.findViewById(R.id.data_date_text);
+        final TextView waterLevelText = view.findViewById(R.id.water_level_text);
+        final TextView temperatureText = view.findViewById(R.id.temperature_text);
+        final TextView luminosityText = view.findViewById(R.id.luminosity_text);
+        final TextView soil_moistureText = view.findViewById(R.id.soil_moisture_text);
+        final TextView dataDateText = view.findViewById(R.id.latest_data_date_text);
 
         CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
 

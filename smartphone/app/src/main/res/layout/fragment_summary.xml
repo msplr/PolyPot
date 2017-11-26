@@ -4,7 +4,7 @@
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.epfl.pdse.polypotapp.MainActivity$PlaceholderFragment">
+    tools:context="ch.epfl.pdse.polypotapp.MainActivity">
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -68,20 +68,22 @@
                         app:layout_column="1"
                         app:layout_columnWeight="1"
                         app:layout_row="1"
-                        app:layout_rowWeight="1" />
+                        app:layout_rowWeight="1"
+                        android:gravity="end" />
 
                     <TextView
                         android:id="@+id/water_level_unit"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:text="%"
+                        android:text="@string/water_level_unit"
                         android:textAlignment="textEnd"
                         android:textAppearance="@style/TextAppearance.AppCompat.Display2"
                         android:textColor="@android:color/darker_gray"
                         app:layout_column="1"
                         app:layout_columnWeight="1"
                         app:layout_row="0"
-                        app:layout_rowWeight="1" />
+                        app:layout_rowWeight="1"
+                        android:gravity="end" />
 
                 </android.support.v7.widget.GridLayout>
 
@@ -132,20 +134,22 @@
                         app:layout_column="0"
                         app:layout_columnWeight="1"
                         app:layout_row="1"
-                        app:layout_rowWeight="1" />
+                        app:layout_rowWeight="1"
+                        android:gravity="start" />
 
                     <TextView
                         android:id="@+id/temperature_unit"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:text="°C"
+                        android:text="@string/temperature_unit"
                         android:textAlignment="textStart"
                         android:textAppearance="@style/TextAppearance.AppCompat.Display2"
                         android:textColor="@android:color/darker_gray"
                         app:layout_column="0"
                         app:layout_columnWeight="1"
                         app:layout_row="0"
-                        app:layout_rowWeight="1" />
+                        app:layout_rowWeight="1"
+                        android:gravity="start" />
 
                 </android.support.v7.widget.GridLayout>
 
@@ -196,20 +200,22 @@
                         app:layout_column="1"
                         app:layout_columnWeight="1"
                         app:layout_row="0"
-                        app:layout_rowWeight="1" />
+                        app:layout_rowWeight="1"
+                        android:gravity="end" />
 
                     <TextView
                         android:id="@+id/soil_moisture_unit"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:text="%"
+                        android:text="@string/soil_moisture_unit"
                         android:textAlignment="textEnd"
                         android:textAppearance="@style/TextAppearance.AppCompat.Display2"
                         android:textColor="@android:color/darker_gray"
                         app:layout_column="1"
                         app:layout_columnWeight="1"
                         app:layout_row="1"
-                        app:layout_rowWeight="1" />
+                        app:layout_rowWeight="1"
+                        android:gravity="end" />
 
                 </android.support.v7.widget.GridLayout>
 
@@ -265,14 +271,15 @@
                         android:id="@+id/luminosity_unit"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:text="lux"
+                        android:text="@string/luminosity_unit"
                         android:textAlignment="textStart"
                         android:textAppearance="@style/TextAppearance.AppCompat.Display2"
                         android:textColor="@android:color/darker_gray"
                         app:layout_column="0"
                         app:layout_columnWeight="1"
                         app:layout_row="1"
-                        app:layout_rowWeight="1" />
+                        app:layout_rowWeight="1"
+                        android:gravity="start" />
 
                 </android.support.v7.widget.GridLayout>
 
@@ -306,7 +313,7 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center_vertical|center"
-                        android:text="Last watering date unknown."
+                        android:text="@string/watering_status_unknown"
                         android:textAlignment="center"
                         android:textAppearance="@style/TextAppearance.AppCompat.Large"
                         app:layout_column="0"
@@ -358,7 +365,7 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center_vertical"
-                        android:text="Unknown plant status."
+                        android:text="@string/plant_status_unknown"
                         android:textAppearance="@style/TextAppearance.AppCompat.Large"
                         app:layout_column="0"
                         app:layout_columnWeight="1.5"
@@ -370,7 +377,7 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
-                android:id="@+id/data_date_card"
+                android:id="@+id/latest_data_date_card"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:onClick="cardClick"
@@ -394,11 +401,11 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
-                        android:id="@+id/data_date_text"
+                        android:id="@+id/latest_data_date_text"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical|center"
-                        android:text="No data"
+                        android:text="@string/latest_data_date_unknown"
                         android:textAppearance="@style/TextAppearance.AppCompat"
                         app:layout_column="0"
                         app:layout_columnWeight="1"

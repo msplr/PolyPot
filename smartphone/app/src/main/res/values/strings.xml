@@ -1,11 +1,9 @@
 <resources>
     <string name="app_name">PolyPot</string>
-    <string name="tab_text_0">Summary</string>
-    <string name="tab_text_1">Water level</string>
-    <string name="tab_text_2">Temperature</string>
-    <string name="tab_text_3">Soil moisture</string>
-    <string name="tab_text_4">Luminosity</string>
-    <string name="tab_text_5">Configuration</string>
+    <string name="title_water_level">Water level</string>
+    <string name="title_temperature">Temperature</string>
+    <string name="title_soil_moisture">Soil moisture</string>
+    <string name="title_luminosity">Luminosity</string>
     <string name="previous_day">Previous day</string>
     <string name="next_day">Next day</string>
     <string name="current_day">Current day</string>
@@ -13,4 +11,11 @@
     <string name="default_server">https://polypot.0xf00.ch</string>
     <string name="error_reception_summary">An error occurred during the reception of the summary\'s data.</string>
     <string name="error_reception_data">An error occurred during the reception of the data.</string>
+    <string name="water_level_unit">%</string>
+    <string name="temperature_unit">°C</string>
+    <string name="soil_moisture_unit">%</string>
+    <string name="luminosity_unit">lux</string>
+    <string name="watering_status_unknown">Last watering date unknown.</string>
+    <string name="plant_status_unknown">Unknown plant status.</string>
+    <string name="latest_data_date_unknown">No data</string>
 </resources>

@@ -46,7 +46,7 @@ public class GraphHelper {
         toDate.setTimeZone(TimeZone.getDefault());
         toDate.add(Calendar.MINUTE, 5);
 
-        ArrayList<Entry> entries = new ArrayList<Entry>();
+        ArrayList<Entry> entries = new ArrayList<>();
 
         for(int i = 0; i < data.length(); i++) {
             JSONObject point = data.getJSONObject(i);

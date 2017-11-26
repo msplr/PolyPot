@@ -91,7 +91,7 @@ public class CommunicationManager {
                     @Override
                     public void onResponse(String response) {
                         try {
-                            JSONObject reader = new JSONObject(response.toString());
+                            JSONObject reader = new JSONObject(response);
                             JSONObject summaryData = reader.getJSONObject("data");
 
                             for(String key : mSummaryDataReadyList.keySet()) {
@@ -131,7 +131,7 @@ public class CommunicationManager {
                     @Override
                     public void onResponse(String response) {
                         try {
-                            JSONObject reader = new JSONObject(response.toString());
+                            JSONObject reader = new JSONObject(response);
                             JSONArray data = reader.getJSONArray("data");
 
                             for(String key : mDataReadyList.keySet()) {

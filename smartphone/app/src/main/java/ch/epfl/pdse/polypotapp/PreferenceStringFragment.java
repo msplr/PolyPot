@@ -33,7 +33,7 @@ public class PreferenceStringFragment extends PreferenceDialogFragmentCompat {
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
 
-        mStringEditText = (EditText) view.findViewById(R.id.string);
+        mStringEditText = view.findViewById(R.id.string);
 
         // Get the value from the related Preference
         String value = ((PreferenceString) getPreference()).getmValue();

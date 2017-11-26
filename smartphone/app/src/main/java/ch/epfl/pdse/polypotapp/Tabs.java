@@ -6,5 +6,5 @@ public class Tabs {
     public static final int TEMPERATURE = 2;
     public static final int HUMIDITY = 3;
     public static final int LUMINOSITY = 4;
-    public static final int CONFIGURATION = 5;;
+    public static final int CONFIGURATION = 5;
 }

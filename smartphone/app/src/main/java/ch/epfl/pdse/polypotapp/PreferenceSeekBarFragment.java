@@ -34,8 +34,8 @@ public class PreferenceSeekBarFragment extends PreferenceDialogFragmentCompat {
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
 
-        seekBar = (SeekBar) view.findViewById(R.id.seekBar);
-        text = (TextView) view.findViewById(R.id.text);
+        seekBar = view.findViewById(R.id.seekBar);
+        text = view.findViewById(R.id.text);
 
         // Get the value from the related Preference
         Integer value = ((PreferenceSeekBar) getPreference()).getmValue();

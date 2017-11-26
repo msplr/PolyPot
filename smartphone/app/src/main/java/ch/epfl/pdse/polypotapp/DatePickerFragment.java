@@ -3,6 +3,7 @@ package ch.epfl.pdse.polypotapp;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.view.MenuItem;
 import android.widget.DatePicker;
@@ -21,6 +22,7 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
         mDateFormat = dateFormat;
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current date in toolbar

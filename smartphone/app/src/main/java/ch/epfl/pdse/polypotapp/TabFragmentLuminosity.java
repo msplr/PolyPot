@@ -27,7 +27,7 @@ public class TabFragmentLuminosity extends Fragment{
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        final LineChart chart = (LineChart) view.findViewById(R.id.graph_luminosity);
+        final LineChart chart = view.findViewById(R.id.graph_luminosity);
         final int color = getResources().getColor(android.R.color.holo_orange_light);
 
         GraphHelper.configureChart(chart, color, 0, 1200);

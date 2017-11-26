@@ -27,7 +27,7 @@ public class TabFragmentWaterLevel extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        final LineChart chart = (LineChart) view.findViewById(R.id.graph_water_level);
+        final LineChart chart = view.findViewById(R.id.graph_water_level);
         final int color = getResources().getColor(android.R.color.holo_blue_light);
 
         GraphHelper.configureChart(chart, color, 0, 100);

@@ -23,8 +23,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-;
-
 public class MainActivity extends AppCompatActivity {
 
     /**
@@ -47,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem mNextDay;
 
     private Calendar mDate;
-    private SimpleDateFormat mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    private SimpleDateFormat mDateFormat;
 
     private CommunicationManager mCommunicationManager;
 
@@ -56,20 +54,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         mCommunicationManager = CommunicationManager.getInstance(this);
-        mCommunicationManager.updateContext(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = findViewById(R.id.tabs);
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager){
@@ -177,6 +175,9 @@ public class MainActivity extends AppCompatActivity {
         // Restore tab
         mViewPager.setCurrentItem(savedInstanceState.getInt("activeTab"));
         mCommunicationManager.getData();
+
+        // Refresh context of CommunicationManager
+        mCommunicationManager.updateContext(this);
     }
 
     @Override
