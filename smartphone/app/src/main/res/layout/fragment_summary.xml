@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context="ch.epfl.pdse.polypotapp.MainActivity$PlaceholderFragment">
 
-
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
