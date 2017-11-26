@@ -4,7 +4,6 @@ import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.icu.util.GregorianCalendar;
 import android.icu.util.TimeZone;
-import android.util.Log;
 
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.data.Entry;
@@ -26,11 +25,10 @@ public class GraphHelper {
 
             float value = Float.parseFloat(point.getString(keyword));
 
-            SimpleDateFormat inputDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ssXXXXX");
             Calendar date = GregorianCalendar.getInstance();
-            inputDateFormat.parse(point.getString("datetime"), date, new ParsePosition(0)); //TODO: don't work without, try to understand and correct
-            Log.e("FFFFFFFF1", inputDateFormat.format(date));
-            date.setTimeZone(TimeZone.getDefault());
+
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ssXXXXX");
+            inputDateFormat.parse(point.getString("datetime"), date, new ParsePosition(0));
 
             entries.add(new Entry(date.getTimeInMillis(), value));
         }
@@ -45,7 +43,8 @@ public class GraphHelper {
         @Override
         public String getFormattedValue(float value, AxisBase axis) {
             mCalendar.setTimeInMillis((long) value);
-            return mDateFormat.format(mCalendar.getTimeInMillis());
+            mCalendar.setTimeZone(TimeZone.getDefault());
+            return mDateFormat.format(mCalendar);
         }
 
         /** this is only needed if numbers are returned, else return 0 */

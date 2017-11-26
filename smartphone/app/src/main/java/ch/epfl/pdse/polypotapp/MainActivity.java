@@ -54,7 +54,17 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Use today by default
+        mDate = GregorianCalendar.getInstance();
+
+        // Set everything more specific than day to zero
+        mDate.set(Calendar.HOUR_OF_DAY, 0);
+        mDate.set(Calendar.MINUTE, 0);
+        mDate.set(Calendar.SECOND, 0);
+        mDate.set(Calendar.MILLISECOND, 0);
+
         mCommunicationManager = CommunicationManager.getInstance(this);
+        mCommunicationManager.updateContext(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -97,37 +107,34 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        // Use today by default
-        mDate = GregorianCalendar.getInstance();
-
-        // Set everything more specific than day to zero
-        mDate.set(Calendar.HOUR_OF_DAY, 0);
-        mDate.set(Calendar.MINUTE, 0);
-        mDate.set(Calendar.SECOND, 0);
-        mDate.set(Calendar.MILLISECOND, 0);
-
-        CommunicationManager.SummaryDataReadyListener listener = new CommunicationManager.SummaryDataReadyListener() {
-            public void onDataReady(JSONObject summaryDataData) {
+        final CommunicationManager.SummaryDataReadyListener listener = new CommunicationManager.SummaryDataReadyListener() {
+            public void onDataReady(JSONObject summaryData) {
                 try {
                     // Switch to latest data date
                     SimpleDateFormat inputDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ssXXXXX");
-                    inputDateFormat.parse(summaryDataData.getString("datetime"), mDate, new ParsePosition(0));
+                    inputDateFormat.parse(summaryData.getString("datetime"), mDate, new ParsePosition(0));
                     mDate.setTimeZone(TimeZone.getDefault());
 
+                    // Set everything more specific than day to zero
                     mDate.set(Calendar.HOUR_OF_DAY, 0);
                     mDate.set(Calendar.MINUTE, 0);
                     mDate.set(Calendar.SECOND, 0);
                     mDate.set(Calendar.MILLISECOND, 0);
 
+                    // Update date in toolbar
                     mCurrentDay.setTitle(mDateFormat.format(mDate));
 
+                    // Only switch the first time
+                    mCommunicationManager.removeSummaryDataReadyListener("mainActivityListener");
+
+                    // Update graphs
                     mCommunicationManager.getData();
                 } catch (final JSONException e) {
                     Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
                 }
             }
         };
-        mCommunicationManager.addSummaryDataReadyListener(listener);
+        mCommunicationManager.addSummaryDataReadyListener("mainActivityListener", listener);
 
         return true;
     }
@@ -153,6 +160,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    // For CommunicationManager
     public Calendar getDate() {
         return mDate;
     }

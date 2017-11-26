@@ -7,8 +7,6 @@ import android.icu.util.Calendar;
 import android.icu.util.TimeZone;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
-import android.support.v4.util.ArraySet;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -21,17 +19,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+
 public class CommunicationManager {
     private static CommunicationManager mInstance;
 
     private Context mContext;
     private RequestQueue mRequestQueue;
 
+    private HashMap<String,SummaryDataReadyListener> mSummaryDataReadyList;
+    private HashMap<String,DataReadyListener> mDataReadyList;
+
     private String mUuid;
     private String mServer;
-
-    private ArraySet<SummaryDataReadyListener> mSummaryDataReadyList;
-    private ArraySet<DataReadyListener> mDataReadyList;
 
     private SimpleDateFormat mDateFormat;
 
@@ -43,30 +43,31 @@ public class CommunicationManager {
         void onDataReady(JSONArray data, Calendar fromDate, Calendar toDate);
     }
 
-    public boolean addSummaryDataReadyListener(SummaryDataReadyListener listener) {
-        return mSummaryDataReadyList.add(listener);
+    public SummaryDataReadyListener addSummaryDataReadyListener(String key, SummaryDataReadyListener listener) {
+        return mSummaryDataReadyList.put(key, listener);
     }
 
-    public boolean removeSummaryDataReadyListener(SummaryDataReadyListener listener) {
-        return mSummaryDataReadyList.remove(listener);
+    public SummaryDataReadyListener removeSummaryDataReadyListener(String key) {
+        return mSummaryDataReadyList.remove(key);
     }
 
-    public boolean addDataReadyListener(DataReadyListener listener) {
-        return mDataReadyList.add(listener);
+    public DataReadyListener addDataReadyListener(String key, DataReadyListener listener) {
+        return mDataReadyList.put(key, listener);
     }
 
-    public boolean removeDataReadyListener(DataReadyListener listener) {
-        return mDataReadyList.remove(listener);
+    public DataReadyListener removeDataReadyListener(String key) {
+        return mDataReadyList.remove(key);
     }
 
     private CommunicationManager(Context context) {
         mContext = context;
         mRequestQueue = Volley.newRequestQueue(context);
 
-        mSummaryDataReadyList = new ArraySet<SummaryDataReadyListener>();
-        mDataReadyList = new ArraySet<DataReadyListener>();
+        mSummaryDataReadyList = new HashMap<>();
+        mDataReadyList = new HashMap<>();
 
         mDateFormat = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss'Z'");
+        mDateFormat.setTimeZone(TimeZone.GMT_ZONE);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         mUuid = preferences.getString("uuid", mContext.getString(R.string.default_uuid));
@@ -80,6 +81,10 @@ public class CommunicationManager {
         return mInstance;
     }
 
+    public void updateContext(Context context) {
+        mContext = context;
+    }
+
     public void getLatestData() {
         StringRequest latestRequest = new StringRequest(Request.Method.GET, mServer + "/get-latest/" + mUuid,
                 new Response.Listener<String>() {
@@ -89,8 +94,8 @@ public class CommunicationManager {
                             JSONObject reader = new JSONObject(response.toString());
                             JSONObject summaryData = reader.getJSONObject("data");
 
-                            for(SummaryDataReadyListener listener : mSummaryDataReadyList) {
-                                listener.onDataReady(summaryData);
+                            for(String key : mSummaryDataReadyList.keySet()) {
+                                mSummaryDataReadyList.get(key).onDataReady(summaryData);
                             }
                         } catch (final JSONException e) {
                             Snackbar.make(((MainActivity) mContext).getView(), mContext.getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
@@ -113,12 +118,10 @@ public class CommunicationManager {
         }
 
         final Calendar fromDate = (Calendar) date.clone();
-        Log.e("EEEEEEEEEEEEEEE", mDateFormat.format(fromDate)); //TODO: don't work without, try to understand and correct
         fromDate.setTimeZone(TimeZone.GMT_ZONE);
         String from = "from=" + mDateFormat.format(fromDate);
 
         final Calendar toDate = (Calendar) date.clone();
-        Log.e("GGGGGGGGGGGGGGG", mDateFormat.format(toDate)); //TODO: don't work without, try to understand and correct
         toDate.setTimeZone(TimeZone.GMT_ZONE);
         toDate.add(Calendar.DAY_OF_MONTH, 1);
         String to = "to=" + mDateFormat.format(toDate);
@@ -131,8 +134,8 @@ public class CommunicationManager {
                             JSONObject reader = new JSONObject(response.toString());
                             JSONArray data = reader.getJSONArray("data");
 
-                            for(DataReadyListener listener : mDataReadyList) {
-                                listener.onDataReady(data, (Calendar) fromDate.clone(), (Calendar) toDate.clone());
+                            for(String key : mDataReadyList.keySet()) {
+                                mDataReadyList.get(key).onDataReady(data, (Calendar) fromDate.clone(), (Calendar) toDate.clone());
                             }
                         } catch (final JSONException e) {
                             Snackbar.make(((MainActivity) mContext).getView(), R.string.error_reception_data, Snackbar.LENGTH_LONG).show();

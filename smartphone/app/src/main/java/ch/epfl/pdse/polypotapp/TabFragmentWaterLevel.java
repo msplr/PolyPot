@@ -88,14 +88,7 @@ public class TabFragmentWaterLevel extends Fragment {
             }
         };
 
-        communicationManager.addDataReadyListener(mListener);
+        communicationManager.addDataReadyListener("waterLevelListener", mListener);
         communicationManager.getData();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
-        communicationManager.removeDataReadyListener(mListener);
     }
 }

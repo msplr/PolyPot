@@ -39,22 +39,22 @@ public class TabFragmentSummary extends Fragment {
         CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
 
         mListener = new CommunicationManager.SummaryDataReadyListener() {
-            public void onDataReady(JSONObject summaryDataData) {
+            public void onDataReady(JSONObject summaryData) {
                 try {
                     // Soil Moisture
-                    int soilMoisture = Math.round(Float.parseFloat(summaryDataData.getString("soil_moisture")));
+                    int soilMoisture = Math.round(Float.parseFloat(summaryData.getString("soil_moisture")));
                     soil_moistureText.setText(Integer.toString(soilMoisture));
 
                     // Temperature
-                    int temperature = Math.round(Float.parseFloat(summaryDataData.getString("temperature")));
+                    int temperature = Math.round(Float.parseFloat(summaryData.getString("temperature")));
                     temperatureText.setText(Integer.toString(temperature));
 
                     // Water Level
-                    int water_level = Math.round(Float.parseFloat(summaryDataData.getString("water_level")));
+                    int water_level = Math.round(Float.parseFloat(summaryData.getString("water_level")));
                     waterLevelText.setText(Integer.toString(water_level));
 
                     // Luminosity
-                    int luminosity = Math.round(Float.parseFloat(summaryDataData.getString("luminosity")));
+                    int luminosity = Math.round(Float.parseFloat(summaryData.getString("luminosity")));
                     luminosityText.setText(Integer.toString(luminosity));
 
                     // Date and Time
@@ -62,7 +62,7 @@ public class TabFragmentSummary extends Fragment {
                     SimpleDateFormat outputDateFormat = new SimpleDateFormat("'Data from 'YYYY-MM-dd' 'HH:mm:ss'.'");
 
                     Calendar date = GregorianCalendar.getInstance();
-                    inputDateFormat.parse(summaryDataData.getString("datetime"), date, new ParsePosition(0));
+                    inputDateFormat.parse(summaryData.getString("datetime"), date, new ParsePosition(0));
                     date.setTimeZone(TimeZone.getDefault());
 
                     dataDateText.setText(outputDateFormat.format(date));
@@ -72,14 +72,7 @@ public class TabFragmentSummary extends Fragment {
             }
         };
 
-        communicationManager.addSummaryDataReadyListener(mListener);
+        communicationManager.addSummaryDataReadyListener("summaryListener", mListener);
         communicationManager.getLatestData();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
-        communicationManager.removeSummaryDataReadyListener(mListener);
     }
 }

@@ -88,14 +88,7 @@ public class TabFragmentSoilMoisture extends Fragment{
             }
         };
 
-        communicationManager.addDataReadyListener(mListener);
+        communicationManager.addDataReadyListener("soilMoistureListener", mListener);
         communicationManager.getData();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
-        communicationManager.removeDataReadyListener(mListener);
     }
 }
