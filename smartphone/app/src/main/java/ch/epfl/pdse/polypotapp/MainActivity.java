@@ -56,15 +56,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Use today by default
-        mDate = GregorianCalendar.getInstance();
-
-        // Set everything more specific than day to zero
-        mDate.set(Calendar.HOUR_OF_DAY, 0);
-        mDate.set(Calendar.MINUTE, 0);
-        mDate.set(Calendar.SECOND, 0);
-        mDate.set(Calendar.MILLISECOND, 0);
-
         mCommunicationManager = CommunicationManager.getInstance(this);
         mCommunicationManager.updateContext(this);
 
@@ -109,35 +100,47 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-        final CommunicationManager.SummaryDataReadyListener listener = new CommunicationManager.SummaryDataReadyListener() {
-            public void onDataReady(JSONObject summaryData) {
-                try {
-                    // Switch to latest data date
-                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                    inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                    mDate.setTime(inputDateFormat.parse(summaryData.getString("datetime")));
-                    mDate.setTimeZone(TimeZone.getDefault());
+        // If mDate is not null, we are restoring the activity and can skip that section
+        if(mDate == null) {
+            // Use today by default
+            mDate = GregorianCalendar.getInstance();
 
-                    // Set everything more specific than day to zero
-                    mDate.set(Calendar.HOUR_OF_DAY, 0);
-                    mDate.set(Calendar.MINUTE, 0);
-                    mDate.set(Calendar.SECOND, 0);
-                    mDate.set(Calendar.MILLISECOND, 0);
+            // Set everything more specific than day to zero
+            mDate.set(Calendar.HOUR_OF_DAY, 0);
+            mDate.set(Calendar.MINUTE, 0);
+            mDate.set(Calendar.SECOND, 0);
+            mDate.set(Calendar.MILLISECOND, 0);
 
-                    // Update date in toolbar
-                    mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
+            final CommunicationManager.SummaryDataReadyListener listener = new CommunicationManager.SummaryDataReadyListener() {
+                public void onDataReady(JSONObject summaryData) {
+                    try {
+                        // Switch to latest data date
+                        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                        inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                        mDate.setTime(inputDateFormat.parse(summaryData.getString("datetime")));
+                        mDate.setTimeZone(TimeZone.getDefault());
 
-                    // Only switch the first time
-                    mCommunicationManager.removeSummaryDataReadyListener("mainActivityListener");
+                        // Set everything more specific than day to zero
+                        mDate.set(Calendar.HOUR_OF_DAY, 0);
+                        mDate.set(Calendar.MINUTE, 0);
+                        mDate.set(Calendar.SECOND, 0);
+                        mDate.set(Calendar.MILLISECOND, 0);
 
-                    // Update graphs
-                    mCommunicationManager.getData();
-                } catch (JSONException|ParseException e) {
-                    Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+                        // Update date in toolbar
+                        mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
+
+                        // Only switch the first time
+                        mCommunicationManager.removeSummaryDataReadyListener("mainActivityListener");
+
+                        // Update graphs
+                        mCommunicationManager.getData();
+                    } catch (JSONException | ParseException e) {
+                        Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+                    }
                 }
-            }
-        };
-        mCommunicationManager.addSummaryDataReadyListener("mainActivityListener", listener);
+            };
+            mCommunicationManager.addSummaryDataReadyListener("mainActivityListener", listener);
+        }
 
         return true;
     }
@@ -145,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
     {
-        // Save reference to date in toolbar
+        // Save reference to items in toolbar
         mPreviousDay = menu.findItem(R.id.previous_day);
         mCurrentDay = menu.findItem(R.id.current_day);
         mNextDay = menu.findItem(R.id.next_day);
@@ -159,13 +162,33 @@ public class MainActivity extends AppCompatActivity {
             mCurrentDay.setVisible(false);
             mNextDay.setVisible(false);
         }
-
         return true;
     }
 
-    // For CommunicationManager
-    public Calendar getDate() {
-        return mDate;
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Always call the superclass so it can restore the view hierarchy
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // Restore date
+        mDate = GregorianCalendar.getInstance();
+        mDate.setTimeInMillis(savedInstanceState.getLong("date"));
+
+        // Restore tab
+        mViewPager.setCurrentItem(savedInstanceState.getInt("activeTab"));
+        mCommunicationManager.getData();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the current tab
+        savedInstanceState.putInt("activeTab", mViewPager.getCurrentItem());
+
+        // Save the date
+        savedInstanceState.putLong("date", mDate.getTimeInMillis());
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -270,5 +293,10 @@ public class MainActivity extends AppCompatActivity {
                 mViewPager.setCurrentItem(Tabs.LUMINOSITY);
                 break;
         }
+    }
+
+    // For CommunicationManager
+    public Calendar getDate() {
+        return mDate;
     }
 }
