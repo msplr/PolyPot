@@ -1,10 +1,17 @@
 package ch.epfl.pdse.polypotapp;
 
+import android.content.Context;
 import android.support.v7.preference.PreferenceDataStore;
 
 public class RemoteDataStore extends PreferenceDataStore {
+    CommunicationManager mCommunicationManager;
+
+    public RemoteDataStore() {
+        mCommunicationManager = CommunicationManager.getInstance();
+    }
+
     public void putString(String key, String value) {
-        // Write the value somewhere ...
+        //mCommunicationManager.updateConfiguration(key, value);
     }
 
     public String getString(String key, String defValue) {
@@ -13,7 +20,7 @@ public class RemoteDataStore extends PreferenceDataStore {
     }
 
     public void putInt(String key, int value) {
-        // Write the value somewhere ...
+        //mCommunicationManager.updateConfiguration(key, Integer.toString(value));
     }
 
     public int getInt(String key, int defValue) {

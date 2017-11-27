@@ -9,7 +9,7 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
@@ -61,7 +61,7 @@ public class CommunicationManager {
 
     private CommunicationManager(Context context) {
         mContext = context;
-        mRequestQueue = Volley.newRequestQueue(context);
+        mRequestQueue = Volley.newRequestQueue(context.getApplicationContext());
 
         mSummaryDataReadyList = new HashMap<>();
         mDataReadyList = new HashMap<>();
@@ -74,25 +74,28 @@ public class CommunicationManager {
         mServer = preferences.getString("server", mContext.getString(R.string.default_server));
     }
 
-    public static synchronized CommunicationManager getInstance(Context context) {
+    public static synchronized CommunicationManager createInstance(Context context) {
         if (mInstance == null) {
             mInstance = new CommunicationManager(context);
         }
         return mInstance;
     }
 
-    public void updateContext(Context context) {
+    public static synchronized CommunicationManager getInstance() {
+        return mInstance;
+    }
+
+    public void updateInstance(Context context) {
         mContext = context;
     }
 
     public void getLatestData() {
-        StringRequest latestRequest = new StringRequest(Request.Method.GET, mServer + "/get-latest/" + mUuid,
-                new Response.Listener<String>() {
+        JsonObjectRequest latestRequest = new JsonObjectRequest(Request.Method.GET, mServer + "/get-latest/" + mUuid, null,
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response) {
                         try {
-                            JSONObject reader = new JSONObject(response);
-                            JSONObject summaryData = reader.getJSONObject("data");
+                            JSONObject summaryData = response.getJSONObject("data");
 
                             for(String key : mSummaryDataReadyList.keySet()) {
                                 mSummaryDataReadyList.get(key).onDataReady(summaryData);
@@ -126,13 +129,12 @@ public class CommunicationManager {
         toDate.add(Calendar.DAY_OF_MONTH, 1);
         String to = "to=" + mDateFormat.format(toDate.getTime());
 
-        StringRequest dataRequest = new StringRequest(Request.Method.GET, mServer + "/get-data/" + mUuid + "?" + from + "&" + to,
-                new Response.Listener<String>() {
+        JsonObjectRequest dataRequest = new JsonObjectRequest(Request.Method.GET, mServer + "/get-data/" + mUuid + "?" + from + "&" + to, null,
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response) {
                         try {
-                            JSONObject reader = new JSONObject(response);
-                            JSONArray data = reader.getJSONArray("data");
+                            JSONArray data = response.getJSONArray("data");
 
                             for(String key : mDataReadyList.keySet()) {
                                 mDataReadyList.get(key).onDataReady(data, (Calendar) fromDate.clone(), (Calendar) toDate.clone());

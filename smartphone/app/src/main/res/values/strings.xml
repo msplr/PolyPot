@@ -18,4 +18,5 @@
     <string name="watering_status_unknown">Last watering date unknown.</string>
     <string name="plant_status_unknown">Unknown plant status.</string>
     <string name="latest_data_date_unknown">No data</string>
+    <string name="no_chart_data">No chart data available for %s.</string>
 </resources>

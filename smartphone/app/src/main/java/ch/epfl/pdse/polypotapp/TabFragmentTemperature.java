@@ -29,14 +29,15 @@ public class TabFragmentTemperature extends Fragment{
     public void onViewCreated(View view, Bundle savedInstanceState) {
         final LineChart chart = view.findViewById(R.id.graph_temperature);
         final int color = getResources().getColor(android.R.color.holo_red_light);
+        final String noChartData = getResources().getString(R.string.no_chart_data);
 
         GraphHelper.configureChart(chart, color, 0, 30);
 
-        CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
+        CommunicationManager communicationManager = CommunicationManager.getInstance();
         mListener = new CommunicationManager.DataReadyListener() {
             public void onDataReady(JSONArray data, Calendar fromDate, Calendar toDate) {
                 try {
-                    GraphHelper.updateChartWithData(chart, color, "temperature", data, fromDate, toDate);
+                    GraphHelper.updateChartWithData(chart, color, "temperature", data, fromDate, toDate, noChartData);
                 } catch (JSONException|ParseException e) {
                     Snackbar.make(getView(), getString(R.string.error_reception_data), Snackbar.LENGTH_LONG).show();
                 }

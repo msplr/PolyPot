@@ -42,6 +42,6 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
         mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
         // Update data and graphs
-        CommunicationManager.getInstance(getContext()).getData();
+        CommunicationManager.getInstance().getData();
     }
 }

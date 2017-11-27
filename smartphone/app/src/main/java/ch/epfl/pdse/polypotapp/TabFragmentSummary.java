@@ -36,7 +36,7 @@ public class TabFragmentSummary extends Fragment {
         final TextView soil_moistureText = view.findViewById(R.id.soil_moisture_text);
         final TextView dataDateText = view.findViewById(R.id.latest_data_date_text);
 
-        CommunicationManager communicationManager = CommunicationManager.getInstance(getContext());
+        CommunicationManager communicationManager = CommunicationManager.getInstance();
 
         mListener = new CommunicationManager.SummaryDataReadyListener() {
             public void onDataReady(JSONObject summaryData) {

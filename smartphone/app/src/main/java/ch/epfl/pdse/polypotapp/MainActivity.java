@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        mCommunicationManager = CommunicationManager.getInstance(this);
+        mCommunicationManager = CommunicationManager.createInstance(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -91,6 +91,29 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Always call the superclass so it can restore the view hierarchy
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // Restore date
+        mDate = GregorianCalendar.getInstance();
+        mDate.setTimeInMillis(savedInstanceState.getLong("date"));
+
+        // Restore tab
+        mViewPager.setCurrentItem(savedInstanceState.getInt("activeTab"));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+
+        // Refresh context of CommunicationManager and data
+        mCommunicationManager.updateInstance(this);
+        mCommunicationManager.getLatestData();
+        mCommunicationManager.getData();
     }
 
     @Override
@@ -164,24 +187,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        // Always call the superclass so it can restore the view hierarchy
-        super.onRestoreInstanceState(savedInstanceState);
-
-        // Restore date
-        mDate = GregorianCalendar.getInstance();
-        mDate.setTimeInMillis(savedInstanceState.getLong("date"));
-
-        // Restore tab
-        mViewPager.setCurrentItem(savedInstanceState.getInt("activeTab"));
-        mCommunicationManager.getData();
-
-        // Refresh context of CommunicationManager
-        mCommunicationManager.updateContext(this);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
+    public void onSaveInstanceState(Bundle savedInstanceState) {;
         // Save the current tab
         savedInstanceState.putInt("activeTab", mViewPager.getCurrentItem());
 
@@ -233,6 +239,16 @@ public class MainActivity extends AppCompatActivity {
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        // If not on summary, get back to it, else let superclass handle it
+        if(mViewPager.getCurrentItem() != Tabs.SUMMARY) {
+            mViewPager.setCurrentItem(Tabs.SUMMARY);
+        } else {
+            super.onBackPressed();
         }
     }
 

@@ -37,10 +37,11 @@ public class GraphHelper {
 
         chart.getLegend().setEnabled(false);
         chart.getAxisRight().setEnabled(false);
+        chart.setTouchEnabled(false);
         chart.setNoDataTextColor(color);
     }
 
-    public static void updateChartWithData(LineChart chart, int color, String keyword, JSONArray data, Calendar fromDate, Calendar toDate) throws JSONException, ParseException {
+    public static void updateChartWithData(LineChart chart, int color, String keyword, JSONArray data, Calendar fromDate, Calendar toDate, String noChartData) throws JSONException, ParseException {
         fromDate.setTimeZone(TimeZone.getDefault());
         fromDate.add(Calendar.MINUTE, 5);
         toDate.setTimeZone(TimeZone.getDefault());
@@ -63,7 +64,9 @@ public class GraphHelper {
         }
 
         if(entries.size() == 0) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             chart.clear();
+            chart.setNoDataText(String.format(noChartData, dateFormat.format(fromDate.getTime())));
         } else {
             LineDataSet dataSet = new LineDataSet(entries, "Label");
             dataSet.setColor(color);
