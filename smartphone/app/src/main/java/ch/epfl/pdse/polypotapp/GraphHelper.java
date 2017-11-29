@@ -41,9 +41,19 @@ public class GraphHelper {
         chart.setNoDataTextColor(color);
     }
 
-    public static void updateChartWithData(LineChart chart, int color, String keyword, JSONArray data, Calendar fromDate, Calendar toDate, String noChartData) throws JSONException, ParseException {
+    public static void updateChartWithData(LineChart chart, int color, String keyword, JSONObject response, String noChartData) throws JSONException, ParseException {
+        JSONArray data = response.getJSONArray("data");
+
+        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        Calendar fromDate = GregorianCalendar.getInstance();
+        fromDate.setTime(inputDateFormat.parse(response.getString("from")));
         fromDate.setTimeZone(TimeZone.getDefault());
         fromDate.add(Calendar.MINUTE, 5);
+
+        Calendar toDate = GregorianCalendar.getInstance();
+        toDate.setTime(inputDateFormat.parse(response.getString("to")));
         toDate.setTimeZone(TimeZone.getDefault());
         toDate.add(Calendar.MINUTE, 5);
 
@@ -55,9 +65,6 @@ public class GraphHelper {
             float value = Float.parseFloat(point.getString(keyword));
 
             Calendar date = GregorianCalendar.getInstance();
-
-            SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
             date.setTime(inputDateFormat.parse(point.getString("datetime")));
 
             entries.add(new Entry(date.getTimeInMillis(), value));

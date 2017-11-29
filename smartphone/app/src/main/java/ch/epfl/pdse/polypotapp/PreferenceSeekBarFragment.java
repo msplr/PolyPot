@@ -38,9 +38,11 @@ public class PreferenceSeekBarFragment extends PreferenceDialogFragmentCompat {
         text = view.findViewById(R.id.text);
 
         // Get the value from the related Preference
-        Integer value = ((PreferenceSeekBar) getPreference()).getmValue();
+        int value = ((PreferenceSeekBar) getPreference()).getValue();
+        int max = ((PreferenceSeekBar) getPreference()).getMax();
 
         seekBar.setProgress(value);
+        seekBar.setMax(max);
         text.setText(Integer.toString(value));
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
@@ -51,8 +53,6 @@ public class PreferenceSeekBarFragment extends PreferenceDialogFragmentCompat {
             public void onStartTrackingTouch(SeekBar seekBar) {}
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
-
-        //TODO: min/max
     }
 
     /**
@@ -68,10 +68,10 @@ public class PreferenceSeekBarFragment extends PreferenceDialogFragmentCompat {
 
             // Save the value
             PreferenceSeekBar preference = (PreferenceSeekBar) getPreference();
-            preference.setmValue(value);
+            preference.setValue(value);
 
             // Update the summary
-            preference.setSummary(preference.getmOriginalSummary());
+            preference.setSummary(preference.getOriginalSummary());
 
         }
     }

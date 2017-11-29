@@ -36,7 +36,7 @@ public class PreferenceNumberFragment extends PreferenceDialogFragmentCompat {
         mNumberEditText = view.findViewById(R.id.number);
 
         // Get the value from the related Preference
-        String value = ((PreferenceNumber) getPreference()).getmValue();
+        String value = ((PreferenceNumber) getPreference()).getValue();
 
         mNumberEditText.setText(value, BufferType.EDITABLE);
     }
@@ -54,10 +54,10 @@ public class PreferenceNumberFragment extends PreferenceDialogFragmentCompat {
 
             // Save the value
             PreferenceNumber preference = (PreferenceNumber) getPreference();
-            preference.setmValue(value);
+            preference.setValue(value);
 
             // Update the summary
-            preference.setSummary(preference.getmOriginalSummary());
+            preference.setSummary(preference.getOriginalSummary());
 
         }
     }

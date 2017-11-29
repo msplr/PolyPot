@@ -1,6 +1,8 @@
 package ch.epfl.pdse.polypotapp;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
@@ -14,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,9 +25,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.TimeZone;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -40,14 +46,17 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    private TabLayout mTabLayout;
+
     private MenuItem mPreviousDay;
     private MenuItem mCurrentDay;
     private MenuItem mNextDay;
 
-    private Calendar mDate;
     private SimpleDateFormat mDateFormat;
+    private Calendar mDate;
 
     private CommunicationManager mCommunicationManager;
+    private HashMap<String, String> mServerConfig;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +64,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        mCommunicationManager = CommunicationManager.createInstance(this);
+
+        mServerConfig = new HashMap<>();
+        mServerConfig.put("target_soil_moisture", "int");
+        mServerConfig.put("water_volume_pumped", "string");
+        mServerConfig.put("logging_interval", "string");
+        mServerConfig.put("sending_interval", "string");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -67,30 +81,14 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = findViewById(R.id.tabs);
+        mTabLayout = findViewById(R.id.tabs);
 
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager){
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                super.onTabSelected(tab);
+        // Make icons in tab independent from other same icons
+        for(int i=0; i < mSectionsPagerAdapter.getCount(); i++) {
+            mTabLayout.getTabAt(i).getIcon().mutate();
+        }
 
-                // In case onPrepareOptionsMenu was not currently called
-                if(mCurrentDay != null) {
-                    if(tab.getPosition() == Tabs.SUMMARY || tab.getPosition() == Tabs.CONFIGURATION) {
-                        // Hide date on Summary and Configuration tabs
-                        mPreviousDay.setVisible(false);
-                        mCurrentDay.setVisible(false);
-                        mNextDay.setVisible(false);
-                    } else {
-                        // Show date on others
-                        mPreviousDay.setVisible(true);
-                        mCurrentDay.setVisible(true);
-                        mNextDay.setVisible(true);
-                    }
-                }
-            }
-        });
+        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
     }
 
     @Override
@@ -110,16 +108,7 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();  // Always call the superclass method first
 
-        // Refresh context of CommunicationManager and data
-        mCommunicationManager.updateInstance(this);
-        mCommunicationManager.getLatestData();
-        mCommunicationManager.getData();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
         // If mDate is not null, we are restoring the activity and can skip that section
         if(mDate == null) {
@@ -132,37 +121,20 @@ public class MainActivity extends AppCompatActivity {
             mDate.set(Calendar.SECOND, 0);
             mDate.set(Calendar.MILLISECOND, 0);
 
-            final CommunicationManager.SummaryDataReadyListener listener = new CommunicationManager.SummaryDataReadyListener() {
-                public void onDataReady(JSONObject summaryData) {
-                    try {
-                        // Switch to latest data date
-                        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                        inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                        mDate.setTime(inputDateFormat.parse(summaryData.getString("datetime")));
-                        mDate.setTimeZone(TimeZone.getDefault());
-
-                        // Set everything more specific than day to zero
-                        mDate.set(Calendar.HOUR_OF_DAY, 0);
-                        mDate.set(Calendar.MINUTE, 0);
-                        mDate.set(Calendar.SECOND, 0);
-                        mDate.set(Calendar.MILLISECOND, 0);
-
-                        // Update date in toolbar
-                        mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
-
-                        // Only switch the first time
-                        mCommunicationManager.removeSummaryDataReadyListener("mainActivityListener");
-
-                        // Update graphs
-                        mCommunicationManager.getData();
-                    } catch (JSONException | ParseException e) {
-                        Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
-                    }
-                }
-            };
-            mCommunicationManager.addSummaryDataReadyListener("mainActivityListener", listener);
+            // Register to EventBus
+            EventBus.getDefault().register(this);
         }
 
+        mCommunicationManager = new CommunicationManager(this, mDate);
+
+        EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_LATEST));
+        EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -177,17 +149,24 @@ public class MainActivity extends AppCompatActivity {
         // Update date in toolbar
         mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
-        // Hide date if on Summary and Configuration tabs
-        if(mViewPager.getCurrentItem() == Tabs.SUMMARY || mViewPager.getCurrentItem() == Tabs.CONFIGURATION) {
-            mPreviousDay.setVisible(false);
-            mCurrentDay.setVisible(false);
-            mNextDay.setVisible(false);
-        }
+        // Hide date if on Summary and Configuration tabs, update icons transparency
+        updateToolbarAndTablayout(mViewPager.getCurrentItem());
+
+        // Same thing, but on tab change
+        mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager){
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                super.onTabSelected(tab);
+
+                // Hide date if on Summary and Configuration tabs, update icons transparency
+                updateToolbarAndTablayout(tab.getPosition());
+            }
+        });
         return true;
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {;
+    public void onSaveInstanceState(Bundle savedInstanceState) {
         // Save the current tab
         savedInstanceState.putInt("activeTab", mViewPager.getCurrentItem());
 
@@ -196,6 +175,18 @@ public class MainActivity extends AppCompatActivity {
 
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        mCommunicationManager.stop();
+        super.onDestroy();
     }
 
     @Override
@@ -212,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                 mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
                 // Update data and graphs
-                mCommunicationManager.getData();
+                EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
 
                 return true;
 
@@ -231,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
                 mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
                 // Update data and graphs
-                mCommunicationManager.getData();
+                EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
 
                 return true;
 
@@ -252,9 +243,90 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Subscribe
+    public void handleSummaryData(CommunicationManager.LatestDataReady event) {
+        try {
+            JSONObject summaryData = event.response.getJSONObject("data");
+
+            // Switch to latest data date
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            mDate.setTime(inputDateFormat.parse(summaryData.getString("datetime")));
+            mDate.setTimeZone(TimeZone.getDefault());
+
+            // Set everything more specific than day to zero
+            mDate.set(Calendar.HOUR_OF_DAY, 0);
+            mDate.set(Calendar.MINUTE, 0);
+            mDate.set(Calendar.SECOND, 0);
+            mDate.set(Calendar.MILLISECOND, 0);
+
+            // Update date in toolbar
+            mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
+
+            // Update graphs
+            EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
+
+            // Parse and store configuration from the server
+            JSONObject configData = event.response.getJSONObject("configuration");
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            Iterator<String> it = configData.keys();
+            while(it.hasNext()) {
+                String key = it.next();
+
+                switch(mServerConfig.get(key)) {
+                    case "int":
+                        editor.putInt(key, configData.getInt(key));
+                        break;
+                    case "string":
+                        editor.putString(key, configData.getString(key));
+                        break;
+                }
+            }
+            editor.apply();
+
+            // Only switch the toolbar date and update the local configuration once
+            EventBus.getDefault().unregister(this);
+        } catch (JSONException | ParseException e) {
+            Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    // Send configuration change to server if needed
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(mServerConfig.containsKey(key)) {
+            HashMap<String, Object> option = new HashMap<>();
+            switch(mServerConfig.get(key)) {
+                case "int":
+                    option.put(key, sharedPreferences.getInt(key, 0));
+                    break;
+                case "string":
+                    option.put(key, sharedPreferences.getString(key, ""));
+                    break;
+            }
+
+            HashMap<String, Object> configuration = new HashMap<>();
+            configuration.put("configuration", option);
+
+            JSONObject jsonRequest = new JSONObject(configuration);
+            EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.POST_CONFIGURATION, jsonRequest));
+        }
+    }
+
     // Fet tabs from Fragment or elsewhere
     public View getView() {
         return mViewPager;
+    }
+
+    public class Tabs {
+        public static final int SUMMARY = 0;
+        public static final int WATER_LEVEL = 1;
+        public static final int TEMPERATURE = 2;
+        public static final int HUMIDITY = 3;
+        public static final int LUMINOSITY = 4;
+        public static final int CONFIGURATION = 5;
     }
 
     /**
@@ -294,6 +366,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Hide date if on Summary and Configuration tabs, update icons transparency
+    private void updateToolbarAndTablayout(int position) {
+        if(position == Tabs.SUMMARY || position == Tabs.CONFIGURATION) {
+            // Hide date on Summary and Configuration tabs
+            mPreviousDay.setVisible(false);
+            mCurrentDay.setVisible(false);
+            mNextDay.setVisible(false);
+        } else {
+            // Show date on others
+            mPreviousDay.setVisible(true);
+            mCurrentDay.setVisible(true);
+            mNextDay.setVisible(true);
+        }
+
+        for(int i=0; i < mSectionsPagerAdapter.getCount(); i++) {
+            if(i == position) {
+                mTabLayout.getTabAt(i).getIcon().setAlpha(255);
+            } else {
+                mTabLayout.getTabAt(i).getIcon().setAlpha(160);
+            }
+        }
+    }
+
     // Switch to the good tab when the user press on a CardView
     public void cardClick(View v) {
         switch(v.getId()) {
@@ -310,10 +405,5 @@ public class MainActivity extends AppCompatActivity {
                 mViewPager.setCurrentItem(Tabs.LUMINOSITY);
                 break;
         }
-    }
-
-    // For CommunicationManager
-    public Calendar getDate() {
-        return mDate;
     }
 }

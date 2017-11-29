@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <android.support.v7.preference.PreferenceCategory
         android:title="Pot">
@@ -8,7 +9,7 @@
             android:key="target_soil_moisture"
             android:title="Soil moisture threshold"
             android:summary="Threshold at which the pot waters the plant.\nCurrent value: %s"
-            android:max="20"
+            app:max="100"
             style="@style/AppTheme.DialogPreference"/>
 
         <ch.epfl.pdse.polypotapp.PreferenceNumber

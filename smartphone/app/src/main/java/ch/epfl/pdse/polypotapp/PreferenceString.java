@@ -36,11 +36,11 @@ public class PreferenceString extends DialogPreference {
         return R.layout.preference_string;
     }
 
-    public String getmValue() {
+    public String getValue() {
         return mValue;
     }
 
-    public void setmValue(String v) {
+    public void setValue(String v) {
         mValue = v;
 
         // Save to SharedPreference
@@ -70,7 +70,7 @@ public class PreferenceString extends DialogPreference {
         return String.format(super.getSummary().toString(), mValue);
     }
 
-    public CharSequence getmOriginalSummary() {
+    public CharSequence getOriginalSummary() {
         // Add ability to replace %s by current value from original summary
         return String.format(mOriginalSummary, mValue);
     }

@@ -10,13 +10,6 @@ public class TabFragmentConfiguration extends PreferenceFragmentCompat {
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         // Load the preferences from an XML resource
         setPreferencesFromResource(R.xml.configuration, rootKey);
-
-        // Use custom DataStore for the configuration of the pot
-        RemoteDataStore dataStore = new RemoteDataStore();
-        findPreference("target_soil_moisture").setPreferenceDataStore(dataStore);
-        findPreference("water_volume_pumped").setPreferenceDataStore(dataStore);
-        findPreference("logging_interval").setPreferenceDataStore(dataStore);
-        findPreference("sending_interval").setPreferenceDataStore(dataStore);
     }
 
     @Override
@@ -42,6 +35,5 @@ public class TabFragmentConfiguration extends PreferenceFragmentCompat {
             // Dialog creation could not be handled here. Try with the super method.
             super.onDisplayPreferenceDialog(preference);
         }
-
     }
 }

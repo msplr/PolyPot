@@ -8,6 +8,8 @@ import android.support.v4.app.DialogFragment;
 import android.view.MenuItem;
 import android.widget.DatePicker;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -42,6 +44,6 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
         mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
         // Update data and graphs
-        CommunicationManager.getInstance().getData();
+        EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
     }
 }

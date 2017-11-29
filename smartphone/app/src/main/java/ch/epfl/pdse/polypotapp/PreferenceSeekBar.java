@@ -7,6 +7,7 @@ import android.util.AttributeSet;
 
 public class PreferenceSeekBar extends DialogPreference {
     private int mValue;
+    private int mMax;
     private String mOriginalSummary;
 
     public PreferenceSeekBar(Context context) {
@@ -29,6 +30,10 @@ public class PreferenceSeekBar extends DialogPreference {
         super(context, attrs, defStyleAttr, defStyleRes);
 
         mOriginalSummary = super.getSummary().toString();
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SeekBarPreference);
+        mMax = a.getInt(R.styleable.PreferenceSeekBar_max, 100); //TODO: min,max,interval
+        a.recycle();
     }
 
     @Override
@@ -36,15 +41,19 @@ public class PreferenceSeekBar extends DialogPreference {
         return R.layout.preference_seekbar;
     }
 
-    public int getmValue() {
+    public int getValue() {
         return mValue;
     }
 
-    public void setmValue(int v) {
+    public void setValue(int v) {
         mValue = v;
 
         // Save to SharedPreference
         persistInt(v);
+    }
+
+    public int getMax() {
+        return mMax;
     }
 
     @Override
@@ -56,7 +65,7 @@ public class PreferenceSeekBar extends DialogPreference {
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
         if (restorePersistedValue) {
             // Restore existing state
-            mValue = this.getPersistedInt(0);
+            mValue = getPersistedInt(0);
         } else {
             // Set default state from the XML attribute
             mValue = (Integer) defaultValue;
@@ -67,11 +76,11 @@ public class PreferenceSeekBar extends DialogPreference {
     @Override
     public CharSequence getSummary() {
         // Add ability to replace %s by current value
-        return String.format(super.getSummary().toString(), mValue);
+        return String.format(super.getSummary().toString(), getValue());
     }
 
-    public CharSequence getmOriginalSummary() {
+    public CharSequence getOriginalSummary() {
         // Add ability to replace %s by current value from original summary
-        return String.format(mOriginalSummary, mValue);
+        return String.format(mOriginalSummary, getValue());
     }
 }
