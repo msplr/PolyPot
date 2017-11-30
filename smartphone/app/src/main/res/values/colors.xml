@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#388e3c</color>
-    <color name="colorPrimaryDark">#1b5e20</color>
-    <color name="colorAccent">#858585</color>
+    <color name="colorPrimary">#388e3c</color>      <!-- Green 700 -->
+    <color name="colorPrimaryDark">#00600f</color>  <!-- Green 700 Dark -->
+    <color name="colorAccent">#9e9e9e</color>       <!-- Grey 500 -->
+    <color name="lightBlue">#29b6f6</color>         <!-- Light Blue 400 -->
+    <color name="red">#f44336</color>               <!-- Red 500 -->
+    <color name="yellow">#fbc02d</color>            <!-- Yellow 700 -->
+    <color name="limeAccent">#aeea00</color>        <!-- Lime Accent 700 -->
 </resources>

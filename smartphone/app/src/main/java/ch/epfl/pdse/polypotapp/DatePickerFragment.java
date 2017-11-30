@@ -18,7 +18,7 @@ public class DatePickerFragment extends DialogFragment implements DatePickerDial
     private Calendar mDate;
     private SimpleDateFormat mDateFormat;
 
-    public DatePickerFragment(MenuItem menuItem, Calendar calendar, SimpleDateFormat dateFormat) {
+    public void configure(MenuItem menuItem, Calendar calendar, SimpleDateFormat dateFormat) {
         mCurrentDay = menuItem;
         mDate = calendar;
         mDateFormat = dateFormat;

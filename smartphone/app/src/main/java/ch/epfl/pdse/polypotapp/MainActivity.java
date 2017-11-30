@@ -180,13 +180,10 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
     @Override
     protected void onPause() {
         super.onPause();
-        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
-    }
 
-    @Override
-    public void onDestroy() {
         mCommunicationManager.stop();
-        super.onDestroy();
+
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -209,7 +206,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             case R.id.current_day:
                 // Let the user pick the date
-                DialogFragment datePicker = new DatePickerFragment(mCurrentDay, mDate, mDateFormat);
+                DatePickerFragment datePicker = new DatePickerFragment();
+                datePicker.configure(mCurrentDay, mDate, mDateFormat);
                 datePicker.show(getSupportFragmentManager(), "datePicker");
 
                 return true;
@@ -261,7 +259,11 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             mDate.set(Calendar.MILLISECOND, 0);
 
             // Update date in toolbar
-            mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
+            if(mCurrentDay  != null) {
+                // May be null if called before onPrepareOptionsMenu, onPrepareOptionsMenu will update
+                // the date for us in this case
+                mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
+            }
 
             // Update graphs
             EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));

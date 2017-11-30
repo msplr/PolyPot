@@ -29,7 +29,7 @@ public class TabFragmentSoilMoisture extends Fragment{
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         mChart = view.findViewById(R.id.graph_soil_moisture);
-        mColor = getResources().getColor(android.R.color.holo_blue_light);
+        mColor = getResources().getColor(R.color.lightBlue);
         mNoChartData = getResources().getString(R.string.no_chart_data);
 
         GraphHelper.configureChart(mChart, mColor, 0, 100);

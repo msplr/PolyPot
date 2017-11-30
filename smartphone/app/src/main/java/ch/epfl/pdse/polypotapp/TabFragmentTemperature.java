@@ -29,7 +29,7 @@ public class TabFragmentTemperature extends Fragment{
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         mChart = view.findViewById(R.id.graph_temperature);
-        mColor = getResources().getColor(android.R.color.holo_red_light);
+        mColor = getResources().getColor(R.color.red);
         mNoChartData = getResources().getString(R.string.no_chart_data);
 
         GraphHelper.configureChart(mChart, mColor, 0, 30);
