@@ -39,6 +39,18 @@ def add_measure(m, pot_id):
     measure.pot_id=pot_id
     db.session.add(measure)
 
+def add_command(c, pot_id):
+    id = c.get('id', None)
+
+    if id != None:
+        command = Command.query.filter(Command.pot_id == pot_id, Command.id == id).one()
+    else:
+        command = Command()
+
+    command.from_dict(c)
+    command.pot_id=pot_id
+    db.session.add(command)
+
 @app.route('/send-data/<uuid:pot_id>', methods=['POST'])
 def send_data(pot_id):
     json_content = request.get_json()
@@ -51,6 +63,14 @@ def send_data(pot_id):
         elif type(json_content['data']) == dict:
             add_measure(json_content['data'], pot_id.hex)
 
+    # Store commands
+    if 'commands' in json_content:
+        if type(json_content['commands']) == list:
+            for c in json_content['commands']:
+                add_command(c, pot_id.hex)
+        elif type(json_content['commands']) == dict:
+            add_command(json_content['commands'], pot_id.hex)
+
     # Send commands & configuration
     json_content = {}
 
@@ -58,15 +78,38 @@ def send_data(pot_id):
     json_content['configuration'] = config.to_dict()
 
     json_content['commands'] = []
-    commands = Command.query.filter_by(pot_id=pot_id.hex).all()
+    commands = Command.query.filter(Command.pot_id == pot_id.hex, Command.status == CommandStatus.new).all()
     for command in commands:
         json_content['commands'].append(command.to_dict())
-        db.session.delete(command)
+        command.status = CommandStatus.sent
 
     # Commit all changes
     db.session.commit()
 
     return jsonify(json_content)
+
+@app.route('/get-latest/<uuid:pot_id>')
+def get_latest(pot_id):
+    json_content = {}
+
+    # Send last data point
+    measure = Measure.query.filter_by(pot_id=pot_id.hex).order_by(Measure.datetime.desc()).first()
+    json_content['data'] = measure.to_dict() if measure else {}
+
+    # Send configuration
+    config = Config.query.filter_by(pot_id=pot_id.hex).one()
+    json_content['configuration'] = config.to_dict()
+
+    # Send the last executed command of each type
+    json_content['commands'] = []
+    for type in CommandType:
+        command = Command.query.filter(Command.pot_id == pot_id.hex, Command.type == type, Command.status == CommandStatus.executed).order_by(Command.datetime.desc()).first()
+        if command:
+            json_content['commands'].append(command.to_dict())
+
+    response = jsonify(json_content)
+    response.cache_control.max_age = config.sending_interval
+    return response
 
 @app.route('/get-data/<uuid:pot_id>')
 def get_data(pot_id):
@@ -74,6 +117,10 @@ def get_data(pot_id):
 
     begin = request.args.get('from')
     end   = request.args.get('to')
+
+    # Send back date range
+    json_content['from'] = begin
+    json_content['to'] = end
 
     begin = datetime.datetime.strptime(begin, '%Y-%m-%dT%H:%M:%SZ') if begin else datetime.datetime(datetime.MINYEAR, 1, 1, 0, 0, 0)
     end   = datetime.datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')   if end   else datetime.datetime(datetime.MAXYEAR, 12, 31, 23, 59, 59)
@@ -84,17 +131,18 @@ def get_data(pot_id):
     for measure in measures:
         json_content['data'].append(measure.to_dict())
 
-    # Send configuration
+    # Send commands
+    json_content['commands'] = []
+    commands = Command.query.filter(Command.pot_id == pot_id.hex, Command.datetime >= begin, Command.datetime < end).order_by(Command.datetime.asc()).all()
+    for command in commands:
+        json_content['commands'].append(command.to_dict())
+
+    # Get configuration
     config = Config.query.filter_by(pot_id=pot_id.hex).one()
-    json_content['configuration'] = config.to_dict()
 
-    return jsonify(json_content)
-
-def add_command(c, pot_id):
-    command = Command()
-    command.from_dict(c)
-    command.pot_id=pot_id
-    db.session.add(command)
+    response = jsonify(json_content)
+    response.cache_control.max_age = config.sending_interval
+    return response
 
 @app.route('/send-c-and-c/<uuid:pot_id>', methods=['POST'])
 def send_commands_and_configuration(pot_id):
@@ -116,7 +164,10 @@ def send_commands_and_configuration(pot_id):
     # Commit all changes
     db.session.commit()
 
-    return 'DONE'
+    # Send back empty JSON response
+    json_content = {}
+
+    return jsonify(json_content)
 
 if __name__ == '__main__':
     db.init_app(app)

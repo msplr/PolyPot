@@ -9,7 +9,7 @@ The PolyPot Server is a Python app written using Flask and SQLAlchemy.
 You can run it on your local machine using the following commands:
 
 ```
-virtualenv-3.6 ~/.virtualenv/polypot
+virtualenv ~/.virtualenv/polypot
 source ~/.virtualenv/polypot/bin/activate
 cd app
 pip install -r requirements.txt
@@ -30,8 +30,9 @@ docker run --rm -it -p 127.0.0.1:5000:5000 -v $(pwd):/polypot/db:Z polypot
 You can test the server using the following commands:
 
 ```
-curl -v localhost:5000/setup/c52562b7-a1f1-4729-8a0f-7ee82aae6a10
-curl -v localhost:5000/send-c-and-c/c52562b7-a1f1-4729-8a0f-7ee82aae6a10 -d "@../protocol/smartphone-server.json" -H "Content-Type: application/json"
-curl -v localhost:5000/send-data/c52562b7-a1f1-4729-8a0f-7ee82aae6a10 -d "@../protocol/pot-server.json" -H "Content-Type: application/json"
-curl -v localhost:5000/get-data/c52562b7-a1f1-4729-8a0f-7ee82aae6a10
+curl -v localhost:5000/setup/01234567-89ab-cdef-0123-456789abcdef
+curl -v localhost:5000/send-c-and-c/01234567-89ab-cdef-0123-456789abcdef -d "@../protocol/smartphone-server.json" -H "Content-Type: application/json"
+curl -v localhost:5000/send-data/01234567-89ab-cdef-0123-456789abcdef -d "@../protocol/pot-server.json" -H "Content-Type: application/json"
+curl -v localhost:5000/get-latest/01234567-89ab-cdef-0123-456789abcdef
+curl -v localhost:5000/get-data/01234567-89ab-cdef-0123-456789abcdef
 ```

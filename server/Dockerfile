@@ -6,6 +6,7 @@ RUN BUILD_DEPS="python-dev" \
  && apk -U add \
     $BUILD_DEPS \
     py-pip \
+    py-enum34 \
     su-exec
 
 COPY app /polypot
