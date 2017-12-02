@@ -55,6 +55,21 @@
     <string name="tick_icon">Tick icon</string>
     <string name="cross_icon">Cross icon</string>
 
-
-
+    <!-- Configuration -->
+    <string name="conf_category_pot">Pot</string>
+    <string name="conf_target_soil_moisture_title">Soil moisture threshold</string>
+    <string name="conf_target_soil_moisture_summary">Threshold at which the pot waters the plant.\nCurrent value: %s%%</string>
+    <string name="conf_water_volume_pumped_title">Water volume pumped</string>
+    <string name="conf_water_volume_pumped_summary">Volume pumped when pot waters the plant.\nCurrent value: %s mL</string>
+    <string name="conf_logging_interval_title">Logging interval</string>
+    <string name="conf_logging_interval_summary">Interval at which the pot take measures.\nCurrent value: %s seconds</string>
+    <string name="conf_sending_interval_title">Sending interval</string>
+    <string name="conf_sending_interval_summary">Interval at which the pot send measurement.\nCurrent value: %s seconds</string>
+    <string name="conf_category_pot_and_smartphone">Pot &amp; Smartphone</string>
+    <string name="conf_setup_pot_title">Setup a new pot</string>
+    <string name="conf_setup_pot_summary">Setup a new pot. You will lose the configuration of your previous pot.</string>
+    <string name="conf_uuid_title">Pot UUID</string>
+    <string name="conf_uuid_summary">The unique identifier of your pot.\nCurrent value: %s</string>
+    <string name="conf_server_title">Server address</string>
+    <string name="conf_server_summary">The address of the server you want to use.\nCurrent value: %s</string>
 </resources>
