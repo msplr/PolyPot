@@ -20,17 +20,17 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 public class CommunicationManager {
-    private RequestQueue mRequestQueue;
-    private SharedPreferences mPreferences;
+    private final RequestQueue mRequestQueue;
+    private final SharedPreferences mPreferences;
 
-    private SimpleDateFormat mDateFormat;
-    private Calendar mDate;
+    private final SimpleDateFormat mDateFormat;
+    private final Calendar mDate;
 
     public enum RequestType {
         GET_LATEST, GET_DATA, POST_CONFIGURATION, POST_SETUP
     }
 
-    public abstract class GenericDataReady {
+    abstract class GenericDataReady {
         public JSONObject response = null;
         public VolleyError error = null;
 
@@ -43,13 +43,13 @@ public class CommunicationManager {
         }
     }
 
-    public class LatestDataReady extends GenericDataReady {}
-    public class SetupDataReady extends GenericDataReady {}
-    public class DataReady extends GenericDataReady {}
+    class LatestDataReady extends GenericDataReady {}
+    class SetupDataReady extends GenericDataReady {}
+    class DataReady extends GenericDataReady {}
 
-    public static class Request {
-        public RequestType type;
-        public JSONObject jsonRequest;
+    static class Request {
+        public final RequestType type;
+        public final JSONObject jsonRequest;
 
         public Request(RequestType type) {
             this.type = type;

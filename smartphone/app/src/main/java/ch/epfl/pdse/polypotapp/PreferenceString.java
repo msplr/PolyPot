@@ -6,8 +6,8 @@ import android.support.v7.preference.DialogPreference;
 import android.util.AttributeSet;
 
 public class PreferenceString extends DialogPreference {
+    private final String mOriginalSummary;
     private String mValue;
-    private String mOriginalSummary;
 
     public PreferenceString(Context context) {
         // Delegate to other constructor

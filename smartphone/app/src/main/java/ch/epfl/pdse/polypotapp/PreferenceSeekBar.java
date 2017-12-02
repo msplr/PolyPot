@@ -6,9 +6,9 @@ import android.support.v7.preference.DialogPreference;
 import android.util.AttributeSet;
 
 public class PreferenceSeekBar extends DialogPreference {
+    private final String mOriginalSummary;
+    private final int mMax;
     private int mValue;
-    private int mMax;
-    private String mOriginalSummary;
 
     public PreferenceSeekBar(Context context) {
         // Delegate to other constructor

@@ -21,7 +21,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-public class GraphHelper {
+class GraphHelper {
     public static void configureChart(LineChart chart, int color, float min, float max) {
         YAxis yAxis = chart.getAxisLeft();
         yAxis.setAxisMinimum(min);
@@ -93,8 +93,8 @@ public class GraphHelper {
     }
 
     public static class DateAxisFormatter implements IAxisValueFormatter {
-        protected final Calendar mCalendar = Calendar.getInstance();
-        protected final SimpleDateFormat mDateFormat = new SimpleDateFormat("HH:'00'");
+        private final Calendar mCalendar = Calendar.getInstance();
+        private final SimpleDateFormat mDateFormat = new SimpleDateFormat("HH:'00'");
 
         @Override
         public String getFormattedValue(float value, AxisBase axis) {
@@ -102,8 +102,5 @@ public class GraphHelper {
             mCalendar.setTimeZone(TimeZone.getDefault());
             return mDateFormat.format(mCalendar.getTime());
         }
-
-        /** this is only needed if numbers are returned, else return 0 */
-        public int getDecimalDigits() { return 0; }
     }
 }

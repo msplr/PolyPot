@@ -241,14 +241,14 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
     }
 
     @Subscribe
-    public void handleSummaryData(CommunicationManager.LatestDataReady event) {
+    public void handleLatestData(CommunicationManager.LatestDataReady event) {
         try {
-            JSONObject summaryData = event.response.getJSONObject("data");
+            JSONObject data = event.response.getJSONObject("data");
 
             // Switch to latest data date
             SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            mDate.setTime(inputDateFormat.parse(summaryData.getString("datetime")));
+            mDate.setTime(inputDateFormat.parse(data.getString("datetime")));
             mDate.setTimeZone(TimeZone.getDefault());
 
             // Set everything more specific than day to zero
@@ -268,21 +268,21 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
 
             // Parse and store configuration from the server
-            JSONObject configData = event.response.getJSONObject("configuration");
+            JSONObject config = event.response.getJSONObject("configuration");
 
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            Iterator<String> it = configData.keys();
+            Iterator<String> it = config.keys();
             while(it.hasNext()) {
                 String key = it.next();
 
                 switch(mServerConfig.get(key)) {
                     case "int":
-                        editor.putInt(key, configData.getInt(key));
+                        editor.putInt(key, config.getInt(key));
                         break;
                     case "string":
-                        editor.putString(key, configData.getString(key));
+                        editor.putString(key, config.getString(key));
                         break;
                 }
             }
@@ -316,7 +316,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         }
     }
 
-    public class Tabs {
+    class Tabs {
         public static final int SUMMARY = 0;
         public static final int WATER_LEVEL = 1;
         public static final int TEMPERATURE = 2;

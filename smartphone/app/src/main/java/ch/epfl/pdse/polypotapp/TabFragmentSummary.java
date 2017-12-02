@@ -57,24 +57,24 @@ public class TabFragmentSummary extends Fragment {
     }
 
     @Subscribe
-    public void handleSummaryData(CommunicationManager.LatestDataReady event) {
+    public void handleLatestData(CommunicationManager.LatestDataReady event) {
         try {
-            JSONObject summaryData = event.response.getJSONObject("data");
+            JSONObject data = event.response.getJSONObject("data");
 
             // Soil Moisture
-            int soilMoisture = Math.round(Float.parseFloat(summaryData.getString("soil_moisture")));
+            int soilMoisture = Math.round(Float.parseFloat(data.getString("soil_moisture")));
             soilMoistureText.setText(Integer.toString(soilMoisture));
 
             // Temperature
-            int temperature = Math.round(Float.parseFloat(summaryData.getString("temperature")));
+            int temperature = Math.round(Float.parseFloat(data.getString("temperature")));
             temperatureText.setText(Integer.toString(temperature));
 
             // Water Level
-            int water_level = Math.round(Float.parseFloat(summaryData.getString("water_level")));
+            int water_level = Math.round(Float.parseFloat(data.getString("water_level")));
             waterLevelText.setText(Integer.toString(water_level));
 
             // Luminosity
-            int luminosity = Math.round(Float.parseFloat(summaryData.getString("luminosity")));
+            int luminosity = Math.round(Float.parseFloat(data.getString("luminosity")));
             luminosityText.setText(Integer.toString(luminosity));
 
             // Date and Time
@@ -83,7 +83,7 @@ public class TabFragmentSummary extends Fragment {
             SimpleDateFormat outputDateFormat = new SimpleDateFormat("'Data from 'yyyy-MM-dd' 'HH:mm:ss'.'");
 
             Calendar date = GregorianCalendar.getInstance();
-            date.setTime(inputDateFormat.parse(summaryData.getString("datetime")));
+            date.setTime(inputDateFormat.parse(data.getString("datetime")));
             date.setTimeZone(TimeZone.getDefault());
 
             dataDateText.setText(outputDateFormat.format(date.getTime()));

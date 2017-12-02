@@ -130,7 +130,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/limeAccent"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
+                    app:srcCompat="@drawable/ic_tick"
+                    android:contentDescription="@string/tick_icon" />
 
                 <ImageView
                     android:id="@+id/wifi_presence_cross"
@@ -138,7 +139,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/red"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
+                    app:srcCompat="@drawable/ic_cross"
+                    android:contentDescription="@string/cross_icon" />
 
                 <TextView
                     android:id="@+id/wifi_presence_text"
@@ -171,7 +173,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/limeAccent"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
+                    app:srcCompat="@drawable/ic_tick"
+                    android:contentDescription="@string/tick_icon" />
 
                 <ImageView
                     android:id="@+id/wifi_disconnect_user_cross"
@@ -179,7 +182,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/red"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
+                    app:srcCompat="@drawable/ic_cross"
+                    android:contentDescription="@string/cross_icon" />
 
                 <TextView
                     android:id="@+id/wifi_disconnect_text"
@@ -212,7 +216,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/limeAccent"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
+                    app:srcCompat="@drawable/ic_tick"
+                    android:contentDescription="@string/tick_icon" />
 
                 <ImageView
                     android:id="@+id/wifi_connect_pot_cross"
@@ -220,7 +225,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/red"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
+                    app:srcCompat="@drawable/ic_cross"
+                    android:contentDescription="@string/cross_icon" />
 
                 <TextView
                     android:id="@+id/wifi_connect_pot_text"
@@ -253,7 +259,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/limeAccent"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
+                    app:srcCompat="@drawable/ic_tick"
+                    android:contentDescription="@string/tick_icon" />
 
                 <ImageView
                     android:id="@+id/uuid_generate_cross"
@@ -261,7 +268,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/red"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
+                    app:srcCompat="@drawable/ic_cross"
+                    android:contentDescription="@string/cross_icon" />
 
                 <TextView
                     android:id="@+id/uuid_generate_text"
@@ -294,7 +302,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/limeAccent"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
+                    app:srcCompat="@drawable/ic_tick"
+                    android:contentDescription="@string/tick_icon" />
 
                 <ImageView
                     android:id="@+id/configuration_send_cross"
@@ -302,7 +311,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/red"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
+                    app:srcCompat="@drawable/ic_cross"
+                    android:contentDescription="@string/cross_icon" />
 
                 <TextView
                     android:id="@+id/configuration_send_text"
@@ -335,7 +345,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/limeAccent"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
+                    app:srcCompat="@drawable/ic_tick"
+                    android:contentDescription="@string/tick_icon" />
 
                 <ImageView
                     android:id="@+id/wifi_disconnect_pot_cross"
@@ -343,7 +354,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/red"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
+                    app:srcCompat="@drawable/ic_cross"
+                    android:contentDescription="@string/cross_icon" />
 
                 <TextView
                     android:id="@+id/wifi_disconnect_pot_text"
@@ -376,7 +388,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/limeAccent"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
+                    app:srcCompat="@drawable/ic_tick"
+                    android:contentDescription="@string/tick_icon" />
 
                 <ImageView
                     android:id="@+id/wifi_reconnect_user_cross"
@@ -384,7 +397,8 @@
                     android:layout_height="20dp"
                     android:tint="@color/red"
                     android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
+                    app:srcCompat="@drawable/ic_cross"
+                    android:contentDescription="@string/cross_icon" />
 
                 <TextView
                     android:id="@+id/wifi_reconnect_user_text"

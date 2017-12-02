@@ -416,7 +416,7 @@ public class ActivitySetup extends AppCompatActivity {
     }
 
     @Subscribe
-    private void handleSetupData(CommunicationManager.SetupDataReady event) {
+    public void handleSetupData(CommunicationManager.SetupDataReady event) {
         mConfigurationSendProgressBar.setVisibility(View.GONE);
         if(event.response == null) {
             mConfigurationSendCross.setVisibility(View.VISIBLE);

@@ -27,6 +27,12 @@
     <string name="plant_status_unknown">Unknown plant status.</string>
     <string name="latest_data_date_unknown">No data</string>
 
+    <string name="water_level_icon">Water level icon</string>
+    <string name="temperature_icon">Temperature icon</string>
+    <string name="soil_moisture_icon">Soil moisture icon</string>
+    <string name="luminosity_icon">Luminosity icon</string>
+    <string name="plant_icon">Plant icon</string>
+
     <!-- Setup pot -->
     <string name="setup_wifi_ssid">SSID WiFi:</string>
     <string name="setup_wifi_password">Password WiFi:</string>
@@ -40,6 +46,10 @@
     <string name="configuration_send">Send configuration to the pot.</string>
     <string name="wifi_disconnect_pot">Disconnect from pot\'s WiFi.</string>
     <string name="wifi_reconnect_user">Reconnect to your WiFi.</string>
+
+    <string name="tick_icon">Tick icon</string>
+    <string name="cross_icon">Cross icon</string>
+
 
 
 </resources>

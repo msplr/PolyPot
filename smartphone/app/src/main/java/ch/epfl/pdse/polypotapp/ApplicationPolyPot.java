@@ -4,7 +4,7 @@ import android.app.Application;
 
 import org.greenrobot.eventbus.EventBus;
 
-public class PolyPotApplication extends Application {
+public class ApplicationPolyPot extends Application {
     @Override
     public void onCreate () {
         super.onCreate();
