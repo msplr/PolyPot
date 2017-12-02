@@ -54,6 +54,9 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
     private SimpleDateFormat mDateFormat;
     private Calendar mDate;
 
+    private boolean mFirstDateChange;
+    private boolean mFirstConfigLoad;
+
     private CommunicationManager mCommunicationManager;
     private HashMap<String, String> mServerConfig;
 
@@ -63,6 +66,9 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         setContentView(R.layout.activity_main);
 
         mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        mFirstDateChange = true;
+        mFirstConfigLoad = true;
 
         mServerConfig = new HashMap<>();
         mServerConfig.put("target_soil_moisture", "int");
@@ -99,6 +105,10 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         mDate = GregorianCalendar.getInstance();
         mDate.setTimeInMillis(savedInstanceState.getLong("date"));
 
+        // Restore first date change and config load state
+        mFirstDateChange = savedInstanceState.getBoolean("firstDateChange");
+        mFirstConfigLoad = savedInstanceState.getBoolean("firstConfigLoad");
+
         // Restore tab
         mViewPager.setCurrentItem(savedInstanceState.getInt("activeTab"));
     }
@@ -119,10 +129,10 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             mDate.set(Calendar.MINUTE, 0);
             mDate.set(Calendar.SECOND, 0);
             mDate.set(Calendar.MILLISECOND, 0);
-
-            // Register to EventBus
-            EventBus.getDefault().register(this);
         }
+
+        // Register to EventBus
+        EventBus.getDefault().register(this);
 
         mCommunicationManager = new CommunicationManager(this, mDate);
 
@@ -169,6 +179,10 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         // Save the current tab
         savedInstanceState.putInt("activeTab", mViewPager.getCurrentItem());
 
+        // Save first date change and config load state
+        savedInstanceState.putBoolean("firstDateChange", mFirstDateChange);
+        savedInstanceState.putBoolean("firstConfigLoad", mFirstConfigLoad);
+
         // Save the date
         savedInstanceState.putLong("date", mDate.getTimeInMillis());
 
@@ -183,6 +197,8 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         mCommunicationManager.stop();
 
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -242,56 +258,67 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
 
     @Subscribe
     public void handleLatestData(CommunicationManager.LatestDataReady event) {
-        try {
-            JSONObject data = event.response.getJSONObject("data");
+        if(mFirstDateChange) {
+            try {
+                JSONObject data = event.response.getJSONObject("data");
 
-            // Switch to latest data date
-            SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-            inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            mDate.setTime(inputDateFormat.parse(data.getString("datetime")));
-            mDate.setTimeZone(TimeZone.getDefault());
+                // Switch to latest data date
+                SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                mDate.setTime(inputDateFormat.parse(data.getString("datetime")));
+                mDate.setTimeZone(TimeZone.getDefault());
 
-            // Set everything more specific than day to zero
-            mDate.set(Calendar.HOUR_OF_DAY, 0);
-            mDate.set(Calendar.MINUTE, 0);
-            mDate.set(Calendar.SECOND, 0);
-            mDate.set(Calendar.MILLISECOND, 0);
+                // Set everything more specific than day to zero
+                mDate.set(Calendar.HOUR_OF_DAY, 0);
+                mDate.set(Calendar.MINUTE, 0);
+                mDate.set(Calendar.SECOND, 0);
+                mDate.set(Calendar.MILLISECOND, 0);
 
-            // Update date in toolbar
-            if(mCurrentDay  != null) {
-                // May be null if called before onPrepareOptionsMenu, onPrepareOptionsMenu will update
-                // the date for us in this case
-                mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
-            }
-
-            // Update graphs
-            EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
-
-            // Parse and store configuration from the server
-            JSONObject config = event.response.getJSONObject("configuration");
-
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-
-            Iterator<String> it = config.keys();
-            while(it.hasNext()) {
-                String key = it.next();
-
-                switch(mServerConfig.get(key)) {
-                    case "int":
-                        editor.putInt(key, config.getInt(key));
-                        break;
-                    case "string":
-                        editor.putString(key, config.getString(key));
-                        break;
+                // Update date in toolbar
+                if (mCurrentDay != null) {
+                    // May be null if called before onPrepareOptionsMenu, onPrepareOptionsMenu will update
+                    // the date for us in this case
+                    mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
                 }
-            }
-            editor.apply();
 
-            // Only switch the toolbar date and update the local configuration once
-            EventBus.getDefault().unregister(this);
-        } catch (NullPointerException|JSONException|ParseException e) {
-            Snackbar.make(mViewPager, getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+                // Only switch the toolbar date once
+                mFirstDateChange = false;
+
+                // Update graphs
+                EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
+            } catch (NullPointerException | JSONException | ParseException e) {
+                Snackbar.make(mViewPager, getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+            }
+        }
+
+        if(mFirstConfigLoad) {
+            try {
+                // Parse and store configuration from the server
+                JSONObject config = event.response.getJSONObject("configuration");
+
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                Iterator<String> it = config.keys();
+                while (it.hasNext()) {
+                    String key = it.next();
+
+                    switch (mServerConfig.get(key)) {
+                        case "int":
+                            editor.putInt(key, config.getInt(key));
+                            break;
+                        case "string":
+                            editor.putString(key, config.getString(key));
+                            break;
+                    }
+                }
+                editor.apply();
+
+                // Only update the local configuration once
+                mFirstConfigLoad = false;
+            } catch (NullPointerException | JSONException e) {
+                Snackbar.make(mViewPager, getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -313,6 +340,15 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
 
             JSONObject jsonRequest = new JSONObject(configuration);
             EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.POST_CONFIGURATION, jsonRequest));
+        }
+    }
+
+    @Subscribe
+    public void handleConfigurationData(CommunicationManager.ConfigurationDataReady event) {
+        if(event.response != null) {
+            Snackbar.make(mViewPager, getString(R.string.configuration_updated), Snackbar.LENGTH_LONG).show();
+        } else {
+            Snackbar.make(mViewPager, getString(R.string.error_configuration_update), Snackbar.LENGTH_LONG).show();
         }
     }
 

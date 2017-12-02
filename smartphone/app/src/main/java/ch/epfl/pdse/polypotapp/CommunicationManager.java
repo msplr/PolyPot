@@ -43,9 +43,10 @@ public class CommunicationManager {
         }
     }
 
+    class DataReady extends GenericDataReady {}
     class LatestDataReady extends GenericDataReady {}
     class SetupDataReady extends GenericDataReady {}
-    class DataReady extends GenericDataReady {}
+    class ConfigurationDataReady extends GenericDataReady {}
 
     static class Request {
         public final RequestType type;
@@ -111,7 +112,7 @@ public class CommunicationManager {
             case POST_CONFIGURATION:
                 method = Method.POST;
                 url = server + "/send-c-and-c/" + UUID;
-                dataReady = null;
+                dataReady = new ConfigurationDataReady();
                 break;
 
             case POST_SETUP:

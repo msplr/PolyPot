@@ -313,11 +313,11 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
-                        android:id="@+id/watering_status"
+                        android:id="@+id/last_watering_text"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:gravity="center_vertical|center"
-                        android:text="@string/watering_status_unknown"
+                        android:text="@string/last_watering_unknown"
                         android:textAlignment="center"
                         android:textAppearance="@style/TextAppearance.AppCompat.Large"
                         app:layout_column="0"

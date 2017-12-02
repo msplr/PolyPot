@@ -9,9 +9,11 @@
 
     <string name="no_chart_data">No chart data available for %s.</string>
 
-    <!-- Communication errors -->
+    <!-- Communication -->
     <string name="error_reception_summary">An error occurred during the reception of the summary\'s data.</string>
     <string name="error_reception_data">An error occurred during the reception of the data.</string>
+    <string name="error_configuration_update">An error occurred during the transmission of the configuration.</string>
+    <string name="configuration_updated">Configuration updated!</string>
 
     <!-- Toolbar -->
     <string name="previous_day">Previous day</string>
@@ -23,9 +25,12 @@
     <string name="temperature_unit">°C</string>
     <string name="soil_moisture_unit">%</string>
     <string name="luminosity_unit">lux</string>
-    <string name="watering_status_unknown">Last watering date unknown.</string>
+    <string name="last_watering_unknown">Last watering date unknown.</string>
     <string name="plant_status_unknown">Unknown plant status.</string>
     <string name="latest_data_date_unknown">No data</string>
+
+    <string name="last_watering_format">\'Last watering:\n\'yyyy-MM-dd\nHH:mm</string>
+    <string name="latest_data_date_format">\'Data from \'yyyy-MM-dd\' \'HH:mm\'.\'</string>
 
     <string name="water_level_icon">Water level icon</string>
     <string name="temperature_icon">Temperature icon</string>

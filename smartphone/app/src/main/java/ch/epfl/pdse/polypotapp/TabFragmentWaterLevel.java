@@ -53,6 +53,11 @@ public class TabFragmentWaterLevel extends Fragment {
         try {
             GraphHelper.updateChartWithData(mChart, mColor, "water_level", event.response, mNoChartData);
         } catch (NullPointerException|JSONException|ParseException e) {
+            // Display error on chart
+            mChart.clear();
+            mChart.setNoDataText(getString(R.string.error_reception_data));
+
+            // Show an error message
             Snackbar.make(getView(), getString(R.string.error_reception_data), Snackbar.LENGTH_LONG).show();
         }
     }
