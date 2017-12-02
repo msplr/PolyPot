@@ -34,15 +34,21 @@
     <android.support.v7.preference.PreferenceCategory
         android:title="Pot &amp; Smartphone">
 
+        <PreferenceScreen
+            android:title="Setup a new pot"
+            android:summary="Setup a new pot. You will lose the configuration of your previous pot.">
+            <intent android:action="ch.epfl.pdse.polypotapp.ActivitySetup" />
+        </PreferenceScreen>
+
         <ch.epfl.pdse.polypotapp.PreferenceString
-            android:defaultValue="@string/default_uuid"
+            android:defaultValue="01234567-89ab-cdef-0123-456789abcdef"
             android:key="uuid"
             android:title="Pot UUID"
             android:summary="The unique identifier of your pot.\nCurrent value: %s"
             style="@style/AppTheme.DialogPreference"/>
 
         <ch.epfl.pdse.polypotapp.PreferenceString
-            android:defaultValue="@string/default_server"
+            android:defaultValue="https://polypot.0xf00.ch"
             android:key="server"
             android:title="Server address"
             android:summary="The address of the server you want to use.\nCurrent value: %s"

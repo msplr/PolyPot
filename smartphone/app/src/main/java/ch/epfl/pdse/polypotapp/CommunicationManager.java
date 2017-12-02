@@ -3,7 +3,6 @@ package ch.epfl.pdse.polypotapp;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
 
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
@@ -21,40 +20,32 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 public class CommunicationManager {
-    private Context mContext;
     private RequestQueue mRequestQueue;
-
-    private String mUuid;
-    private String mServer;
+    private SharedPreferences mPreferences;
 
     private SimpleDateFormat mDateFormat;
     private Calendar mDate;
 
     public enum RequestType {
-        GET_LATEST, GET_DATA, POST_CONFIGURATION
+        GET_LATEST, GET_DATA, POST_CONFIGURATION, POST_SETUP
     }
 
-    public interface GenericDataReady {
-        void addResponse(JSONObject response);
-    }
+    public abstract class GenericDataReady {
+        public JSONObject response = null;
+        public VolleyError error = null;
 
-    public class LatestDataReady implements GenericDataReady {
-        public JSONObject response;
-
-        @Override
         public void addResponse(JSONObject response) {
             this.response = response;
         }
-    }
 
-    public class DataReady implements GenericDataReady {
-        public JSONObject response;
-
-        @Override
-        public void addResponse(JSONObject response) {
-            this.response = response;
+        public void addError(VolleyError error) {
+            this.error = error;
         }
     }
+
+    public class LatestDataReady extends GenericDataReady {}
+    public class SetupDataReady extends GenericDataReady {}
+    public class DataReady extends GenericDataReady {}
 
     public static class Request {
         public RequestType type;
@@ -72,7 +63,6 @@ public class CommunicationManager {
     }
 
     public CommunicationManager(Context context, Calendar date) {
-        mContext = context;
         mRequestQueue = Volley.newRequestQueue(context.getApplicationContext());
         mRequestQueue.getCache().clear();
 
@@ -80,9 +70,7 @@ public class CommunicationManager {
         mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
         mDate = date;
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        mUuid = preferences.getString("uuid", mContext.getString(R.string.default_uuid));
-        mServer = preferences.getString("server", mContext.getString(R.string.default_server));
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         EventBus.getDefault().register(this);
     }
@@ -93,13 +81,16 @@ public class CommunicationManager {
 
     @Subscribe
     public void handleRequest(Request event) {
+        String UUID = mPreferences.getString("uuid", "");
+        String server = mPreferences.getString("server", "");
+
         int method = Method.GET;
-        String url = mServer;
+        String url = server;
         final GenericDataReady dataReady;
 
         switch (event.type) {
             case GET_LATEST:
-                url = mServer + "/get-latest/" + mUuid;
+                url = server + "/get-latest/" + UUID;
                 dataReady = new LatestDataReady();
                 break;
 
@@ -113,14 +104,20 @@ public class CommunicationManager {
                 toDate.add(Calendar.DAY_OF_MONTH, 1);
                 String to = "to=" + mDateFormat.format(toDate.getTime());
 
-                url = mServer + "/get-data/" + mUuid + "?" + from + "&" + to;
+                url = server + "/get-data/" + UUID + "?" + from + "&" + to;
                 dataReady = new DataReady();
                 break;
 
             case POST_CONFIGURATION:
                 method = Method.POST;
-                url = mServer + "/send-c-and-c/" + mUuid;
+                url = server + "/send-c-and-c/" + UUID;
                 dataReady = null;
+                break;
+
+            case POST_SETUP:
+                method = Method.POST;
+                url = "http://192.168.1.1/setup";
+                dataReady = new SetupDataReady();
                 break;
 
             default:
@@ -138,11 +135,15 @@ public class CommunicationManager {
                         }
                     }
                 }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Snackbar.make(((MainActivity) mContext).getView(), R.string.error_reception_data, Snackbar.LENGTH_LONG).show();
-            }
-        });
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        if(dataReady != null) {
+                            dataReady.addError(error);
+                            EventBus.getDefault().post(dataReady);
+                        }
+                    }
+                }
+        );
 
         mRequestQueue.add(dataRequest);
     }

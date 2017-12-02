@@ -13,7 +13,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+public class FragmentDatePicker extends DialogFragment implements DatePickerDialog.OnDateSetListener {
     private MenuItem mCurrentDay;
     private Calendar mDate;
     private SimpleDateFormat mDateFormat;

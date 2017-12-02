@@ -87,7 +87,7 @@ public class TabFragmentSummary extends Fragment {
             date.setTimeZone(TimeZone.getDefault());
 
             dataDateText.setText(outputDateFormat.format(date.getTime()));
-        } catch (JSONException|ParseException e) {
+        } catch (NullPointerException|JSONException|ParseException e) {
             Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
         }
     }

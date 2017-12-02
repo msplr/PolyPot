@@ -52,7 +52,7 @@ public class TabFragmentSoilMoisture extends Fragment{
     public void handleData(CommunicationManager.DataReady event) {
         try {
             GraphHelper.updateChartWithData(mChart, mColor, "soil_moisture", event.response, mNoChartData);
-        } catch (JSONException|ParseException e) {
+        } catch (NullPointerException|JSONException|ParseException e) {
             Snackbar.make(getView(), getString(R.string.error_reception_data), Snackbar.LENGTH_LONG).show();
         }
     }

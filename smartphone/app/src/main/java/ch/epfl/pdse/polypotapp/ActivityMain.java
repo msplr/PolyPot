@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -29,7 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TimeZone;
 
-public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class ActivityMain extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -206,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             case R.id.current_day:
                 // Let the user pick the date
-                DatePickerFragment datePicker = new DatePickerFragment();
+                FragmentDatePicker datePicker = new FragmentDatePicker();
                 datePicker.configure(mCurrentDay, mDate, mDateFormat);
                 datePicker.show(getSupportFragmentManager(), "datePicker");
 
@@ -291,8 +290,8 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
             // Only switch the toolbar date and update the local configuration once
             EventBus.getDefault().unregister(this);
-        } catch (JSONException | ParseException e) {
-            Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+        } catch (NullPointerException|JSONException|ParseException e) {
+            Snackbar.make(mViewPager, getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -315,11 +314,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
             JSONObject jsonRequest = new JSONObject(configuration);
             EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.POST_CONFIGURATION, jsonRequest));
         }
-    }
-
-    // Fet tabs from Fragment or elsewhere
-    public View getView() {
-        return mViewPager;
     }
 
     public class Tabs {

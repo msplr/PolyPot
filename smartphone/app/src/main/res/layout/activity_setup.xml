@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ch.epfl.pdse.polypotapp.ActivitySetup">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/gridLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/ssid_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setup_wifi_ssid"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                app:layout_column="0"
+                app:layout_gravity="right"
+                app:layout_row="0" />
+
+            <EditText
+                android:id="@+id/ssid_edit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="text"
+                app:layout_column="1"
+                app:layout_columnWeight="1"
+                app:layout_row="0" />
+
+            <TextView
+                android:id="@+id/password_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setup_wifi_password"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                app:layout_column="0"
+                app:layout_gravity="right"
+                app:layout_row="1" />
+
+            <EditText
+                android:id="@+id/password_edit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPassword"
+                app:layout_column="1"
+                app:layout_columnWeight="1"
+                app:layout_row="1" />
+
+            <TextView
+                android:id="@+id/server_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/setup_server"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                app:layout_column="0"
+                app:layout_gravity="right"
+                app:layout_row="2" />
+
+            <EditText
+                android:id="@+id/server_edit"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="text"
+                app:layout_column="1"
+                app:layout_columnWeight="1"
+                app:layout_row="2" />
+
+            <Button
+                android:id="@+id/setup_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:onClick="setupClick"
+                android:text="@string/setup_button"
+                app:layout_column="1"
+                app:layout_columnWeight="1"
+                app:layout_row="3" />
+
+        </android.support.v7.widget.GridLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/gridLayout">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp">
+
+                <ProgressBar
+                    android:id="@+id/wifi_presence_progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:visibility="invisible" />
+
+                <ImageView
+                    android:id="@+id/wifi_presence_tick"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/limeAccent"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_tick" />
+
+                <ImageView
+                    android:id="@+id/wifi_presence_cross"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/red"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_cross" />
+
+                <TextView
+                    android:id="@+id/wifi_presence_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="8dp"
+                    android:text="@string/wifi_presence"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp">
+
+                <ProgressBar
+                    android:id="@+id/wifi_disconnect_user_progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:visibility="invisible" />
+
+                <ImageView
+                    android:id="@+id/wifi_disconnect_user_tick"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/limeAccent"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_tick" />
+
+                <ImageView
+                    android:id="@+id/wifi_disconnect_user_cross"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/red"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_cross" />
+
+                <TextView
+                    android:id="@+id/wifi_disconnect_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="8dp"
+                    android:text="@string/wifi_disconnect_user"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp">
+
+                <ProgressBar
+                    android:id="@+id/wifi_connect_pot_progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:visibility="invisible" />
+
+                <ImageView
+                    android:id="@+id/wifi_connect_pot_tick"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/limeAccent"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_tick" />
+
+                <ImageView
+                    android:id="@+id/wifi_connect_pot_cross"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/red"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_cross" />
+
+                <TextView
+                    android:id="@+id/wifi_connect_pot_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="8dp"
+                    android:text="@string/wifi_connect_pot"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp">
+
+                <ProgressBar
+                    android:id="@+id/uuid_generate_progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:visibility="invisible" />
+
+                <ImageView
+                    android:id="@+id/uuid_generate_tick"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/limeAccent"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_tick" />
+
+                <ImageView
+                    android:id="@+id/uuid_generate_cross"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/red"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_cross" />
+
+                <TextView
+                    android:id="@+id/uuid_generate_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="8dp"
+                    android:text="@string/uuid_generate"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp">
+
+                <ProgressBar
+                    android:id="@+id/configuration_send_progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:visibility="invisible" />
+
+                <ImageView
+                    android:id="@+id/configuration_send_tick"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/limeAccent"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_tick" />
+
+                <ImageView
+                    android:id="@+id/configuration_send_cross"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/red"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_cross" />
+
+                <TextView
+                    android:id="@+id/configuration_send_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="8dp"
+                    android:text="@string/configuration_send"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp">
+
+                <ProgressBar
+                    android:id="@+id/wifi_disconnect_pot_progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:visibility="invisible" />
+
+                <ImageView
+                    android:id="@+id/wifi_disconnect_pot_tick"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/limeAccent"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_tick" />
+
+                <ImageView
+                    android:id="@+id/wifi_disconnect_pot_cross"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/red"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_cross" />
+
+                <TextView
+                    android:id="@+id/wifi_disconnect_pot_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="8dp"
+                    android:text="@string/wifi_disconnect_pot"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingBottom="4dp"
+                android:paddingTop="4dp">
+
+                <ProgressBar
+                    android:id="@+id/wifi_reconnect_user_progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:visibility="invisible" />
+
+                <ImageView
+                    android:id="@+id/wifi_reconnect_user_tick"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/limeAccent"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_tick" />
+
+                <ImageView
+                    android:id="@+id/wifi_reconnect_user_cross"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:tint="@color/red"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_cross" />
+
+                <TextView
+                    android:id="@+id/wifi_reconnect_user_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingLeft="8dp"
+                    android:text="@string/wifi_reconnect_user"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v4.widget.NestedScrollView>

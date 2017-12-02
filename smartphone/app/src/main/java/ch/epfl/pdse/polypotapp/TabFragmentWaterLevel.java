@@ -52,7 +52,7 @@ public class TabFragmentWaterLevel extends Fragment {
     public void handleData(CommunicationManager.DataReady event) {
         try {
             GraphHelper.updateChartWithData(mChart, mColor, "water_level", event.response, mNoChartData);
-        } catch (JSONException|ParseException e) {
+        } catch (NullPointerException|JSONException|ParseException e) {
             Snackbar.make(getView(), getString(R.string.error_reception_data), Snackbar.LENGTH_LONG).show();
         }
     }

@@ -4,7 +4,7 @@
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.epfl.pdse.polypotapp.MainActivity">
+    tools:context="ch.epfl.pdse.polypotapp.ActivityMain">
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                         android:id="@+id/water_level_icon"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:src="@drawable/ic_water_level"
+                        app:srcCompat="@drawable/ic_water_level"
                         android:tint="@color/lightBlue"
                         app:layout_column="0"
                         app:layout_columnWeight="1"
@@ -116,7 +116,7 @@
                         android:id="@+id/temperature_icon"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:src="@drawable/ic_temperature"
+                        app:srcCompat="@drawable/ic_temperature"
                         android:tint="@color/red"
                         app:layout_column="1"
                         app:layout_columnWeight="1"
@@ -182,7 +182,7 @@
                         android:id="@+id/soil_moisture_icon"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:src="@drawable/ic_soil_moisture"
+                        app:srcCompat="@drawable/ic_soil_moisture"
                         android:tint="@color/lightBlue"
                         app:layout_column="0"
                         app:layout_columnWeight="1"
@@ -248,7 +248,7 @@
                         android:id="@+id/luminosity_icon"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:src="@drawable/ic_luminosity"
+                        app:srcCompat="@drawable/ic_luminosity"
                         android:tint="@color/yellow"
                         app:layout_column="1"
                         app:layout_columnWeight="1"
@@ -352,7 +352,7 @@
                         android:id="@+id/plant_icon"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:src="@drawable/ic_plant"
+                        app:srcCompat="@drawable/ic_plant"
                         android:tint="@color/limeAccent"
                         app:layout_column="1"
                         app:layout_columnWeight="1"
