@@ -17,6 +17,7 @@ import android.view.View;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -53,6 +54,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
 
     private SimpleDateFormat mDateFormat;
     private Calendar mDate;
+    private Calendar mWaterDate;
 
     private boolean mFirstDateChange;
     private boolean mFirstConfigLoad;
@@ -65,7 +67,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        mDateFormat = new SimpleDateFormat(getResources().getString(R.string.date_format));
 
         mFirstDateChange = true;
         mFirstConfigLoad = true;
@@ -287,7 +289,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 // Update graphs
                 EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
             } catch (NullPointerException | JSONException | ParseException e) {
-                Snackbar.make(mViewPager, getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mViewPager, getString(R.string.reception_summary_error), Snackbar.LENGTH_LONG).show();
             }
         }
 
@@ -317,38 +319,34 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 // Only update the local configuration once
                 mFirstConfigLoad = false;
             } catch (NullPointerException | JSONException e) {
-                Snackbar.make(mViewPager, getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mViewPager, getString(R.string.reception_summary_error), Snackbar.LENGTH_LONG).show();
             }
         }
-    }
 
-    // Send configuration change to server if needed
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(mServerConfig.containsKey(key)) {
-            HashMap<String, Object> option = new HashMap<>();
-            switch(mServerConfig.get(key)) {
-                case "int":
-                    option.put(key, sharedPreferences.getInt(key, 0));
-                    break;
-                case "string":
-                    option.put(key, sharedPreferences.getString(key, ""));
-                    break;
+        try {
+            JSONArray commands = event.response.getJSONArray("commands");
+
+            // Search last watering
+            for(int i = 0; i < commands.length(); i++) {
+                JSONObject command = commands.getJSONObject(i);
+                if(command.getString("type").equals("water")) {
+                    // Date and Time
+                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                    inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                    mWaterDate = GregorianCalendar.getInstance();
+                    mWaterDate.setTime(mDateFormat.parse(command.getString("datetime")));
+                    mWaterDate.setTimeZone(TimeZone.getDefault());
+
+                    // Set everything more specific than day to zero
+                    mWaterDate.set(Calendar.HOUR_OF_DAY, 0);
+                    mWaterDate.set(Calendar.MINUTE, 0);
+                    mWaterDate.set(Calendar.SECOND, 0);
+                    mWaterDate.set(Calendar.MILLISECOND, 0);
+                }
             }
-
-            HashMap<String, Object> configuration = new HashMap<>();
-            configuration.put("configuration", option);
-
-            JSONObject jsonRequest = new JSONObject(configuration);
-            EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.POST_CONFIGURATION, jsonRequest));
-        }
-    }
-
-    @Subscribe
-    public void handleConfigurationData(CommunicationManager.ConfigurationDataReady event) {
-        if(event.response != null) {
-            Snackbar.make(mViewPager, getString(R.string.configuration_updated), Snackbar.LENGTH_LONG).show();
-        } else {
-            Snackbar.make(mViewPager, getString(R.string.error_configuration_update), Snackbar.LENGTH_LONG).show();
+        } catch (NullPointerException | JSONException | ParseException e) {
+            Snackbar.make(mViewPager, getString(R.string.reception_summary_error), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -356,7 +354,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         public static final int SUMMARY = 0;
         public static final int WATER_LEVEL = 1;
         public static final int TEMPERATURE = 2;
-        public static final int HUMIDITY = 3;
+        public static final int SOIL_MOISTURE = 3;
         public static final int LUMINOSITY = 4;
         public static final int CONFIGURATION = 5;
     }
@@ -380,7 +378,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                     return new TabFragmentWaterLevel();
                 case Tabs.TEMPERATURE:
                     return new TabFragmentTemperature();
-                case Tabs.HUMIDITY:
+                case Tabs.SOIL_MOISTURE:
                     return new TabFragmentSoilMoisture();
                 case Tabs.LUMINOSITY:
                     return new TabFragmentLuminosity();
@@ -431,11 +429,104 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 mViewPager.setCurrentItem(Tabs.TEMPERATURE);
                 break;
             case R.id.soil_moisture_card:
-                mViewPager.setCurrentItem(Tabs.HUMIDITY);
+                mViewPager.setCurrentItem(Tabs.SOIL_MOISTURE);
                 break;
             case R.id.luminosity_card:
                 mViewPager.setCurrentItem(Tabs.LUMINOSITY);
                 break;
+            case R.id.last_watering_card:
+                if(mWaterDate != null) {
+                    mDate.setTime(mWaterDate.getTime());
+
+                    // Update date in toolbar
+                    mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
+
+                    // Update data and graphs
+                    EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
+                }
+                mViewPager.setCurrentItem(Tabs.SOIL_MOISTURE);
+                break;
+        }
+    }
+
+    // Water plant
+    public void waterPlant(View v) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        long time = (sharedPreferences.getLong("block_water_command_until", 0) - Calendar.getInstance().getTimeInMillis())/1000;
+
+        if(time > 0) {
+            long hours = time / 3600;
+            long minutes = (time % 3600 ) / 60;
+            long seconds = (time % 3600 ) % 60;
+
+            Snackbar.make(mViewPager, String.format(getString(R.string.command_water_wait), hours, minutes, seconds), Snackbar.LENGTH_LONG).show();
+            return;
+        }
+
+        SimpleDateFormat outputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+        Calendar datetime = Calendar.getInstance();
+        datetime.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        HashMap<String, Object> command = new HashMap<>();
+        command.put("type", "water");
+        command.put("status", "new");
+        command.put("datetime", outputDateFormat.format(datetime.getTime()));
+
+        HashMap<String, Object> commands = new HashMap<>();
+        commands.put("commands", command);
+
+        JSONObject jsonRequest = new JSONObject(commands);
+        EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.POST_CONF_AND_COMMANDS, jsonRequest, "command.water"));
+    }
+
+    // Send configuration change to server if needed
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(mServerConfig.containsKey(key)) {
+            HashMap<String, Object> option = new HashMap<>();
+            switch(mServerConfig.get(key)) {
+                case "int":
+                    option.put(key, sharedPreferences.getInt(key, 0));
+                    break;
+                case "string":
+                    option.put(key, sharedPreferences.getString(key, ""));
+                    break;
+            }
+
+            HashMap<String, Object> configuration = new HashMap<>();
+            configuration.put("configuration", option);
+
+            JSONObject jsonRequest = new JSONObject(configuration);
+            EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.POST_CONF_AND_COMMANDS, jsonRequest, "configuration." + key));
+        }
+    }
+
+
+    @Subscribe
+    public void handleConfAndCommandsData(CommunicationManager.ConfAndCommandsDataReady event) {
+        if (event.hint.startsWith("configuration")) {
+            if (event.response != null) {
+                Snackbar.make(mViewPager, getString(R.string.configuration_updated), Snackbar.LENGTH_LONG).show();
+            } else {
+                Snackbar.make(mViewPager, getString(R.string.configuration_update_error), Snackbar.LENGTH_LONG).show();
+            }
+        } else if(event.hint.equals("command.water")) {
+            if (event.response != null) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                int time = Integer.decode(sharedPreferences.getString("sending_interval", "0"));
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putLong("block_water_command_until", Calendar.getInstance().getTimeInMillis() + time*1000);
+                editor.apply();
+
+                int hours = time / 3600;
+                int minutes = (time % 3600 ) / 60;
+                int seconds = (time % 3600 ) % 60;
+
+                Snackbar.make(mViewPager, String.format(getString(R.string.command_water_sent), hours, minutes, seconds), Snackbar.LENGTH_LONG).show();
+            } else {
+                Snackbar.make(mViewPager, getString(R.string.command_water_error), Snackbar.LENGTH_LONG).show();
+            }
         }
     }
 }

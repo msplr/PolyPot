@@ -406,9 +406,9 @@ public class ActivitySetup extends AppCompatActivity {
         mServer = findViewById(R.id.server_edit);
 
         HashMap<String, Object> configuration = new HashMap<>();
-        configuration.put("ssid", mSSID.getText());
-        configuration.put("password", mPassword.getText());
-        configuration.put("server", mServer.getText());
+        configuration.put("ssid", mSSID.getText().toString());
+        configuration.put("password", mPassword.getText().toString());
+        configuration.put("server", mServer.getText().toString());
         configuration.put("uuid", mUUID);
 
         JSONObject jsonRequest = new JSONObject(configuration);
@@ -421,6 +421,12 @@ public class ActivitySetup extends AppCompatActivity {
         if(event.response == null) {
             mConfigurationSendCross.setVisibility(View.VISIBLE);
         } else {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("server", mServer.getText().toString());
+            editor.putString("uuid", mUUID);
+            editor.apply();
+
             mConfigurationSendTick.setVisibility(View.VISIBLE);
         }
 

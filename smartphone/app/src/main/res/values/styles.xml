@@ -22,4 +22,8 @@
         <item name="positiveButtonText">@android:string/ok</item>
         <item name="negativeButtonText">@android:string/cancel</item>
     </style>
+
+    <style name="GreenButton" parent="ThemeOverlay.AppCompat">
+        <item name="colorAccent">@color/colorPrimary</item>
+    </style>
 </resources>

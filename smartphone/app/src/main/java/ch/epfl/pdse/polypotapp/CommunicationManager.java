@@ -27,39 +27,41 @@ public class CommunicationManager {
     private final Calendar mDate;
 
     public enum RequestType {
-        GET_LATEST, GET_DATA, POST_CONFIGURATION, POST_SETUP
+        GET_LATEST, GET_DATA, POST_CONF_AND_COMMANDS, POST_SETUP
     }
 
     abstract class GenericDataReady {
         public JSONObject response = null;
         public VolleyError error = null;
-
-        public void addResponse(JSONObject response) {
-            this.response = response;
-        }
-
-        public void addError(VolleyError error) {
-            this.error = error;
-        }
+        public String hint = "";
     }
 
     class DataReady extends GenericDataReady {}
     class LatestDataReady extends GenericDataReady {}
     class SetupDataReady extends GenericDataReady {}
-    class ConfigurationDataReady extends GenericDataReady {}
+    class ConfAndCommandsDataReady extends GenericDataReady {}
 
     static class Request {
         public final RequestType type;
         public final JSONObject jsonRequest;
+        public final String hint;
 
         public Request(RequestType type) {
             this.type = type;
             this.jsonRequest = null;
+            this.hint = "";
         }
 
         public Request(RequestType type, JSONObject jsonRequest) {
             this.type = type;
             this.jsonRequest = jsonRequest;
+            this.hint = "";
+        }
+
+        public Request(RequestType type, JSONObject jsonRequest, String hint) {
+            this.type = type;
+            this.jsonRequest = jsonRequest;
+            this.hint = hint;
         }
     }
 
@@ -81,7 +83,7 @@ public class CommunicationManager {
     }
 
     @Subscribe
-    public void handleRequest(Request event) {
+    public void handleRequest(final Request event) {
         String UUID = mPreferences.getString("uuid", "");
         String server = mPreferences.getString("server", "");
 
@@ -109,10 +111,10 @@ public class CommunicationManager {
                 dataReady = new DataReady();
                 break;
 
-            case POST_CONFIGURATION:
+            case POST_CONF_AND_COMMANDS:
                 method = Method.POST;
                 url = server + "/send-c-and-c/" + UUID;
-                dataReady = new ConfigurationDataReady();
+                dataReady = new ConfAndCommandsDataReady();
                 break;
 
             case POST_SETUP:
@@ -131,7 +133,8 @@ public class CommunicationManager {
                     @Override
                     public void onResponse(JSONObject response) {
                         if(dataReady != null) {
-                            dataReady.addResponse(response);
+                            dataReady.response = response;
+                            dataReady.hint = event.hint;
                             EventBus.getDefault().post(dataReady);
                         }
                     }
@@ -139,7 +142,8 @@ public class CommunicationManager {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         if(dataReady != null) {
-                            dataReady.addError(error);
+                            dataReady.error = error;
+                            dataReady.hint = event.hint;
                             EventBus.getDefault().post(dataReady);
                         }
                     }

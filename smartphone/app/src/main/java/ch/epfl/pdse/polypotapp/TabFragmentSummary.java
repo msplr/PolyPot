@@ -118,7 +118,7 @@ public class TabFragmentSummary extends Fragment {
             mLastWateringText.setText(R.string.last_watering_unknown);
 
             // Show an error message
-            Snackbar.make(getView(), getString(R.string.error_reception_summary), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getView(), getString(R.string.reception_summary_error), Snackbar.LENGTH_LONG).show();
         }
     }
 }

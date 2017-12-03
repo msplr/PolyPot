@@ -1,5 +1,6 @@
 package ch.epfl.pdse.polypotapp;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -19,7 +20,7 @@ import java.text.ParseException;
 public class TabFragmentTemperature extends Fragment{
     private LineChart mChart;
     private int mColor;
-    private String mNoChartData;
+    private Resources mResources;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -30,7 +31,7 @@ public class TabFragmentTemperature extends Fragment{
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         mChart = view.findViewById(R.id.graph_temperature);
         mColor = getResources().getColor(R.color.red);
-        mNoChartData = getResources().getString(R.string.no_chart_data);
+        mResources = getResources();
 
         GraphHelper.configureChart(mChart, mColor, 0, 30);
         EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
@@ -51,14 +52,14 @@ public class TabFragmentTemperature extends Fragment{
     @Subscribe
     public void handleData(CommunicationManager.DataReady event) {
         try {
-            GraphHelper.updateChartWithData(mChart, mColor, "temperature", event.response, mNoChartData);
+            GraphHelper.updateChartWithData(mChart, mColor, "temperature", event.response, mResources);
         } catch (NullPointerException|JSONException|ParseException e) {
             // Display error on chart
             mChart.clear();
-            mChart.setNoDataText(getString(R.string.error_reception_data));
+            mChart.setNoDataText(getString(R.string.reception_data_error));
 
             // Show an error message
-            Snackbar.make(getView(), getString(R.string.error_reception_data), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getView(), getString(R.string.reception_data_error), Snackbar.LENGTH_LONG).show();
         }
     }
 }

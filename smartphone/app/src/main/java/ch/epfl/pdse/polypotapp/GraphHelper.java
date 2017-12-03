@@ -1,5 +1,7 @@
 package ch.epfl.pdse.polypotapp;
 
+import android.content.res.Resources;
+
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
@@ -41,7 +43,7 @@ class GraphHelper {
         chart.setNoDataTextColor(color);
     }
 
-    public static void updateChartWithData(LineChart chart, int color, String keyword, JSONObject response, String noChartData) throws JSONException, ParseException {
+    public static void updateChartWithData(LineChart chart, int color, String keyword, JSONObject response, Resources resources) throws JSONException, ParseException {
         JSONArray data = response.getJSONArray("data");
 
         SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -71,9 +73,9 @@ class GraphHelper {
         }
 
         if(entries.size() == 0) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat outputDateFormat = new SimpleDateFormat(resources.getString(R.string.date_format));
             chart.clear();
-            chart.setNoDataText(String.format(noChartData, dateFormat.format(fromDate.getTime())));
+            chart.setNoDataText(String.format(resources.getString(R.string.no_chart_data), outputDateFormat.format(fromDate.getTime())));
         } else {
             LineDataSet dataSet = new LineDataSet(entries, "Label");
             dataSet.setColor(color);
