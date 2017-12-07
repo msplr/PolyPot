@@ -2,7 +2,6 @@ package ch.epfl.pdse.polypotapp;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -48,6 +47,10 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
 
     private TabLayout mTabLayout;
 
+    private String mServer;
+    private String mUUID;
+    private SharedPreferences mSharedPreferences;
+
     private MenuItem mPreviousDay;
     private MenuItem mCurrentDay;
     private MenuItem mNextDay;
@@ -59,27 +62,35 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
     private boolean mFirstDateChange;
     private boolean mFirstConfigLoad;
 
-    private CommunicationManager mCommunicationManager;
-    private HashMap<String, String> mServerConfig;
+    private HashMap<String, String> mConfigTypeMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        CommunicationManager.getDefault(this.getApplicationContext()).clearCache();
+
+        Bundle b = getIntent().getExtras();
+        mServer = b.getString("server");
+        mUUID = b.getString("uuid");
+
+        mSharedPreferences = getSharedPreferences(Pot.getPreferenceName(mServer, mUUID), MODE_PRIVATE);
+
         mDateFormat = new SimpleDateFormat(getResources().getString(R.string.date_format));
 
         mFirstDateChange = true;
         mFirstConfigLoad = true;
 
-        mServerConfig = new HashMap<>();
-        mServerConfig.put("target_soil_moisture", "int");
-        mServerConfig.put("water_volume_pumped", "string");
-        mServerConfig.put("logging_interval", "string");
-        mServerConfig.put("sending_interval", "string");
+        mConfigTypeMap = new HashMap<>();
+        mConfigTypeMap.put("target_soil_moisture", "int");
+        mConfigTypeMap.put("water_volume_pumped", "string");
+        mConfigTypeMap.put("logging_interval", "string");
+        mConfigTypeMap.put("sending_interval", "string");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -119,7 +130,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
     public void onResume() {
         super.onResume();  // Always call the superclass method first
 
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+        mSharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
         // If mDate is not null, we are restoring the activity and can skip that section
         if(mDate == null) {
@@ -136,10 +147,8 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         // Register to EventBus
         EventBus.getDefault().register(this);
 
-        mCommunicationManager = new CommunicationManager(this, mDate);
-
-        EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_LATEST));
-        EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
+        EventBus.getDefault().post(new CommunicationManager.LatestRequest(mServer, mUUID));
+        EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mDate));
     }
 
     @Override
@@ -164,7 +173,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         updateToolbarAndTablayout(mViewPager.getCurrentItem());
 
         // Same thing, but on tab change
-        mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager){
+        mTabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager) {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 super.onTabSelected(tab);
@@ -196,9 +205,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
     protected void onPause() {
         super.onPause();
 
-        mCommunicationManager.stop();
-
-        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+        mSharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
 
         EventBus.getDefault().unregister(this);
     }
@@ -217,14 +224,13 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
                 // Update data and graphs
-                EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
+                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mDate));
 
                 return true;
 
             case R.id.current_day:
                 // Let the user pick the date
-                FragmentDatePicker datePicker = new FragmentDatePicker();
-                datePicker.configure(mCurrentDay, mDate, mDateFormat);
+                DialogFragmentDatePicker datePicker = DialogFragmentDatePicker.newInstance(mServer, mUUID);
                 datePicker.show(getSupportFragmentManager(), "datePicker");
 
                 return true;
@@ -237,7 +243,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
                 // Update data and graphs
-                EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
+                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mDate));
 
                 return true;
 
@@ -287,9 +293,9 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 mFirstDateChange = false;
 
                 // Update graphs
-                EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
+                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mDate));
             } catch (NullPointerException | JSONException | ParseException e) {
-                Snackbar.make(mViewPager, getString(R.string.reception_summary_error), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mViewPager, R.string.reception_summary_error, Snackbar.LENGTH_LONG).show();
             }
         }
 
@@ -298,14 +304,13 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 // Parse and store configuration from the server
                 JSONObject config = event.response.getJSONObject("configuration");
 
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
 
                 Iterator<String> it = config.keys();
                 while (it.hasNext()) {
                     String key = it.next();
 
-                    switch (mServerConfig.get(key)) {
+                    switch (mConfigTypeMap.get(key)) {
                         case "int":
                             editor.putInt(key, config.getInt(key));
                             break;
@@ -319,7 +324,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 // Only update the local configuration once
                 mFirstConfigLoad = false;
             } catch (NullPointerException | JSONException e) {
-                Snackbar.make(mViewPager, getString(R.string.reception_summary_error), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mViewPager, R.string.reception_summary_error, Snackbar.LENGTH_LONG).show();
             }
         }
 
@@ -346,7 +351,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 }
             }
         } catch (NullPointerException | JSONException | ParseException e) {
-            Snackbar.make(mViewPager, getString(R.string.reception_summary_error), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mViewPager, R.string.reception_summary_error, Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -356,7 +361,8 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         public static final int TEMPERATURE = 2;
         public static final int SOIL_MOISTURE = 3;
         public static final int LUMINOSITY = 4;
-        public static final int CONFIGURATION = 5;
+        public static final int PLANT = 5;
+        public static final int CONFIGURATION = 6;
     }
 
     /**
@@ -373,17 +379,19 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             // getItem is called to instantiate the fragment for the given page.
             switch (position) {
                 case Tabs.SUMMARY:
-                    return new TabFragmentSummary();
+                    return TabFragmentSummary.newInstance(mServer, mUUID);
                 case Tabs.WATER_LEVEL:
-                    return new TabFragmentWaterLevel();
+                    return TabFragmentWaterLevel.newInstance(mServer, mUUID);
                 case Tabs.TEMPERATURE:
-                    return new TabFragmentTemperature();
+                    return TabFragmentTemperature.newInstance(mServer, mUUID);
                 case Tabs.SOIL_MOISTURE:
-                    return new TabFragmentSoilMoisture();
+                    return TabFragmentSoilMoisture.newInstance(mServer, mUUID);
                 case Tabs.LUMINOSITY:
-                    return new TabFragmentLuminosity();
+                    return TabFragmentLuminosity.newInstance(mServer, mUUID);
+                case Tabs.PLANT:
+                    return TabFragmentPlant.newInstance(mServer, mUUID);
                 case Tabs.CONFIGURATION:
-                    return new TabFragmentConfiguration();
+                    return TabFragmentPotConfiguration.newInstance(mServer, mUUID);
                 default:
                     return null;
             }
@@ -391,14 +399,14 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
 
         @Override
         public int getCount() {
-            // Show 5 total pages.
-            return 6;
+            // Show total pages.
+            return 7;
         }
     }
 
     // Hide date if on Summary and Configuration tabs, update icons transparency
     private void updateToolbarAndTablayout(int position) {
-        if(position == Tabs.SUMMARY || position == Tabs.CONFIGURATION) {
+        if(position == Tabs.SUMMARY || position == Tabs.PLANT || position == Tabs.CONFIGURATION) {
             // Hide date on Summary and Configuration tabs
             mPreviousDay.setVisible(false);
             mCurrentDay.setVisible(false);
@@ -442,17 +450,19 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                     mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
 
                     // Update data and graphs
-                    EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
+                    EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mDate));
                 }
                 mViewPager.setCurrentItem(Tabs.SOIL_MOISTURE);
+                break;
+            case R.id.plant_card:
+                mViewPager.setCurrentItem(Tabs.PLANT);
                 break;
         }
     }
 
     // Water plant
     public void waterPlant(View v) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        long time = (sharedPreferences.getLong("block_water_command_until", 0) - Calendar.getInstance().getTimeInMillis())/1000;
+        long time = (mSharedPreferences.getLong("block_water_command_until", 0) - Calendar.getInstance().getTimeInMillis())/1000;
 
         if(time > 0) {
             long hours = time / 3600;
@@ -477,19 +487,19 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         commands.put("commands", command);
 
         JSONObject jsonRequest = new JSONObject(commands);
-        EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.POST_CONF_AND_COMMANDS, jsonRequest, "command.water"));
+        EventBus.getDefault().post(new CommunicationManager.ConfAndCommandsRequest(mServer, mUUID, jsonRequest, "command.water"));
     }
 
     // Send configuration change to server if needed
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if(mServerConfig.containsKey(key)) {
+        if(mConfigTypeMap.containsKey(key)) {
             HashMap<String, Object> option = new HashMap<>();
-            switch(mServerConfig.get(key)) {
+            switch (mConfigTypeMap.get(key)) {
                 case "int":
                     option.put(key, sharedPreferences.getInt(key, 0));
                     break;
                 case "string":
-                    option.put(key, sharedPreferences.getString(key, ""));
+                    option.put(key, sharedPreferences.getString(key, null));
                     break;
             }
 
@@ -497,36 +507,46 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             configuration.put("configuration", option);
 
             JSONObject jsonRequest = new JSONObject(configuration);
-            EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.POST_CONF_AND_COMMANDS, jsonRequest, "configuration." + key));
+            EventBus.getDefault().post(new CommunicationManager.ConfAndCommandsRequest(mServer, mUUID, jsonRequest, "configuration." + key));
         }
     }
-
 
     @Subscribe
     public void handleConfAndCommandsData(CommunicationManager.ConfAndCommandsDataReady event) {
         if (event.hint.startsWith("configuration")) {
             if (event.response != null) {
-                Snackbar.make(mViewPager, getString(R.string.configuration_updated), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mViewPager, R.string.configuration_updated, Snackbar.LENGTH_LONG).show();
             } else {
-                Snackbar.make(mViewPager, getString(R.string.configuration_update_error), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mViewPager, R.string.configuration_update_error, Snackbar.LENGTH_LONG).show();
             }
         } else if(event.hint.equals("command.water")) {
             if (event.response != null) {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                int time = Integer.decode(sharedPreferences.getString("sending_interval", "0"));
+                long time = Long.decode(mSharedPreferences.getString("sending_interval", "0"));
 
-                SharedPreferences.Editor editor = sharedPreferences.edit();
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
                 editor.putLong("block_water_command_until", Calendar.getInstance().getTimeInMillis() + time*1000);
                 editor.apply();
 
-                int hours = time / 3600;
-                int minutes = (time % 3600 ) / 60;
-                int seconds = (time % 3600 ) % 60;
+                long hours = time / 3600;
+                long minutes = (time % 3600 ) / 60;
+                long seconds = (time % 3600 ) % 60;
 
                 Snackbar.make(mViewPager, String.format(getString(R.string.command_water_sent), hours, minutes, seconds), Snackbar.LENGTH_LONG).show();
             } else {
-                Snackbar.make(mViewPager, getString(R.string.command_water_error), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mViewPager, R.string.command_water_error, Snackbar.LENGTH_LONG).show();
             }
         }
+    }
+
+    public Calendar getDate() {
+        return mDate;
+    }
+
+    public MenuItem getCurrentDay() {
+        return mCurrentDay;
+    }
+
+    public SimpleDateFormat getDateFormat() {
+        return mDateFormat;
     }
 }

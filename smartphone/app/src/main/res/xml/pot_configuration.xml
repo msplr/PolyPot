@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ch.epfl.pdse.polypotapp.PreferenceSeekBar
+        android:defaultValue="50"
+        android:key="target_soil_moisture"
+        android:title="@string/conf_target_soil_moisture_title"
+        android:summary="@string/conf_target_soil_moisture_summary"
+        app:max="100" />
+
+    <ch.epfl.pdse.polypotapp.PreferenceNumber
+        android:defaultValue="250"
+        android:key="water_volume_pumped"
+        android:title="@string/conf_water_volume_pumped_title"
+        android:summary="@string/conf_water_volume_pumped_summary" />
+
+    <ch.epfl.pdse.polypotapp.PreferenceNumber
+        android:defaultValue="900"
+        android:key="logging_interval"
+        android:title="@string/conf_logging_interval_title"
+        android:summary="@string/conf_logging_interval_summary" />
+
+    <ch.epfl.pdse.polypotapp.PreferenceNumber
+        android:defaultValue="3600"
+        android:key="sending_interval"
+        android:title="@string/conf_sending_interval_title"
+        android:summary="@string/conf_sending_interval_summary" />
+
+    <ch.epfl.pdse.polypotapp.PreferenceSpinner
+        android:key="water_tank"
+        android:title="@string/conf_water_tank_title"
+        android:summary="@string/conf_water_tank_summary"
+        app:array="@array/tanks" />
+
+    <ch.epfl.pdse.polypotapp.PreferenceSpinner
+        android:key="plant"
+        android:title="@string/conf_plant_title"
+        android:summary="@string/conf_plant_summary"
+        app:array="@array/plants"/>
+
+</android.support.v7.preference.PreferenceScreen>

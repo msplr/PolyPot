@@ -1,5 +1,6 @@
 package ch.epfl.pdse.polypotapp;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,12 +19,39 @@ import org.json.JSONException;
 import java.text.ParseException;
 
 public class TabFragmentWaterLevel extends Fragment {
+    private ActivityMain mActivity;
+
+    private String mServer;
+    private String mUUID;
+
     private LineChart mChart;
     private int mColor;
     private Resources mResources;
 
+    public static TabFragmentWaterLevel newInstance(String server, String uuid) {
+        TabFragmentWaterLevel f = new TabFragmentWaterLevel();
+
+        Bundle args = new Bundle();
+        args.putString("server", server);
+        args.putString("uuid", uuid);
+        f.setArguments(args);
+
+        return f;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        mActivity = (ActivityMain) context;
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Bundle args = getArguments();
+        mServer = args.getString("server");
+        mUUID = args.getString("uuid");
+
         return inflater.inflate(R.layout.fragment_water_level, container, false);
     }
 
@@ -34,7 +62,7 @@ public class TabFragmentWaterLevel extends Fragment {
         mResources = getResources();
 
         GraphHelper.configureChart(mChart, mColor, 0, 100);
-        EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_DATA));
+        EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mActivity.getDate()));
     }
 
     @Override
@@ -59,7 +87,7 @@ public class TabFragmentWaterLevel extends Fragment {
             mChart.setNoDataText(getString(R.string.reception_data_error));
 
             // Show an error message
-            Snackbar.make(getView(), getString(R.string.reception_data_error), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getView(), R.string.reception_data_error, Snackbar.LENGTH_LONG).show();
         }
     }
 }

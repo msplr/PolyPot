@@ -22,6 +22,9 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public class TabFragmentSummary extends Fragment {
+    private String mServer;
+    private String mUUID;
+
     private TextView mWaterLevelText;
     private TextView mTemperatureText;
     private TextView mLuminosityText;
@@ -29,8 +32,23 @@ public class TabFragmentSummary extends Fragment {
     private TextView mLatestDataDateText;
     private TextView mLastWateringText;
 
+    public static TabFragmentSummary newInstance(String server, String uuid) {
+        TabFragmentSummary f = new TabFragmentSummary();
+
+        Bundle args = new Bundle();
+        args.putString("server", server);
+        args.putString("uuid", uuid);
+        f.setArguments(args);
+
+        return f;
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Bundle args = getArguments();
+        mServer = args.getString("server");
+        mUUID = args.getString("uuid");
+
         return inflater.inflate(R.layout.fragment_summary, container, false);
     }
 
@@ -44,7 +62,7 @@ public class TabFragmentSummary extends Fragment {
         mLatestDataDateText = view.findViewById(R.id.latest_data_date_text);
         mLastWateringText = view.findViewById(R.id.last_watering_text);
 
-        EventBus.getDefault().post(new CommunicationManager.Request(CommunicationManager.RequestType.GET_LATEST));
+        EventBus.getDefault().post(new CommunicationManager.LatestRequest(mServer, mUUID));
     }
 
     @Override
@@ -118,7 +136,7 @@ public class TabFragmentSummary extends Fragment {
             mLastWateringText.setText(R.string.last_watering_unknown);
 
             // Show an error message
-            Snackbar.make(getView(), getString(R.string.reception_summary_error), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getView(), R.string.reception_summary_error, Snackbar.LENGTH_LONG).show();
         }
     }
 }

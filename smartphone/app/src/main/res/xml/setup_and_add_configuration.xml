@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="@string/conf_category_general">
+
+        <ch.epfl.pdse.polypotapp.PreferenceString
+            android:key="name"
+            android:title="@string/conf_name_title"
+            android:summary="@string/conf_name_summary"
+            app:hint="@string/conf_name_hint" />
+
+        <ch.epfl.pdse.polypotapp.PreferenceString
+            android:key="server"
+            android:title="@string/conf_server_title"
+            android:summary="@string/conf_server_summary"
+            app:type="uri"
+            app:hint="@string/conf_server_hint" />
+
+        <ch.epfl.pdse.polypotapp.PreferenceString
+            android:key="uuid"
+            android:title="@string/conf_uuid_title"
+            android:summary="@string/conf_uuid_summary"
+            app:hint="@string/conf_uuid_hint" />
+    </android.support.v7.preference.PreferenceCategory>
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="@string/conf_category_wifi">
+
+        <ch.epfl.pdse.polypotapp.PreferenceString
+            android:key="ssid"
+            android:title="@string/conf_ssid_title"
+            android:summary="@string/conf_ssid_summary"
+            app:hint="@string/conf_ssid_hint" />
+
+        <ch.epfl.pdse.polypotapp.PreferenceString
+            android:key="password"
+            android:title="@string/conf_password_title"
+            android:summary="@string/conf_password_summary"
+            app:type="password"
+            app:hint="@string/conf_password_hint"/>
+    </android.support.v7.preference.PreferenceCategory>
+
+    <android.support.v7.preference.PreferenceCategory
+        android:title="@string/conf_category_pot" />
+
+</android.support.v7.preference.PreferenceScreen>

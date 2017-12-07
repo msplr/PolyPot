@@ -3,10 +3,15 @@ package ch.epfl.pdse.polypotapp;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.preference.DialogPreference;
+import android.support.v7.preference.PreferenceViewHolder;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.widget.EditText;
 
 public class PreferenceNumber extends DialogPreference {
-    private final String mOriginalSummary;
+    private EditText mEditText;
+
     private String mValue;
 
     public PreferenceNumber(Context context) {
@@ -15,36 +20,38 @@ public class PreferenceNumber extends DialogPreference {
     }
 
     public PreferenceNumber(Context context, AttributeSet attrs) {
-        // Delegate to other constructor
-        // Use the preferenceStyle as the default style
-        this(context, attrs, R.attr.preferenceStyle);
+        this(context, attrs, 0);
     }
 
     public PreferenceNumber(Context context, AttributeSet attrs, int defStyleAttr) {
-        // Delegate to other constructor
-        this(context, attrs, defStyleAttr, defStyleAttr);
-    }
-
-    public PreferenceNumber(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-
-        mOriginalSummary = super.getSummary().toString();
+        super(context, attrs, defStyleAttr);
+        //setLayoutResource(R.layout.layout_preference);
+        setWidgetLayoutResource(R.layout.preference_number);
     }
 
     @Override
-    public int getDialogLayoutResource() {
-        return R.layout.preference_number;
-    }
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        super.onBindViewHolder(holder);
 
-    public String getValue() {
-        return mValue;
-    }
+        holder.itemView.setClickable(false);
 
-    public void setValue(String v) {
-        mValue = v;
+        mEditText = (EditText) holder.findViewById(R.id.number);
 
-        // Save to SharedPreference
-        persistString(v);
+        mEditText.setText(mValue);
+
+        mEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mValue = editable.toString();
+                persistString(mValue);
+            }
+        });
     }
 
     @Override
@@ -62,16 +69,5 @@ public class PreferenceNumber extends DialogPreference {
             mValue = (String) defaultValue;
             persistString(mValue);
         }
-    }
-
-    @Override
-    public CharSequence getSummary() {
-        // Add ability to replace %s by current value
-        return String.format(super.getSummary().toString(), mValue);
-    }
-
-    public CharSequence getOriginalSummary() {
-        // Add ability to replace %s by current value from original summary
-        return String.format(mOriginalSummary, mValue);
     }
 }

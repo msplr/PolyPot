@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="empty" />
+    <string-array name="tanks">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+    </string-array>
+    <string-array name="plants">
+        <item>Geranium</item>
+        <item>Cactus</item>
+        <item>Rose</item>
+    </string-array>
+</resources>

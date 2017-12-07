@@ -3,10 +3,18 @@ package ch.epfl.pdse.polypotapp;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v7.preference.DialogPreference;
+import android.support.v7.preference.PreferenceViewHolder;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.widget.EditText;
 
 public class PreferenceString extends DialogPreference {
-    private final String mOriginalSummary;
+    private EditText mEditText;
+
+    private final String mHint;
+    private final String mType;
     private String mValue;
 
     public PreferenceString(Context context) {
@@ -15,36 +23,55 @@ public class PreferenceString extends DialogPreference {
     }
 
     public PreferenceString(Context context, AttributeSet attrs) {
-        // Delegate to other constructor
-        // Use the preferenceStyle as the default style
-        this(context, attrs, R.attr.preferenceStyle);
+        this(context, attrs, 0);
     }
 
     public PreferenceString(Context context, AttributeSet attrs, int defStyleAttr) {
-        // Delegate to other constructor
-        this(context, attrs, defStyleAttr, defStyleAttr);
-    }
+        super(context, attrs, defStyleAttr);
+        setLayoutResource(R.layout.layout_preference);
+        setWidgetLayoutResource(R.layout.preference_string);
 
-    public PreferenceString(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-
-        mOriginalSummary = super.getSummary().toString();
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PreferenceString);
+        mHint = a.getString(R.styleable.PreferenceString_hint);
+        mType = a.getString(R.styleable.PreferenceString_type);
+        a.recycle();
     }
 
     @Override
-    public int getDialogLayoutResource() {
-        return R.layout.preference_string;
-    }
+    public void onBindViewHolder(PreferenceViewHolder holder) {
+        super.onBindViewHolder(holder);
 
-    public String getValue() {
-        return mValue;
-    }
+        holder.itemView.setClickable(false);
 
-    public void setValue(String v) {
-        mValue = v;
+        mEditText = (EditText) holder.findViewById(R.id.string);
 
-        // Save to SharedPreference
-        persistString(v);
+        mEditText.setText(mValue);
+
+        if(mHint != null) {
+            mEditText.setHint(mHint);
+        }
+
+        if(mType != null) {
+            if (mType.equals("password")) {
+                mEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+            } else if (mType.equals("uri")) {
+                mEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+            }
+        }
+
+        mEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                mValue = editable.toString();
+                persistString(mValue);
+            }
+        });
     }
 
     @Override
@@ -62,16 +89,5 @@ public class PreferenceString extends DialogPreference {
             mValue = (String) defaultValue;
             persistString(mValue);
         }
-    }
-
-    @Override
-    public CharSequence getSummary() {
-        // Add ability to replace %s by current value
-        return String.format(super.getSummary().toString(), mValue);
-    }
-
-    public CharSequence getOriginalSummary() {
-        // Add ability to replace %s by current value from original summary
-        return String.format(mOriginalSummary, mValue);
     }
 }

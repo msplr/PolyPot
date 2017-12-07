@@ -1,8 +1,6 @@
 package ch.epfl.pdse.polypotapp;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
@@ -20,136 +18,144 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 public class CommunicationManager {
+    private static CommunicationManager mInstance;
+
     private final RequestQueue mRequestQueue;
-    private final SharedPreferences mPreferences;
-
     private final SimpleDateFormat mDateFormat;
-    private final Calendar mDate;
 
-    public enum RequestType {
-        GET_LATEST, GET_DATA, POST_CONF_AND_COMMANDS, POST_SETUP
+    abstract static class GenericRequest {
+        public String server;
+        public String uuid;
+        public JSONObject jsonRequest;
+        public String hint;
+        public Calendar date;
     }
-
     abstract class GenericDataReady {
         public JSONObject response = null;
         public VolleyError error = null;
         public String hint = "";
     }
 
-    class DataReady extends GenericDataReady {}
+    static class LatestRequest extends GenericRequest {
+        public LatestRequest(String server, String uuid) {
+            this.server = server;
+            this.uuid = uuid;
+        }
+    }
     class LatestDataReady extends GenericDataReady {}
-    class SetupDataReady extends GenericDataReady {}
-    class ConfAndCommandsDataReady extends GenericDataReady {}
 
-    static class Request {
-        public final RequestType type;
-        public final JSONObject jsonRequest;
-        public final String hint;
-
-        public Request(RequestType type) {
-            this.type = type;
-            this.jsonRequest = null;
-            this.hint = "";
+    static class DataRequest extends GenericRequest {
+        public DataRequest(String server, String uuid, Calendar date) {
+            this.server = server;
+            this.uuid = uuid;
+            this.date = date;
         }
+    }
+    class DataReady extends GenericDataReady {}
 
-        public Request(RequestType type, JSONObject jsonRequest) {
-            this.type = type;
-            this.jsonRequest = jsonRequest;
-            this.hint = "";
-        }
-
-        public Request(RequestType type, JSONObject jsonRequest, String hint) {
-            this.type = type;
+    static class ConfAndCommandsRequest extends GenericRequest {
+        public ConfAndCommandsRequest(String server, String uuid, JSONObject jsonRequest, String hint) {
+            this.server = server;
+            this.uuid = uuid;
             this.jsonRequest = jsonRequest;
             this.hint = hint;
         }
     }
+    class ConfAndCommandsDataReady extends GenericDataReady {}
 
-    public CommunicationManager(Context context, Calendar date) {
+    static class SetupRequest extends GenericRequest {
+        public SetupRequest(String server, String uuid, JSONObject jsonRequest) {
+            this.server = server;
+            this.uuid = uuid;
+            this.jsonRequest = jsonRequest;
+        }
+    }
+    class SetupDataReady extends  GenericDataReady {}
+
+    static class SetupPotRequest extends GenericRequest {
+        public SetupPotRequest(String server, String uuid, JSONObject jsonRequest) {
+            this.server = server;
+            this.uuid = uuid;
+            this.jsonRequest = jsonRequest;
+        }
+    }
+    class SetupPotDataReady extends GenericDataReady {}
+
+    private CommunicationManager(Context context) {
         mRequestQueue = Volley.newRequestQueue(context.getApplicationContext());
-        mRequestQueue.getCache().clear();
 
         mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-        mDate = date;
-
-        mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         EventBus.getDefault().register(this);
     }
 
-    public void stop() {
-        EventBus.getDefault().unregister(this);
+    public static CommunicationManager getDefault(Context context) {
+        if(mInstance == null) {
+            mInstance = new CommunicationManager(context);
+        }
+        return mInstance;
     }
 
     @Subscribe
-    public void handleRequest(final Request event) {
-        String UUID = mPreferences.getString("uuid", "");
-        String server = mPreferences.getString("server", "");
-
+    public void handleRequest(final GenericRequest event) {
         int method = Method.GET;
-        String url = server;
+        String url = event.server;
         final GenericDataReady dataReady;
 
-        switch (event.type) {
-            case GET_LATEST:
-                url = server + "/get-latest/" + UUID;
-                dataReady = new LatestDataReady();
-                break;
+        if(event instanceof LatestRequest) {
+            url += "/get-latest/" + event.uuid;
+            dataReady = new LatestDataReady();
+        } else if(event instanceof DataRequest) {
+            final Calendar fromDate = (Calendar) event.date.clone();
+            fromDate.setTimeZone(TimeZone.getTimeZone("UTC"));
+            String from = "from=" + mDateFormat.format(fromDate.getTime());
 
-            case GET_DATA:
-                final Calendar fromDate = (Calendar) mDate.clone();
-                fromDate.setTimeZone(TimeZone.getTimeZone("UTC"));
-                String from = "from=" + mDateFormat.format(fromDate.getTime());
+            final Calendar toDate = (Calendar) event.date.clone();
+            toDate.setTimeZone(TimeZone.getTimeZone("UTC"));
+            toDate.add(Calendar.DAY_OF_MONTH, 1);
+            String to = "to=" + mDateFormat.format(toDate.getTime());
 
-                final Calendar toDate = (Calendar) mDate.clone();
-                toDate.setTimeZone(TimeZone.getTimeZone("UTC"));
-                toDate.add(Calendar.DAY_OF_MONTH, 1);
-                String to = "to=" + mDateFormat.format(toDate.getTime());
-
-                url = server + "/get-data/" + UUID + "?" + from + "&" + to;
-                dataReady = new DataReady();
-                break;
-
-            case POST_CONF_AND_COMMANDS:
-                method = Method.POST;
-                url = server + "/send-c-and-c/" + UUID;
-                dataReady = new ConfAndCommandsDataReady();
-                break;
-
-            case POST_SETUP:
-                method = Method.POST;
-                url = "http://192.168.1.1/setup";
-                dataReady = new SetupDataReady();
-                break;
-
-            default:
-                dataReady = null;
-                break;
+            url += "/get-data/" + event.uuid + "?" + from + "&" + to;
+            dataReady = new DataReady();
+        } else if(event instanceof ConfAndCommandsRequest) {
+            method = Method.POST;
+            url += "/send-c-and-c/" + event.uuid;
+            dataReady = new ConfAndCommandsDataReady();
+        } else if(event instanceof SetupRequest) {
+            method = Method.POST;
+            url += "/setup";
+            dataReady = new SetupDataReady();
+        } else if(event instanceof SetupPotRequest) {
+            method = Method.POST;
+            url = "http://192.168.1.1/setup";
+            dataReady = new SetupPotDataReady();
+        } else {
+            dataReady = null;
         }
 
         JsonObjectRequest dataRequest = new JsonObjectRequest(method, url, event.jsonRequest,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        if(dataReady != null) {
-                            dataReady.response = response;
-                            dataReady.hint = event.hint;
-                            EventBus.getDefault().post(dataReady);
-                        }
+                        dataReady.response = response;
+                        dataReady.hint = event.hint;
+                        EventBus.getDefault().post(dataReady);
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        if(dataReady != null) {
-                            dataReady.error = error;
-                            dataReady.hint = event.hint;
-                            EventBus.getDefault().post(dataReady);
-                        }
+                        dataReady.error = error;
+                        dataReady.hint = event.hint;
+                        EventBus.getDefault().post(dataReady);
                     }
                 }
-        );
+            );
 
         mRequestQueue.add(dataRequest);
+    }
+    
+    public void clearCache() {
+        mRequestQueue.getCache().clear();
     }
 }

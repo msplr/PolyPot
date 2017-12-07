@@ -2,11 +2,16 @@ package ch.epfl.pdse.polypotapp;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v7.preference.DialogPreference;
+import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
-public class PreferenceSeekBar extends DialogPreference {
-    private final String mOriginalSummary;
+public class PreferenceSeekBar extends Preference {
+    private SeekBar mSeekBar;
+    private TextView mText;
+
     private final int mMax;
     private int mValue;
 
@@ -16,44 +21,50 @@ public class PreferenceSeekBar extends DialogPreference {
     }
 
     public PreferenceSeekBar(Context context, AttributeSet attrs) {
-        // Delegate to other constructor
-        // Use the preferenceStyle as the default style
-        this(context, attrs, R.attr.preferenceStyle);
+        this(context, attrs, 0);
     }
 
     public PreferenceSeekBar(Context context, AttributeSet attrs, int defStyleAttr) {
-        // Delegate to other constructor
-        this(context, attrs, defStyleAttr, defStyleAttr);
-    }
+        super(context, attrs, defStyleAttr);
+        setLayoutResource(R.layout.layout_preference);
+        setWidgetLayoutResource(R.layout.preference_seekbar);
 
-    public PreferenceSeekBar(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-
-        mOriginalSummary = super.getSummary().toString();
-
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.SeekBarPreference);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PreferenceSeekBar);
         mMax = a.getInt(R.styleable.PreferenceSeekBar_max, 100); //TODO: min,max,interval
         a.recycle();
     }
 
     @Override
-    public int getDialogLayoutResource() {
-        return R.layout.preference_seekbar;
-    }
+    public void onBindViewHolder(final PreferenceViewHolder holder) {
+        super.onBindViewHolder(holder);
 
-    public int getValue() {
-        return mValue;
-    }
+        holder.itemView.setClickable(false);
 
-    public void setValue(int v) {
-        mValue = v;
+        mSeekBar = (SeekBar) holder.findViewById(R.id.seekBar);
+        mText = (TextView) holder.findViewById(R.id.text);
 
-        // Save to SharedPreference
-        persistInt(v);
-    }
+        mSeekBar.setProgress(mValue);
+        mSeekBar.setMax(mMax);
 
-    public int getMax() {
-        return mMax;
+        mText.setText(Integer.toString(mValue));
+
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                mText.setText(Integer.toString(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                mSeekBar.requestFocus();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mValue = seekBar.getProgress();
+                persistInt(mValue);
+            }
+        });
     }
 
     @Override
@@ -71,16 +82,5 @@ public class PreferenceSeekBar extends DialogPreference {
             mValue = (Integer) defaultValue;
             persistInt(mValue);
         }
-    }
-
-    @Override
-    public CharSequence getSummary() {
-        // Add ability to replace %s by current value
-        return String.format(super.getSummary().toString(), getValue());
-    }
-
-    public CharSequence getOriginalSummary() {
-        // Add ability to replace %s by current value from original summary
-        return String.format(mOriginalSummary, getValue());
     }
 }

@@ -39,44 +39,83 @@
     <string name="last_watering_format">\'Last watering:\n\'yyyy-MM-dd</string>
     <string name="latest_data_date_format">\'Data from \'yyyy-MM-dd\' \'HH:mm\'.\'</string>
 
+    <!-- Icons -->
     <string name="water_level_icon">Water level icon</string>
     <string name="temperature_icon">Temperature icon</string>
     <string name="soil_moisture_icon">Soil moisture icon</string>
     <string name="luminosity_icon">Luminosity icon</string>
     <string name="plant_icon">Plant icon</string>
+    <string name="pot_icon">Pot icon</string>
+
+    <!-- Pots' list -->
+    <string name="add">Add</string>
+    <string name="pot_deleted">Pot deleted.</string>
+    <string name="undo">Undo</string>
 
     <!-- Setup pot -->
-    <string name="setup_wifi_ssid">SSID WiFi:</string>
-    <string name="setup_wifi_password">Password WiFi:</string>
-    <string name="setup_server">Server:</string>
-    <string name="setup_button">Setup</string>
+    <string name="empty_name">Please, enter a name.</string>
+    <string name="empty_or_invalid_server">Please, enter a valid server URL.</string>
+    <string name="invalid_uuid">Please, enter a valid UUID.</string>
+    <string name="pot_already_exists">A pot with this server and UUID already exists.</string>
+    <string name="empty_uuid">Please, enter a UUID.</string>
+    <string name="empty_ssid">Please, enter a Wi-Fi SSID.</string>
+    <string name="empty_password">Please, enter a Wi-Fi password.</string>
+    <string name="uuid_or_server_not_found">Non existing server or UUID.</string>
 
-    <string name="wifi_presence">Check pot\'s WiFi presence.</string>
-    <string name="wifi_disconnect_user">Disconnect from your WiFi.</string>
-    <string name="wifi_connect_pot">Connect to pot\'s WiFi.</string>
-    <string name="uuid_generate">Generate UUID</string>
+    <string name="setup_button">(Re)start setup</string>
+
+    <string name="uuid_check_or_generate">Check or generate UUID with server.</string>
+    <string name="wifi_disconnect_user">Disconnect from your Wi-Fi.</string>
+    <string name="wifi_connect_pot">Connect to pot\'s Wi-Fi.</string>
     <string name="configuration_send">Send configuration to the pot.</string>
-    <string name="wifi_disconnect_pot">Disconnect from pot\'s WiFi.</string>
-    <string name="wifi_reconnect_user">Reconnect to your WiFi.</string>
+    <string name="wifi_disconnect_pot">Disconnect from pot\'s Wi-Fi.</string>
+    <string name="wifi_reconnect_user">Reconnect to your Wi-Fi.</string>
 
     <string name="tick_icon">Tick icon</string>
     <string name="cross_icon">Cross icon</string>
 
+    <string name="setup_success">Setup successful!</string>
+    <string name="finish">finish</string>
+    <string name="setup_error">Error during setup. Restart setup or edit setup settings.</string>
+    <string name="edit">Edit</string>
+
     <!-- Configuration -->
-    <string name="conf_category_pot">Pot</string>
-    <string name="conf_target_soil_moisture_title">Soil moisture threshold</string>
-    <string name="conf_target_soil_moisture_summary">Threshold at which the pot waters the plant.\nCurrent value: %s%%</string>
-    <string name="conf_water_volume_pumped_title">Water volume pumped</string>
-    <string name="conf_water_volume_pumped_summary">Volume pumped when pot waters the plant.\nCurrent value: %s mL</string>
-    <string name="conf_logging_interval_title">Logging interval</string>
-    <string name="conf_logging_interval_summary">Interval at which the pot take measures.\nCurrent value: %s seconds</string>
-    <string name="conf_sending_interval_title">Sending interval</string>
-    <string name="conf_sending_interval_summary">Interval at which the pot send measurement.\nCurrent value: %s seconds</string>
-    <string name="conf_category_pot_and_smartphone">Pot &amp; Smartphone</string>
-    <string name="conf_setup_pot_title">Setup a new pot</string>
-    <string name="conf_setup_pot_summary">Setup a new pot. You will lose the configuration of your previous pot.</string>
-    <string name="conf_uuid_title">Pot UUID</string>
-    <string name="conf_uuid_summary">The unique identifier of your pot.\nCurrent value: %s</string>
+    <string name="add_only">Add only</string>
+    <string name="setup_pot_and_add">Setup Pot &amp; Add</string>
+
+    <string name="conf_category_general">General settings (for add and pot setup)</string>
+
+    <string name="conf_name_title">Pot name</string>
+    <string name="conf_name_summary">The name used in the pots\' list.</string>
+    <string name="conf_name_hint">Enter a name.</string>
     <string name="conf_server_title">Server address</string>
-    <string name="conf_server_summary">The address of the server you want to use.\nCurrent value: %s</string>
+    <string name="conf_server_summary">The address of the server you want to use.</string>
+    <string name="conf_server_hint">Enter a server URL.</string>
+    <string name="conf_uuid_title">Pot UUID</string>
+    <string name="conf_uuid_summary">The unique identifier of your pot. Leave blank unless you want to add an already setup pot.</string>
+    <string name="conf_uuid_hint">Leave blank or enter an UUID.</string>
+
+    <string name="conf_category_wifi">Wi-Fi settings (for pot setup)</string>
+
+    <string name="conf_ssid_title">Wi-Fi SSID</string>
+    <string name="conf_ssid_summary">The SSID of the Wi-Fi the pot will use.</string>
+    <string name="conf_ssid_hint">Enter an SSID for setup.</string>
+    <string name="conf_password_title">Wi-Fi password</string>
+    <string name="conf_password_summary">The password of the Wi-Fi the pot will use.</string>
+    <string name="conf_password_hint">Enter a password for setup.</string>
+
+    <string name="conf_category_pot">Pot configuration (optional)</string>
+
+    <string name="conf_target_soil_moisture_title">Soil moisture threshold</string>
+    <string name="conf_target_soil_moisture_summary">Threshold at which the pot waters the plant, in percents.</string>
+    <string name="conf_water_volume_pumped_title">Water volume pumped</string>
+    <string name="conf_water_volume_pumped_summary">Volume pumped when pot waters the plant, in mL.</string>
+    <string name="conf_logging_interval_title">Logging interval</string>
+    <string name="conf_logging_interval_summary">Interval at which the pot take measures, in seconds.</string>
+    <string name="conf_sending_interval_title">Sending interval</string>
+    <string name="conf_sending_interval_summary">Interval at which the pot send measurement, in seconds.</string>
+    <string name="conf_water_tank_title">Water tank</string>
+    <string name="conf_water_tank_summary">The water tank you use.</string>
+    <string name="conf_plant_title">Plant</string>
+    <string name="conf_plant_summary">The plant specie in your pot.</string>
 </resources>
