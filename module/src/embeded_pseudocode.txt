@@ -1,0 +1,60 @@
+Pseudo-code for ESP32:
+	
+#Initialisation
+
+#Wake up:
+	#Time managment
+	time_s=time_s+sleep_duty
+	time_iso[i]=conversion_iso(time_s)
+
+	#Sending duty check
+	sending=false
+	If sensing_time*(i+1)==sending_time
+		sending=true
+	endif
+	
+	#IO setting
+	Enable sensors by writting a "1" in the right GPIO
+
+#Sensors reading:
+	luminosity[i]= read(luminosity sensor)
+	water_dist[i]=read(distance sensor)
+	moisture[i]=read (moisture_sensor)
+	temperature[i]=read(temperature_sensor) 
+	water_percent[i]=establish_water_vol(water_dist)                             #Through a lookup table
+
+#Water mangment:
+	watered[i]=flase
+	If moisture < target_moisture				
+		water plant for (target_volume/flow_rate)
+		watered=true
+		water_dist_new=read(distance_sensor)
+		water_percent_new=establish_water_vol(water_dist_new)
+		pumped_vol=water_percent-water_percent_new
+		water_percent[i]=water_percent_new
+		water_dist[i]=water_dist_new
+	endif
+
+	Disable sensors by writting a "0" in the right GPIO
+
+#Data sending:
+	Enables wifi
+	Resync the clock with the wifi router's 				#if possible
+	Export the datas to JSON format
+	Try:
+		HTTP POST request containing the JSON file @ /send-data/<uuid:pot_id>
+		Get the response and memorise
+	Catch:
+		Go to deepsleep for 15 secs
+		then retry
+	endtrycatch
+	Disable wifi
+
+#New config:
+	target_moisture=target_moisture_new
+	target_volume=target_volume_new
+	logging_interval=logging_interval_new
+	sending_interval=sending_interval_new
+	sending_interval=Adjust(sending_interval, logging_interval)	
+	
+	
