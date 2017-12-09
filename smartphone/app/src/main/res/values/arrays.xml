@@ -2,13 +2,10 @@
 <resources>
     <string-array name="empty" />
     <string-array name="tanks">
-        <item>Small</item>
-        <item>Medium</item>
-        <item>Large</item>
+        <item>Standard</item>
     </string-array>
     <string-array name="plants">
-        <item>Geranium</item>
-        <item>Cactus</item>
-        <item>Rose</item>
+        <item>Unspecified</item>
+        <item>None</item>
     </string-array>
 </resources>

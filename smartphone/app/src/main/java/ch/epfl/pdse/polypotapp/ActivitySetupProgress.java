@@ -41,6 +41,8 @@ public class ActivitySetupProgress extends AppCompatActivity {
     private String mWaterVolumePumped;
     private String mLoggingInterval;
     private String mSendingInterval;
+    private String mWaterTank;
+    private String mPlant;
     private HashMap<String, Object> mConfiguration;
 
     private int mUserId;
@@ -93,12 +95,16 @@ public class ActivitySetupProgress extends AppCompatActivity {
         mWaterVolumePumped = mSharedPreferencesSetup.getString("water_volume_pumped", null);
         mLoggingInterval = mSharedPreferencesSetup.getString("logging_interval", null);
         mSendingInterval = mSharedPreferencesSetup.getString("sending_interval", null);
+        mWaterTank = mSharedPreferencesSetup.getString("water_tank", null);
+        mPlant = mSharedPreferencesSetup.getString("plant", null);
 
         mConfiguration = new HashMap<>();
         mConfiguration.put("target_soil_moisture", mTargetSoilMoisture);
         mConfiguration.put("water_volume_pumped", mWaterVolumePumped);
         mConfiguration.put("logging_interval", mLoggingInterval);
         mConfiguration.put("sending_interval", mSendingInterval);
+        mConfiguration.put("water_tank", mWaterTank);
+        mConfiguration.put("plant", mPlant);
 
         mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
@@ -454,6 +460,8 @@ public class ActivitySetupProgress extends AppCompatActivity {
             editor.putString("water_volume_pumped", mWaterVolumePumped);
             editor.putString("logging_interval", mLoggingInterval);
             editor.putString("sending_interval", mSendingInterval);
+            editor.putString("water_tank", mWaterTank);
+            editor.putString("plant", mPlant);
             editor.apply();
 
             editor = mSharedPreferencesSetup.edit();

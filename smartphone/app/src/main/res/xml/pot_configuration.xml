@@ -28,12 +28,14 @@
         android:summary="@string/conf_sending_interval_summary" />
 
     <ch.epfl.pdse.polypotapp.PreferenceSpinner
+        android:defaultValue="Standard"
         android:key="water_tank"
         android:title="@string/conf_water_tank_title"
         android:summary="@string/conf_water_tank_summary"
         app:array="@array/tanks" />
 
     <ch.epfl.pdse.polypotapp.PreferenceSpinner
+        android:defaultValue="Unspecified"
         android:key="plant"
         android:title="@string/conf_plant_title"
         android:summary="@string/conf_plant_summary"

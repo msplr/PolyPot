@@ -14,18 +14,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.gson.internal.LinkedTreeMap;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class ActivityMain extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -51,18 +54,32 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
     private String mUUID;
     private SharedPreferences mSharedPreferences;
 
-    private MenuItem mPreviousDay;
-    private MenuItem mCurrentDay;
-    private MenuItem mNextDay;
+    private MenuItem mPreviousPeriod;
+    private MenuItem mCurrentPeriod;
+    private MenuItem mNextPeriod;
+    private MenuItem mCurrentPeriodMode;
 
-    private SimpleDateFormat mDateFormat;
+    private PeriodMode mPeriodMode;
+    private SimpleDateFormat mDateFormatDay;
+    private SimpleDateFormat mDateFormatWeek;
+    private SimpleDateFormat mDateFormatMonth;
+    private SimpleDateFormat mAxisDateFormatDay;
+    private SimpleDateFormat mAxisDateFormatWeek;
+    private SimpleDateFormat mAxisDateFormatMonth;
     private Calendar mDate;
     private Calendar mWaterDate;
+    private Calendar mFromDate;
+    private Calendar mToDate;
 
     private boolean mFirstDateChange;
     private boolean mFirstConfigLoad;
 
     private HashMap<String, String> mConfigTypeMap;
+    private Snackbar mConfigurationSnackbar;
+    private int mConfigurationBeingSent;
+
+    private LinkedTreeMap<String, Object> mPlants;
+    private Plant mPlant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +94,13 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
 
         mSharedPreferences = getSharedPreferences(Pot.getPreferenceName(mServer, mUUID), MODE_PRIVATE);
 
-        mDateFormat = new SimpleDateFormat(getResources().getString(R.string.date_format));
+        mDateFormatDay = new SimpleDateFormat(getResources().getString(R.string.date_format_day), Locale.US);
+        mDateFormatWeek = new SimpleDateFormat(getResources().getString(R.string.date_format_week), Locale.US);
+        mDateFormatMonth = new SimpleDateFormat(getResources().getString(R.string.date_format_month), Locale.US);
+
+        mAxisDateFormatDay = new SimpleDateFormat(getResources().getString(R.string.axis_date_format_day), Locale.US);
+        mAxisDateFormatWeek = new SimpleDateFormat(getResources().getString(R.string.axis_date_format_week), Locale.US);
+        mAxisDateFormatMonth = new SimpleDateFormat(getResources().getString(R.string.axis_date_format_month), Locale.US);
 
         mFirstDateChange = true;
         mFirstConfigLoad = true;
@@ -87,10 +110,19 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         mConfigTypeMap.put("water_volume_pumped", "string");
         mConfigTypeMap.put("logging_interval", "string");
         mConfigTypeMap.put("sending_interval", "string");
+        mConfigTypeMap.put("water_tank", "string");
+        mConfigTypeMap.put("plant", "string");
+
+        mConfigurationSnackbar = Snackbar.make(mViewPager, R.string.configuration_sending, Snackbar.LENGTH_INDEFINITE);
+        mConfigurationBeingSent = 0;
+
+        mPlants = Plant.getPlantsList(this);
+        mPlant = new Plant(mPlants, getSharedPreferences().getString("plant", "Unspecified"));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -115,8 +147,10 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         super.onRestoreInstanceState(savedInstanceState);
 
         // Restore date
+        mPeriodMode = PeriodMode.valueOf(savedInstanceState.getString("period_mode"));
         mDate = GregorianCalendar.getInstance();
         mDate.setTimeInMillis(savedInstanceState.getLong("date"));
+        updateFromToDates();
 
         // Restore first date change and config load state
         mFirstDateChange = savedInstanceState.getBoolean("firstDateChange");
@@ -135,20 +169,16 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         // If mDate is not null, we are restoring the activity and can skip that section
         if(mDate == null) {
             // Use today by default
+            mPeriodMode = PeriodMode.DAY;
             mDate = GregorianCalendar.getInstance();
-
-            // Set everything more specific than day to zero
-            mDate.set(Calendar.HOUR_OF_DAY, 0);
-            mDate.set(Calendar.MINUTE, 0);
-            mDate.set(Calendar.SECOND, 0);
-            mDate.set(Calendar.MILLISECOND, 0);
+            updateFromToDates();
         }
 
         // Register to EventBus
         EventBus.getDefault().register(this);
 
         EventBus.getDefault().post(new CommunicationManager.LatestRequest(mServer, mUUID));
-        EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mDate));
+        EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mFromDate, mToDate));
     }
 
     @Override
@@ -162,12 +192,13 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
     public boolean onPrepareOptionsMenu(Menu menu)
     {
         // Save reference to items in toolbar
-        mPreviousDay = menu.findItem(R.id.previous_day);
-        mCurrentDay = menu.findItem(R.id.current_day);
-        mNextDay = menu.findItem(R.id.next_day);
+        mPreviousPeriod = menu.findItem(R.id.previous_day);
+        mCurrentPeriod = menu.findItem(R.id.current_day);
+        mNextPeriod = menu.findItem(R.id.next_day);
+        mCurrentPeriodMode = menu.findItem(R.id.date_mode);
 
         // Update date in toolbar
-        mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
+        updateDateInToolbar();
 
         // Hide date if on Summary and Configuration tabs, update icons transparency
         updateToolbarAndTablayout(mViewPager.getCurrentItem());
@@ -195,6 +226,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         savedInstanceState.putBoolean("firstConfigLoad", mFirstConfigLoad);
 
         // Save the date
+        savedInstanceState.putString("period_mode", mPeriodMode.toString());
         savedInstanceState.putLong("date", mDate.getTimeInMillis());
 
         // Always call the superclass so it can save the view hierarchy state
@@ -217,34 +249,42 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         // as you specify a parent activity in AndroidManifest.xml.
         switch (item.getItemId()) {
             case R.id.previous_day:
-                // Remove one day
-                mDate.add(Calendar.DAY_OF_MONTH, -1);
-
-                // Update date in toolbar
-                mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
+                backwardDateByOne();
 
                 // Update data and graphs
-                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mDate));
-
+                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mFromDate, mToDate));
                 return true;
 
             case R.id.current_day:
                 // Let the user pick the date
                 DialogFragmentDatePicker datePicker = DialogFragmentDatePicker.newInstance(mServer, mUUID);
                 datePicker.show(getSupportFragmentManager(), "datePicker");
-
                 return true;
 
             case R.id.next_day:
-                // Add one day
-                mDate.add(Calendar.DAY_OF_MONTH, 1);
-
-                // Update date in toolbar
-                mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
+                forwardDateByOne();
 
                 // Update data and graphs
-                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mDate));
+                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mFromDate, mToDate));
+                return true;
 
+            case R.id.date_mode:
+                switch(mPeriodMode) {
+                    case DAY:
+                        mPeriodMode = PeriodMode.WEEK;
+                        break;
+                    case WEEK:
+                        mPeriodMode = PeriodMode.MONTH;
+                        break;
+                    case MONTH:
+                        mPeriodMode = PeriodMode.DAY;
+                        break;
+                }
+                updateFromToDates();
+                updateDateInToolbar();
+
+                // Update data and graphs
+                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mFromDate, mToDate));
                 return true;
 
             default:
@@ -271,29 +311,15 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 JSONObject data = event.response.getJSONObject("data");
 
                 // Switch to latest data date
-                SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                Calendar date = Calendar.getInstance();
+                SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
                 inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                mDate.setTime(inputDateFormat.parse(data.getString("datetime")));
-                mDate.setTimeZone(TimeZone.getDefault());
-
-                // Set everything more specific than day to zero
-                mDate.set(Calendar.HOUR_OF_DAY, 0);
-                mDate.set(Calendar.MINUTE, 0);
-                mDate.set(Calendar.SECOND, 0);
-                mDate.set(Calendar.MILLISECOND, 0);
-
-                // Update date in toolbar
-                if (mCurrentDay != null) {
-                    // May be null if called before onPrepareOptionsMenu, onPrepareOptionsMenu will update
-                    // the date for us in this case
-                    mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
-                }
+                date.setTime(inputDateFormat.parse(data.getString("datetime")));
+                date.setTimeZone(TimeZone.getDefault());
+                setDate(date.getTime());
 
                 // Only switch the toolbar date once
                 mFirstDateChange = false;
-
-                // Update graphs
-                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mDate));
             } catch (NullPointerException | JSONException | ParseException e) {
                 Snackbar.make(mViewPager, R.string.reception_summary_error, Snackbar.LENGTH_LONG).show();
             }
@@ -327,42 +353,16 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 Snackbar.make(mViewPager, R.string.reception_summary_error, Snackbar.LENGTH_LONG).show();
             }
         }
-
-        try {
-            JSONArray commands = event.response.getJSONArray("commands");
-
-            // Search last watering
-            for(int i = 0; i < commands.length(); i++) {
-                JSONObject command = commands.getJSONObject(i);
-                if(command.getString("type").equals("water")) {
-                    // Date and Time
-                    SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-                    inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                    mWaterDate = GregorianCalendar.getInstance();
-                    mWaterDate.setTime(mDateFormat.parse(command.getString("datetime")));
-                    mWaterDate.setTimeZone(TimeZone.getDefault());
-
-                    // Set everything more specific than day to zero
-                    mWaterDate.set(Calendar.HOUR_OF_DAY, 0);
-                    mWaterDate.set(Calendar.MINUTE, 0);
-                    mWaterDate.set(Calendar.SECOND, 0);
-                    mWaterDate.set(Calendar.MILLISECOND, 0);
-                }
-            }
-        } catch (NullPointerException | JSONException | ParseException e) {
-            Snackbar.make(mViewPager, R.string.reception_summary_error, Snackbar.LENGTH_LONG).show();
-        }
     }
 
     class Tabs {
-        public static final int SUMMARY = 0;
-        public static final int WATER_LEVEL = 1;
-        public static final int TEMPERATURE = 2;
-        public static final int SOIL_MOISTURE = 3;
-        public static final int LUMINOSITY = 4;
-        public static final int PLANT = 5;
-        public static final int CONFIGURATION = 6;
+        private static final int SUMMARY = 0;
+        private static final int WATER_LEVEL = 1;
+        private static final int TEMPERATURE = 2;
+        private static final int SOIL_MOISTURE = 3;
+        private static final int LUMINOSITY = 4;
+        private static final int PLANT = 5;
+        private static final int CONFIGURATION = 6;
     }
 
     /**
@@ -370,7 +370,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
      * one of the sections/tabs/pages.
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
-        public SectionsPagerAdapter(FragmentManager fm) {
+        private SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -408,14 +408,16 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
     private void updateToolbarAndTablayout(int position) {
         if(position == Tabs.SUMMARY || position == Tabs.PLANT || position == Tabs.CONFIGURATION) {
             // Hide date on Summary and Configuration tabs
-            mPreviousDay.setVisible(false);
-            mCurrentDay.setVisible(false);
-            mNextDay.setVisible(false);
+            mPreviousPeriod.setVisible(false);
+            mCurrentPeriod.setVisible(false);
+            mNextPeriod.setVisible(false);
+            mCurrentPeriodMode.setVisible(false);
         } else {
             // Show date on others
-            mPreviousDay.setVisible(true);
-            mCurrentDay.setVisible(true);
-            mNextDay.setVisible(true);
+            mPreviousPeriod.setVisible(true);
+            mCurrentPeriod.setVisible(true);
+            mNextPeriod.setVisible(true);
+            mCurrentPeriodMode.setVisible(true);
         }
 
         for(int i=0; i < mSectionsPagerAdapter.getCount(); i++) {
@@ -444,13 +446,8 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 break;
             case R.id.last_watering_card:
                 if(mWaterDate != null) {
-                    mDate.setTime(mWaterDate.getTime());
-
-                    // Update date in toolbar
-                    mCurrentDay.setTitle(mDateFormat.format(mDate.getTime()));
-
-                    // Update data and graphs
-                    EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mDate));
+                    //mPeriodMode = DateMode.DAY;
+                    setDate(mWaterDate.getTime());
                 }
                 mViewPager.setCurrentItem(Tabs.SOIL_MOISTURE);
                 break;
@@ -473,7 +470,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             return;
         }
 
-        SimpleDateFormat outputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        SimpleDateFormat outputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 
         Calendar datetime = Calendar.getInstance();
         datetime.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -490,7 +487,17 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         EventBus.getDefault().post(new CommunicationManager.ConfAndCommandsRequest(mServer, mUUID, jsonRequest, "command.water"));
     }
 
-    // Send configuration change to server if needed
+    class PreferenceChanged {
+        public final String key;
+        public final boolean failed;
+
+        public PreferenceChanged(String key, boolean failed) {
+            this.key = key;
+            this.failed = failed;
+        }
+    }
+
+    // Send configuration change to server, update plant and broadcast change
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if(mConfigTypeMap.containsKey(key)) {
             HashMap<String, Object> option = new HashMap<>();
@@ -507,19 +514,41 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             configuration.put("configuration", option);
 
             JSONObject jsonRequest = new JSONObject(configuration);
-            EventBus.getDefault().post(new CommunicationManager.ConfAndCommandsRequest(mServer, mUUID, jsonRequest, "configuration." + key));
+            EventBus.getDefault().post(new CommunicationManager.ConfAndCommandsRequest(mServer, mUUID, jsonRequest, "configuration/" + key));
+
+            if(mConfigurationBeingSent == 0) {
+                mConfigurationSnackbar.show();
+            }
+
+            mConfigurationBeingSent++;
         }
     }
 
     @Subscribe
     public void handleConfAndCommandsData(CommunicationManager.ConfAndCommandsDataReady event) {
         if (event.hint.startsWith("configuration")) {
+            String key = event.hint.split("/")[1];
+
+            mConfigurationBeingSent--;
+
+            if(mConfigurationBeingSent == 0) {
+                mConfigurationSnackbar.dismiss();
+            }
+
             if (event.response != null) {
                 Snackbar.make(mViewPager, R.string.configuration_updated, Snackbar.LENGTH_LONG).show();
+
+                if(key.equals("plant")) {
+                    mPlant = new Plant(mPlants, mSharedPreferences.getString("plant", "Unspecified"));
+                }
+
+                EventBus.getDefault().post(new PreferenceChanged(key, false));
             } else {
                 Snackbar.make(mViewPager, R.string.configuration_update_error, Snackbar.LENGTH_LONG).show();
+
+                EventBus.getDefault().post(new PreferenceChanged(key, true));
             }
-        } else if(event.hint.equals("command.water")) {
+        } else if(event.hint.equals("command/water")) {
             if (event.response != null) {
                 long time = Long.decode(mSharedPreferences.getString("sending_interval", "0"));
 
@@ -538,15 +567,151 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         }
     }
 
-    public Calendar getDate() {
-        return mDate;
+    private enum PeriodMode {
+        DAY, WEEK, MONTH
     }
 
-    public MenuItem getCurrentDay() {
-        return mCurrentDay;
+    private void forwardDateByOne() {
+        // Add one
+        switch(mPeriodMode) {
+            case DAY:
+                mDate.add(Calendar.DAY_OF_MONTH, 1);
+                break;
+            case WEEK:
+                mDate.add(Calendar.WEEK_OF_YEAR, 1);
+                break;
+            case MONTH:
+                mDate.add(Calendar.MONTH, 1);
+                break;
+        }
+
+        updateFromToDates();
+        updateDateInToolbar();
+    }
+
+    private void backwardDateByOne() {
+        // Remove one day
+        switch(mPeriodMode) {
+            case DAY:
+                mDate.add(Calendar.DAY_OF_MONTH, -1);
+                break;
+            case WEEK:
+                mDate.add(Calendar.WEEK_OF_YEAR, -1);
+                break;
+            case MONTH:
+                mDate.add(Calendar.MONTH, -1);
+                break;
+        }
+
+        updateFromToDates();
+        updateDateInToolbar();
+    }
+
+    public void setDate(Date date) {
+        mDate.setTime(date);
+
+        updateFromToDates();
+        updateDateInToolbar();
+    }
+
+    private void updateFromToDates() {
+        mFromDate = (Calendar) mDate.clone();
+
+        // Set everything more specific than day to zero
+        mFromDate.set(Calendar.HOUR_OF_DAY, 0);
+        mFromDate.set(Calendar.MINUTE, 0);
+        mFromDate.set(Calendar.SECOND, 0);
+        mFromDate.set(Calendar.MILLISECOND, 0);
+
+        switch(mPeriodMode) {
+            case DAY:
+                mToDate = (Calendar) mFromDate.clone();
+                mToDate.add(Calendar.DAY_OF_MONTH, 1);
+                break;
+            case WEEK:
+                mFromDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                mToDate = (Calendar) mFromDate.clone();
+                mToDate.add(Calendar.WEEK_OF_YEAR, 1);
+                break;
+            case MONTH:
+                mFromDate.set(Calendar.DAY_OF_MONTH, 1);
+                mToDate = (Calendar) mFromDate.clone();
+                mToDate.add(Calendar.MONTH, 1);
+                break;
+        }
+    }
+
+    private void updateDateInToolbar() {
+        switch(mPeriodMode) {
+            case DAY:
+                mCurrentPeriod.setTitle(mDateFormatDay.format(mDate.getTime()));
+                mCurrentPeriodMode.setTitle(R.string.period_mode_day);
+                break;
+            case WEEK:
+                mCurrentPeriod.setTitle(mDateFormatWeek.format(mDate.getTime()));
+                mCurrentPeriodMode.setTitle(R.string.period_mode_week);
+                break;
+            case MONTH:
+                mCurrentPeriod.setTitle(mDateFormatMonth.format(mDate.getTime()));
+                mCurrentPeriodMode.setTitle(R.string.period_mode_month);
+                break;
+        }
+    }
+
+    public Calendar getFromDate() {
+        return mFromDate;
+    }
+
+    public Calendar getToDate() {
+        return mToDate;
     }
 
     public SimpleDateFormat getDateFormat() {
-        return mDateFormat;
+        switch(mPeriodMode) {
+            case DAY:
+                return mDateFormatDay;
+            case WEEK:
+                return mDateFormatWeek;
+            case MONTH:
+                return mDateFormatMonth;
+        }
+        return null;
+    }
+
+    public SimpleDateFormat getAxisDateFormat() {
+        switch(mPeriodMode) {
+            case DAY:
+                return mAxisDateFormatDay;
+            case WEEK:
+                return mAxisDateFormatWeek;
+            case MONTH:
+                return mAxisDateFormatMonth;
+        }
+        return null;
+    }
+
+    public int getLabelCount() {
+        switch(mPeriodMode) {
+            case DAY:
+                return 9;
+            case WEEK:
+                return 8;
+            case MONTH:
+                return 10;
+        }
+        return 0;
+    }
+
+    public void setWaterDate(Date date) {
+        mWaterDate = GregorianCalendar.getInstance();
+        mWaterDate.setTime(date);
+    }
+
+    public SharedPreferences getSharedPreferences() {
+        return mSharedPreferences;
+    }
+
+    public Plant getPlant() {
+        return mPlant;
     }
 }

@@ -6,12 +6,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.view.MenuItem;
 import android.widget.DatePicker;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class DialogFragmentDatePicker extends DialogFragment implements DatePickerDialog.OnDateSetListener {
@@ -46,7 +44,7 @@ public class DialogFragmentDatePicker extends DialogFragment implements DatePick
         mUUID = args.getString("uuid");
 
         // Use the current date in toolbar
-        Calendar date = mActivity.getDate();
+        Calendar date = mActivity.getFromDate();
 
         int year = date.get(Calendar.YEAR);
         int month = date.get(Calendar.MONTH);
@@ -57,17 +55,13 @@ public class DialogFragmentDatePicker extends DialogFragment implements DatePick
     }
 
     public void onDateSet(DatePicker view, int year, int month, int day) {
-        Calendar date = mActivity.getDate();
-        SimpleDateFormat dateFormat = mActivity.getDateFormat();
-        MenuItem currentDay = mActivity.getCurrentDay();
+        Calendar date = mActivity.getFromDate();
 
         // Update date
         date.set(year, month, day);
-
-        // Update date in toolbar
-        currentDay.setTitle(dateFormat.format(date.getTime()));
+        mActivity.setDate(date.getTime());
 
         // Update data and graphs
-        EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID,date));
+        EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mActivity.getFromDate(), mActivity.getToDate()));
     }
 }

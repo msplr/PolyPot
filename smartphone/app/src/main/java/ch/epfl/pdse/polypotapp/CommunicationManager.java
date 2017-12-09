@@ -15,6 +15,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class CommunicationManager {
@@ -28,7 +29,8 @@ public class CommunicationManager {
         public String uuid;
         public JSONObject jsonRequest;
         public String hint;
-        public Calendar date;
+        public Calendar fromDate;
+        public Calendar toDate;
     }
     abstract class GenericDataReady {
         public JSONObject response = null;
@@ -45,10 +47,11 @@ public class CommunicationManager {
     class LatestDataReady extends GenericDataReady {}
 
     static class DataRequest extends GenericRequest {
-        public DataRequest(String server, String uuid, Calendar date) {
+        public DataRequest(String server, String uuid, Calendar fromDate, Calendar toDate) {
             this.server = server;
             this.uuid = uuid;
-            this.date = date;
+            this.fromDate = fromDate;
+            this.toDate = toDate;
         }
     }
     class DataReady extends GenericDataReady {}
@@ -84,7 +87,7 @@ public class CommunicationManager {
     private CommunicationManager(Context context) {
         mRequestQueue = Volley.newRequestQueue(context.getApplicationContext());
 
-        mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         EventBus.getDefault().register(this);
@@ -107,14 +110,8 @@ public class CommunicationManager {
             url += "/get-latest/" + event.uuid;
             dataReady = new LatestDataReady();
         } else if(event instanceof DataRequest) {
-            final Calendar fromDate = (Calendar) event.date.clone();
-            fromDate.setTimeZone(TimeZone.getTimeZone("UTC"));
-            String from = "from=" + mDateFormat.format(fromDate.getTime());
-
-            final Calendar toDate = (Calendar) event.date.clone();
-            toDate.setTimeZone(TimeZone.getTimeZone("UTC"));
-            toDate.add(Calendar.DAY_OF_MONTH, 1);
-            String to = "to=" + mDateFormat.format(toDate.getTime());
+            String from = "from=" + mDateFormat.format(event.fromDate.getTime());
+            String to = "to=" + mDateFormat.format(event.toDate.getTime());
 
             url += "/get-data/" + event.uuid + "?" + from + "&" + to;
             dataReady = new DataReady();

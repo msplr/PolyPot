@@ -28,17 +28,15 @@ class Pot {
     public static ArrayList<Pot> getPots(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String potsString = sharedPreferences.getString("list", "[{\"name\":\"Default pot\",\"server\":\"https://polypot.0xf00.ch\",\"uuid\":\"01234567-89ab-cdef-0123-456789abcdef\"}]");
-
-        Gson gson = new Gson();
-        return gson.fromJson(potsString, new TypeToken<ArrayList<Pot>>(){}.getType());
+;
+        return new Gson().fromJson(potsString, new TypeToken<ArrayList<Pot>>(){}.getType());
     }
 
     public static void savePots(Context context, ArrayList<Pot> pots) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Gson gson = new Gson();
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("list", gson.toJson(pots));
+        editor.putString("list", new Gson().toJson(pots));
         editor.apply();
     }
 

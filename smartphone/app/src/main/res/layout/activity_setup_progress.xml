@@ -2,290 +2,289 @@
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="ch.epfl.pdse.polypotapp.ActivitySetupProgress">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/activity_margin"
+        android:layout_marginEnd="@dimen/activity_margin"
+        android:layout_marginStart="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/activity_margin"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/setup_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="setupClick"
+            android:text="@string/setup_button" />
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="@dimen/activity_margin"
-            android:layout_marginEnd="@dimen/activity_margin"
-            android:layout_marginStart="@dimen/activity_margin"
-            android:layout_marginTop="@dimen/activity_margin"
+            android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/inter_element_spacing_half"
+            android:paddingTop="@dimen/inter_element_spacing_half">
 
-            <Button
-                android:id="@+id/setup_button"
-                android:layout_width="match_parent"
+            <ProgressBar
+                android:id="@+id/uuid_generate_progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/uuid_generate_tick"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/tick_icon"
+                android:tint="@color/limeAccent"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_tick" />
+
+            <ImageView
+                android:id="@+id/uuid_generate_cross"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/cross_icon"
+                android:tint="@color/red"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_cross" />
+
+            <TextView
+                android:id="@+id/uuid_generate_text"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:onClick="setupClick"
-                android:text="@string/setup_button" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingBottom="@dimen/inter_element_spacing_half"
-                android:paddingTop="@dimen/inter_element_spacing_half">
-
-                <ProgressBar
-                    android:id="@+id/uuid_generate_progressBar"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:visibility="invisible" />
-
-                <ImageView
-                    android:id="@+id/uuid_generate_tick"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/tick_icon"
-                    android:tint="@color/limeAccent"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
-
-                <ImageView
-                    android:id="@+id/uuid_generate_cross"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/cross_icon"
-                    android:tint="@color/red"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
-
-                <TextView
-                    android:id="@+id/uuid_generate_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/inter_element_spacing"
-                    android:text="@string/uuid_check_or_generate"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingBottom="@dimen/inter_element_spacing_half"
-                android:paddingTop="@dimen/inter_element_spacing_half">
-
-                <ProgressBar
-                    android:id="@+id/wifi_disconnect_user_progressBar"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:visibility="invisible" />
-
-                <ImageView
-                    android:id="@+id/wifi_disconnect_user_tick"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/tick_icon"
-                    android:tint="@color/limeAccent"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
-
-                <ImageView
-                    android:id="@+id/wifi_disconnect_user_cross"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/cross_icon"
-                    android:tint="@color/red"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
-
-                <TextView
-                    android:id="@+id/wifi_disconnect_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/inter_element_spacing"
-                    android:text="@string/wifi_disconnect_user"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingBottom="@dimen/inter_element_spacing_half"
-                android:paddingTop="@dimen/inter_element_spacing_half">
-
-                <ProgressBar
-                    android:id="@+id/wifi_connect_pot_progressBar"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:visibility="invisible" />
-
-                <ImageView
-                    android:id="@+id/wifi_connect_pot_tick"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/tick_icon"
-                    android:tint="@color/limeAccent"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
-
-                <ImageView
-                    android:id="@+id/wifi_connect_pot_cross"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/cross_icon"
-                    android:tint="@color/red"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
-
-                <TextView
-                    android:id="@+id/wifi_connect_pot_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/inter_element_spacing"
-                    android:text="@string/wifi_connect_pot"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingBottom="@dimen/inter_element_spacing_half"
-                android:paddingTop="@dimen/inter_element_spacing_half">
-
-                <ProgressBar
-                    android:id="@+id/configuration_send_progressBar"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:visibility="invisible" />
-
-                <ImageView
-                    android:id="@+id/configuration_send_tick"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/tick_icon"
-                    android:tint="@color/limeAccent"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
-
-                <ImageView
-                    android:id="@+id/configuration_send_cross"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/cross_icon"
-                    android:tint="@color/red"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
-
-                <TextView
-                    android:id="@+id/configuration_send_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/inter_element_spacing"
-                    android:text="@string/configuration_send"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingBottom="@dimen/inter_element_spacing_half"
-                android:paddingTop="@dimen/inter_element_spacing_half">
-
-                <ProgressBar
-                    android:id="@+id/wifi_disconnect_pot_progressBar"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:visibility="invisible" />
-
-                <ImageView
-                    android:id="@+id/wifi_disconnect_pot_tick"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/tick_icon"
-                    android:tint="@color/limeAccent"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
-
-                <ImageView
-                    android:id="@+id/wifi_disconnect_pot_cross"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/cross_icon"
-                    android:tint="@color/red"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
-
-                <TextView
-                    android:id="@+id/wifi_disconnect_pot_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/inter_element_spacing"
-                    android:text="@string/wifi_disconnect_pot"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingBottom="@dimen/inter_element_spacing_half"
-                android:paddingTop="@dimen/inter_element_spacing_half">
-
-                <ProgressBar
-                    android:id="@+id/wifi_reconnect_user_progressBar"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:visibility="invisible" />
-
-                <ImageView
-                    android:id="@+id/wifi_reconnect_user_tick"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/tick_icon"
-                    android:tint="@color/limeAccent"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_tick" />
-
-                <ImageView
-                    android:id="@+id/wifi_reconnect_user_cross"
-                    android:layout_width="@dimen/setup_status"
-                    android:layout_height="@dimen/setup_status"
-                    android:contentDescription="@string/cross_icon"
-                    android:tint="@color/red"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cross" />
-
-                <TextView
-                    android:id="@+id/wifi_reconnect_user_text"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="@dimen/inter_element_spacing"
-                    android:text="@string/wifi_reconnect_user"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-            </LinearLayout>
-
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/inter_element_spacing"
+                android:text="@string/uuid_check_or_generate"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/inter_element_spacing_half"
+            android:paddingTop="@dimen/inter_element_spacing_half">
+
+            <ProgressBar
+                android:id="@+id/wifi_disconnect_user_progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/wifi_disconnect_user_tick"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/tick_icon"
+                android:tint="@color/limeAccent"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_tick" />
+
+            <ImageView
+                android:id="@+id/wifi_disconnect_user_cross"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/cross_icon"
+                android:tint="@color/red"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_cross" />
+
+            <TextView
+                android:id="@+id/wifi_disconnect_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/inter_element_spacing"
+                android:text="@string/wifi_disconnect_user"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/inter_element_spacing_half"
+            android:paddingTop="@dimen/inter_element_spacing_half">
+
+            <ProgressBar
+                android:id="@+id/wifi_connect_pot_progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/wifi_connect_pot_tick"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/tick_icon"
+                android:tint="@color/limeAccent"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_tick" />
+
+            <ImageView
+                android:id="@+id/wifi_connect_pot_cross"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/cross_icon"
+                android:tint="@color/red"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_cross" />
+
+            <TextView
+                android:id="@+id/wifi_connect_pot_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/inter_element_spacing"
+                android:text="@string/wifi_connect_pot"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/inter_element_spacing_half"
+            android:paddingTop="@dimen/inter_element_spacing_half">
+
+            <ProgressBar
+                android:id="@+id/configuration_send_progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/configuration_send_tick"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/tick_icon"
+                android:tint="@color/limeAccent"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_tick" />
+
+            <ImageView
+                android:id="@+id/configuration_send_cross"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/cross_icon"
+                android:tint="@color/red"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_cross" />
+
+            <TextView
+                android:id="@+id/configuration_send_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/inter_element_spacing"
+                android:text="@string/configuration_send"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/inter_element_spacing_half"
+            android:paddingTop="@dimen/inter_element_spacing_half">
+
+            <ProgressBar
+                android:id="@+id/wifi_disconnect_pot_progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/wifi_disconnect_pot_tick"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/tick_icon"
+                android:tint="@color/limeAccent"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_tick" />
+
+            <ImageView
+                android:id="@+id/wifi_disconnect_pot_cross"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/cross_icon"
+                android:tint="@color/red"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_cross" />
+
+            <TextView
+                android:id="@+id/wifi_disconnect_pot_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/inter_element_spacing"
+                android:text="@string/wifi_disconnect_pot"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/inter_element_spacing_half"
+            android:paddingTop="@dimen/inter_element_spacing_half">
+
+            <ProgressBar
+                android:id="@+id/wifi_reconnect_user_progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:visibility="invisible" />
+
+            <ImageView
+                android:id="@+id/wifi_reconnect_user_tick"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/tick_icon"
+                android:tint="@color/limeAccent"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_tick" />
+
+            <ImageView
+                android:id="@+id/wifi_reconnect_user_cross"
+                android:layout_width="@dimen/setup_status"
+                android:layout_height="@dimen/setup_status"
+                android:contentDescription="@string/cross_icon"
+                android:tint="@color/red"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_cross" />
+
+            <TextView
+                android:id="@+id/wifi_reconnect_user_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingLeft="@dimen/inter_element_spacing"
+                android:text="@string/wifi_reconnect_user"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        </LinearLayout>
+
+    </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>

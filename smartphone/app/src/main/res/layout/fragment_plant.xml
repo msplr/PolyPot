@@ -5,4 +5,51 @@
     android:layout_height="match_parent"
     tools:context="ch.epfl.pdse.polypotapp.ActivityMain">
 
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/title_plant"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/activity_margin"
+                android:layout_marginStart="@dimen/activity_margin"
+                android:layout_marginTop="@dimen/activity_margin"
+                android:text="@string/title_plant"
+                android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/configured_plant"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/activity_margin"
+                android:layout_marginStart="@dimen/activity_margin"
+                android:layout_marginTop="@dimen/activity_margin"
+                android:text="@string/plant_configured"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title_plant" />
+
+            <TextView
+                android:id="@+id/description_plant"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/activity_margin"
+                android:layout_marginEnd="@dimen/activity_margin"
+                android:layout_marginStart="@dimen/activity_margin"
+                android:layout_marginTop="@dimen/description_spacing"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/configured_plant" />
+
+        </android.support.constraint.ConstraintLayout>
+
 </android.support.v4.widget.NestedScrollView>

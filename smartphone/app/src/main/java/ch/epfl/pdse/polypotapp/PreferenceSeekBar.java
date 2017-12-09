@@ -8,11 +8,15 @@ import android.util.AttributeSet;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 public class PreferenceSeekBar extends Preference {
     private SeekBar mSeekBar;
     private TextView mText;
 
     private final int mMax;
+    private int mPreviousValue = -1;
     private int mValue;
 
     public PreferenceSeekBar(Context context) {
@@ -61,6 +65,10 @@ public class PreferenceSeekBar extends Preference {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
+                if(mPreviousValue == -1) {
+                    mPreviousValue = mValue;
+                }
+
                 mValue = seekBar.getProgress();
                 persistInt(mValue);
             }
@@ -81,6 +89,33 @@ public class PreferenceSeekBar extends Preference {
             // Set default state from the XML attribute
             mValue = (Integer) defaultValue;
             persistInt(mValue);
+        }
+    }
+
+    @Override
+    public void onAttached() {
+        super.onAttached();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDetached() {
+        super.onDetached();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void handlePreferenceChange(ActivityMain.PreferenceChanged event) {
+        if(event.key.equals(getKey())) {
+            if(event.failed && mPreviousValue != -1) {
+                mValue = mPreviousValue;
+                persistInt(mValue);
+
+                mPreviousValue = -1;
+                notifyChanged();
+            } else if(!event.failed) {
+                mPreviousValue = -1;
+            }
         }
     }
 }

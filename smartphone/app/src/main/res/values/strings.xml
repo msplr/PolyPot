@@ -1,20 +1,33 @@
 <resources>
     <string name="app_name">PolyPot</string>
-    <string name="date_format">yyyy-MM-dd</string>
+    <string name="date_format_day">yyyy-MM-dd</string>
+    <string name="date_format_week">yyyy-\'W\'ww</string>
+    <string name="date_format_month">yyyy-MM</string>
+
+    <string name="axis_date_format_day">HH:00</string>
+    <string name="axis_date_format_week">EEE</string>
+    <string name="axis_date_format_month">dd</string>
 
     <!-- Tabs -->
     <string name="title_water_level">Water level</string>
     <string name="title_temperature">Temperature</string>
     <string name="title_soil_moisture">Soil moisture</string>
     <string name="title_luminosity">Luminosity</string>
+    <string name="title_plant">Plant status</string>
 
+    <string name="label_water_level">Water level for %s, in %%.</string>
+    <string name="label_temperature">Temperature for %s, in °C.</string>
+    <string name="label_soil_moisture">Soil moisture for %s, in %%.</string>
+    <string name="label_luminosity">Luminosity for %s, in lx.</string>
     <string name="no_chart_data">No chart data available for %s.</string>
+    <string name="target_soil_moisture_limit">Target soil moisture</string>
 
     <!-- Communication -->
     <string name="reception_summary_error">An error occurred during the reception of the summary\'s data.</string>
     <string name="reception_data_error">An error occurred during the reception of the data.</string>
 
-    <string name="configuration_update_error">An error occurred during the transmission of the configuration.</string>
+    <string name="configuration_sending">Sending configuration&#8230;</string>
+    <string name="configuration_update_error">An error occurred during the transmission of the configuration. Previous value restored.</string>
     <string name="configuration_updated">Configuration updated!</string>
 
     <string name="command_water_error">An error occurred during the transmission of the command.</string>
@@ -22,15 +35,18 @@
     <string name="command_water_wait">Water command already sent. Please wait %d:%02d:%02d before sending one more.</string>
 
     <!-- Toolbar -->
-    <string name="previous_day">Previous day</string>
-    <string name="next_day">Next day</string>
-    <string name="current_day">Current day</string>
+    <string name="previous_period">Previous period</string>
+    <string name="next_period">Next period</string>
+    <string name="current_period">Current period</string>
+    <string name="period_mode_day">DAY</string>
+    <string name="period_mode_week">WK</string>
+    <string name="period_mode_month">MTH</string>
 
     <!-- Summary -->
     <string name="water_level_unit">%</string>
     <string name="temperature_unit">°C</string>
     <string name="soil_moisture_unit">%</string>
-    <string name="luminosity_unit">lux</string>
+    <string name="luminosity_unit">lx</string>
     <string name="last_watering_unknown">Last watering date unknown.</string>
     <string name="water_plant_button">Water plant</string>
     <string name="plant_status_unknown">Unknown plant status.</string>
@@ -38,6 +54,9 @@
 
     <string name="last_watering_format">\'Last watering:\n\'yyyy-MM-dd</string>
     <string name="latest_data_date_format">\'Data from \'yyyy-MM-dd\' \'HH:mm\'.\'</string>
+
+    <!-- Plant status -->
+    <string name="plant_configured">Plant configured: %s</string>
 
     <!-- Icons -->
     <string name="water_level_icon">Water level icon</string>
@@ -60,7 +79,7 @@
     <string name="empty_uuid">Please, enter a UUID.</string>
     <string name="empty_ssid">Please, enter a Wi-Fi SSID.</string>
     <string name="empty_password">Please, enter a Wi-Fi password.</string>
-    <string name="uuid_or_server_not_found">Non existing server or UUID.</string>
+    <string name="uuid_or_server_not_found">The server and/or the UUID doesn\'t seem to exist.</string>
 
     <string name="setup_button">(Re)start setup</string>
 

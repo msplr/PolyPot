@@ -1,14 +1,15 @@
 package ch.epfl.pdse.polypotapp;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 
@@ -26,7 +27,7 @@ public class TabFragmentLuminosity extends Fragment {
 
     private LineChart mChart;
     private int mColor;
-    private Resources mResources;
+    private TextView mDescription;
 
     public static TabFragmentLuminosity newInstance(String server, String uuid) {
         TabFragmentLuminosity f = new TabFragmentLuminosity();
@@ -57,12 +58,24 @@ public class TabFragmentLuminosity extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        final SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                CommunicationManager.getDefault(getActivity()).clearCache();
+                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mActivity.getFromDate(), mActivity.getToDate()));
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
         mChart = view.findViewById(R.id.graph_luminosity);
         mColor = getResources().getColor(R.color.yellow);
-        mResources = getResources();
+        mDescription = view.findViewById(R.id.description_luminosity);
 
         GraphHelper.configureChart(mChart, mColor, 0, 1200);
-        EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mActivity.getDate()));
+        EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mActivity.getFromDate(), mActivity.getToDate()));
+
+        updateDescription();
     }
 
     @Override
@@ -80,7 +93,7 @@ public class TabFragmentLuminosity extends Fragment {
     @Subscribe
     public void handleData(CommunicationManager.DataReady event) {
         try {
-            GraphHelper.updateChartWithData(mChart, mColor, "luminosity", event.response, mResources);
+            GraphHelper.updateChartWithData(mChart, mColor, "luminosity", getString(R.string.label_luminosity), event.response, mActivity);
         } catch (NullPointerException|JSONException|ParseException e) {
             // Display error on chart
             mChart.clear();
@@ -89,5 +102,16 @@ public class TabFragmentLuminosity extends Fragment {
             // Show an error message
             Snackbar.make(getView(), R.string.reception_data_error, Snackbar.LENGTH_LONG).show();
         }
+    }
+
+    @Subscribe
+    public void handlePreferenceChange(ActivityMain.PreferenceChanged event) {
+        if(!event.failed && event.key.equals("plant")) {
+            updateDescription();
+        }
+    }
+
+    private void updateDescription() {
+        mDescription.setText(mActivity.getPlant().luminosityDescription);
     }
 }

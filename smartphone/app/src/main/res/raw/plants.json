@@ -1,0 +1,24 @@
+{
+  "Unspecified": {
+    "description": "You did not specify a plant specie in your settings.\n\nSelect yours to have custom advices!\n\nSelect \"None\" you hide this message.",
+    "waterLevelRange": "-100000/100000",
+    "waterLevelDescription": "You did not specify a plant specie in your settings.\n\nSelect yours to have custom advices!\n\nSelect \"None\" you hide this message.",
+    "temperatureRange": "-100000/100000",
+    "temperatureDescription": "You did not specify a plant specie in your settings.\n\nSelect yours to have custom advices!\n\nSelect \"None\" you hide this message.",
+    "soilMoistureRange": "-100000/100000",
+    "soilMoistureDescription": "You did not specify a plant specie in your settings.\n\nSelect yours to have custom advices!\n\nSelect \"None\" you hide this message.",
+    "luminosityRange": "-100000/100000",
+    "luminosityDescription": "You did not specify a plant specie in your settings.\n\nSelect yours to have custom advices!\n\nSelect \"None\" you hide this message."
+  },
+  "None": {
+    "description": "Not really a plant specie, just hide all messages.",
+    "waterLevelRange": "-100000/100000",
+    "waterLevelDescription": "",
+    "temperatureRange": "-100000/100000",
+    "temperatureDescription": "",
+    "soilMoistureRange": "-100000/100000",
+    "soilMoistureDescription": "",
+    "luminosityRange": "-100000/100000",
+    "luminosityDescription": ""
+  }
+}

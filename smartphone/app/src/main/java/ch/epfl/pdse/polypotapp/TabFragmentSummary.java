@@ -1,9 +1,11 @@
 package ch.epfl.pdse.polypotapp;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +21,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class TabFragmentSummary extends Fragment {
+    private ActivityMain mActivity;
+
     private String mServer;
     private String mUUID;
 
@@ -44,6 +49,13 @@ public class TabFragmentSummary extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        mActivity = (ActivityMain) context;
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Bundle args = getArguments();
         mServer = args.getString("server");
@@ -54,6 +66,16 @@ public class TabFragmentSummary extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        final SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                CommunicationManager.getDefault(getActivity()).clearCache();
+                EventBus.getDefault().post(new CommunicationManager.LatestRequest(mServer, mUUID));
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
         // Save for later use
         mWaterLevelText = view.findViewById(R.id.water_level_text);
         mTemperatureText = view.findViewById(R.id.temperature_text);
@@ -100,9 +122,9 @@ public class TabFragmentSummary extends Fragment {
             mLuminosityText.setText(Integer.toString(luminosity));
 
             // Date and Time
-            SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
             inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-            SimpleDateFormat outputDateFormat = new SimpleDateFormat(getString(R.string.latest_data_date_format));
+            SimpleDateFormat outputDateFormat = new SimpleDateFormat(getString(R.string.latest_data_date_format), Locale.US);
 
             Calendar date = GregorianCalendar.getInstance();
             date.setTime(inputDateFormat.parse(data.getString("datetime")));
@@ -118,12 +140,14 @@ public class TabFragmentSummary extends Fragment {
                 JSONObject command = commands.getJSONObject(i);
                 if(command.getString("type").equals("water")) {
                     // Date and Time
-                    outputDateFormat = new SimpleDateFormat(getString(R.string.last_watering_format));
+                    outputDateFormat = new SimpleDateFormat(getString(R.string.last_watering_format), Locale.US);
 
                     date.setTime(inputDateFormat.parse(command.getString("datetime")));
                     date.setTimeZone(TimeZone.getDefault());
 
                     mLastWateringText.setText(outputDateFormat.format(date.getTime()));
+
+                    mActivity.setWaterDate(date.getTime());
                 }
             }
         } catch (NullPointerException|JSONException|ParseException e) {

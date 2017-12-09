@@ -5,15 +5,19 @@
     <item
         android:id="@+id/previous_day"
         android:icon="@drawable/ic_arrow_left"
-        android:title="@string/previous_day"
+        android:title="@string/previous_period"
         app:showAsAction="always" />
     <item
         android:id="@+id/current_day"
-        android:title="@string/current_day"
+        android:title="@string/current_period"
         app:showAsAction="always" />
     <item
         android:id="@+id/next_day"
         android:icon="@drawable/ic_arrow_right"
-        android:title="@string/next_day"
+        android:title="@string/next_period"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/date_mode"
+        android:title="@string/period_mode_day"
         app:showAsAction="always" />
 </menu>

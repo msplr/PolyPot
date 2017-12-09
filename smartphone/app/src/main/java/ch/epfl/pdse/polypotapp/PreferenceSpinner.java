@@ -5,16 +5,19 @@ import android.content.res.TypedArray;
 import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 public class PreferenceSpinner extends DialogPreference implements AdapterView.OnItemSelectedListener {
     private Spinner mSpinner;
 
     private final int mArray;
+    private String mPreviousValue;
     private String mValue;
 
     public PreferenceSpinner(Context context) {
@@ -63,6 +66,10 @@ public class PreferenceSpinner extends DialogPreference implements AdapterView.O
             focus.requestFocus();
         }
 
+        if(mPreviousValue == null) {
+            mPreviousValue = mValue;
+        }
+
         mValue = (String) adapterView.getItemAtPosition(pos);
         persistString(mValue);
     }
@@ -85,6 +92,33 @@ public class PreferenceSpinner extends DialogPreference implements AdapterView.O
             // Set default state from the XML attribute
             mValue = (String) defaultValue;
             persistString(mValue);
+        }
+    }
+
+    @Override
+    public void onAttached() {
+        super.onAttached();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDetached() {
+        super.onDetached();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void handlePreferenceChange(ActivityMain.PreferenceChanged event) {
+        if(event.key.equals(getKey())) {
+            if(event.failed && mPreviousValue != null) {
+                mValue = mPreviousValue;
+                persistString(mValue);
+
+                mPreviousValue = null;
+                notifyChanged();
+            } else if(!event.failed) {
+                mPreviousValue = null;
+            }
         }
     }
 }
