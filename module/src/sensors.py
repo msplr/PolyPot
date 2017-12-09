@@ -1,4 +1,5 @@
 import machine
+import struct
 
 def sensor_pwr(enable):
     SENSOR_ENn = machine.Pin(25, machine.Pin.OUT)
@@ -17,3 +18,13 @@ adc_luminosity = machine.ADC(pin_luminosity) # ADC1 CH 5
 
 adc_luminosity.read()
 
+
+i2c = machine.I2C(scl=machine.Pin(16), sda=machine.Pin(4), freq=100000)
+i2c.scan()
+
+# temperature sensor
+i2c.writeto_mem(72, 0x01, b'\x00') # write control register
+temp = i2c.readfrom_mem(72, 0x00, 2)
+temp = struct.unpack('>h', temp) # MSByte first -> 16 bit big endian
+(temp, ) = temp # upack tuple
+temp = temp / 256
