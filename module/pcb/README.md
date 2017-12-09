@@ -2,8 +2,11 @@
 
 ## Issues
 
-- Button gpio 23 does not allow wakeup from deepsleep
+- Button gpio 23 does not allow wakeup from deepsleep -> connect to IO15
 - Soil moisture sensor pinout is wrong. FIX THE CABLE BEFORE CONNECTING!
+- IO12 is not connected to SENSOR_ENn PMOS (typo in signal name)
+- IO12 must not be pulled up during boot -> use IO25
+- R1 and R11 need to be ~120 Ohm to have higher LED brightness
 
 ## Images
 ![Board Top](https://raw.githubusercontent.com/nuft/PolyPot/master/module/pcb/img/top.jpg)
