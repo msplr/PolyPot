@@ -43,7 +43,6 @@ public class ActivitySetupProgress extends AppCompatActivity {
     private String mSendingInterval;
     private String mWaterTank;
     private String mPlant;
-    private HashMap<String, Object> mConfiguration;
 
     private int mUserId;
     private int mPotId;
@@ -97,14 +96,6 @@ public class ActivitySetupProgress extends AppCompatActivity {
         mSendingInterval = mSharedPreferencesSetup.getString("sending_interval", null);
         mWaterTank = mSharedPreferencesSetup.getString("water_tank", null);
         mPlant = mSharedPreferencesSetup.getString("plant", null);
-
-        mConfiguration = new HashMap<>();
-        mConfiguration.put("target_soil_moisture", mTargetSoilMoisture);
-        mConfiguration.put("water_volume_pumped", mWaterVolumePumped);
-        mConfiguration.put("logging_interval", mLoggingInterval);
-        mConfiguration.put("sending_interval", mSendingInterval);
-        mConfiguration.put("water_tank", mWaterTank);
-        mConfiguration.put("plant", mPlant);
 
         mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
@@ -260,8 +251,16 @@ public class ActivitySetupProgress extends AppCompatActivity {
         mUUIDCheckOrGenerateProgressBar.setVisibility(View.VISIBLE);
 
         if(mUUID.isEmpty()) {
+            HashMap<String, Object> configuration = new HashMap<>();
+            configuration.put("target_soil_moisture", mTargetSoilMoisture);
+            configuration.put("water_volume_pumped", mWaterVolumePumped);
+            configuration.put("logging_interval", mLoggingInterval);
+            configuration.put("sending_interval", mSendingInterval);
+            configuration.put("water_tank", mWaterTank);
+            configuration.put("plant", mPlant);
+
             HashMap<String, Object> setup = new HashMap<>();
-            setup.put("configuration", mConfiguration);
+            setup.put("configuration", configuration);
 
             JSONObject jsonRequest = new JSONObject(setup);
             EventBus.getDefault().post(new CommunicationManager.SetupRequest(mServer, mUUID, jsonRequest));
@@ -434,7 +433,6 @@ public class ActivitySetupProgress extends AppCompatActivity {
         setup.put("uuid", mUUID);
         setup.put("ssid", mSSID);
         setup.put("password", mPassword);
-        setup.put("configuration", mConfiguration);
 
         JSONObject jsonRequest = new JSONObject(setup);
         EventBus.getDefault().post(new CommunicationManager.SetupPotRequest(mServer, mUUID, jsonRequest));

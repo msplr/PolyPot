@@ -2,7 +2,21 @@
 
 ## Setup
 
-### Pot and Smartphone
+### Smartphone and Server
+
+The Smartphone registers with the Server through an HTTP POST request. The response is a JSON response containing the Pot ID.
+
+The server will generate a new UUID for the Pot.
+
+The URL to be called is `/setup`.
+
+The JSON request MUST have the following top-level members:
+ - `configuration`: an Configuration object, containing the configuration of the Pot. See "Configuration object" section for details.
+
+The JSON response MUST have the following top-level members:
+ - `uuid`: the uuid the Pot will use.
+
+### Smartphone and Pot
 
 When the Pot is started for the first time, it MUST setup a Wi-Fi Access Point (AP) with the ssid `PolyPot` and the password `setupPolyPot`.
 
@@ -20,20 +34,21 @@ The JSON request MUST have the following top-level members:
  - `uuid`: the UUID the Pot will use.
  - `server`: the server the Pot will use.
 
- The JSON response MUST be an empty JSON object.
+The JSON response MUST be an empty JSON object.
 
-### Pot and Server
+#### Pot
 
-The Pot registers with the Server through an HTTP GET request. The response is a JSON response containing the configuration and the Pot ID.
+The Pot MUST try to connect to the Wi-Fi and make an HTTP POST request containing an empty JSON-encoded payload to the server. The response is a JSON response containing the configuration and the pending commands.
 
-The URL to be called is `/setup/<uuid:pot_id>`.
+The URL to be called is `/send-data/<uuid:pot_id>`.
 
-If the Pot can't connect to the Server, the Pot MUST stay in the setup mode.
+If the Pot can't connect to the Wi-Fi or the Server, the Pot MUST stay in the setup mode.
 
-If the UUID already exist in the database, the Server MUST return an error and the Pot MUST stay in the setup mode.
+The JSON request MUST be an empty JSON object.
 
 The JSON response MUST have the following top-level members:
  - `configuration`: an Configuration object, containing the configuration of the Pot. See "Configuration object" section for details.
+ - `commands`: an array of Command objects, containing the last command of each type executed by the Pot. See "Command object" section for details.
 
 ## Communications paths
 
@@ -94,8 +109,9 @@ A Data object MUST have the following members:
  - `datetime`: a string representing the date and the time (UTC) when the measures where made, following the ISO 8601 standard.
  - `soil_moisture`: a float number representing the soil moisture, in percents.
  - `temperature`: a float number representing the temperature, in degree Celsius.
- - `luminosity`: an integer number representing the luminosity, in lux.
- - `water_level`: an integer number representing the water level of the tank, in percents.
+ - `luminosity`: an float number representing the luminosity, in lux.
+ - `water_level`: an float number representing the water level of the tank, in percents.
+ - `battery_level`: an float number representing the battery level, in percents.
 
 ### Configuration object
 
@@ -104,6 +120,8 @@ A Configuration object MAY have the following members:
  - `water_volume_pumped`: the volume pumped when the Pot water the plant, in milliliter.
  - `logging_interval`: the interval a which the Pot must wake up and take measures, in seconds.
  - `sending_interval`: the interval a which the Pot must wake up and send the data accumulated, in seconds.
+ - `water_tank`: the water tank used for the Pot.
+ - `plant`: the plant specie in the Pot.
 
 ### Command object
 

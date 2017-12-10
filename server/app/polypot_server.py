@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import uuid
 
 from flask import Flask, request, jsonify, render_template
 from polypot_database import *
@@ -17,19 +18,29 @@ def index():
     stats['commands'] = Command.query.count()
     return render_template('index.html', stats=stats)
 
-@app.route('/setup/<uuid:pot_id>')
-def setup(pot_id):
-    # Generate new configuration
+@app.route('/setup', methods=['POST'])
+def setup():
+    json_content = request.get_json()
+
+    # Generate new UUID
+    pot_id = uuid.uuid4()
+    n = Config.query.filter_by(pot_id=pot_id.hex).count()
+    while n > 0:
+        pot_id = uuid.uuid4()
+        n = Config.query.filter_by(pot_id=pot_id.hex).count()
+
+    # Store configuration and uuid
     config = Config()
     config.pot_id = pot_id.hex
+    config.from_dict(json_content['configuration'])
     db.session.add(config)
 
     # Commit all changes
     db.session.commit()
 
-    # Send configuration and id
+    # Send uuid
     json_content = {}
-    json_content['configuration'] = config.to_dict()
+    json_content['uuid'] = str(pot_id)
 
     return jsonify(json_content)
 
@@ -169,7 +180,7 @@ def send_commands_and_configuration(pot_id):
 
     return jsonify(json_content)
 
-if __name__ == '__main__':
-    db.init_app(app)
-    db.create_all(app=app)
-    app.run(host='0.0.0.0')
+
+db.init_app(app)
+db.create_all(app=app)
+app.run(host='0.0.0.0')

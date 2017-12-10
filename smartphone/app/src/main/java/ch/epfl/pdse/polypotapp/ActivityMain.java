@@ -113,9 +113,6 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         mConfigTypeMap.put("water_tank", "string");
         mConfigTypeMap.put("plant", "string");
 
-        mConfigurationSnackbar = Snackbar.make(mViewPager, R.string.configuration_sending, Snackbar.LENGTH_INDEFINITE);
-        mConfigurationBeingSent = 0;
-
         mPlants = Plant.getPlantsList(this);
         mPlant = new Plant(mPlants, getSharedPreferences().getString("plant", "Unspecified"));
 
@@ -139,6 +136,9 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         }
 
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+
+        mConfigurationSnackbar = Snackbar.make(mViewPager, R.string.configuration_sending, Snackbar.LENGTH_INDEFINITE);
+        mConfigurationBeingSent = 0;
     }
 
     @Override
