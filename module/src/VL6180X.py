@@ -1,6 +1,6 @@
 import struct
 
-class VL6180X(object):
+class VL6180X():
     """VL6180X TOF distance sensor driver """
     ADDR = 0x29
     # Register configuration as in application note AN4545 : VL6180X basic ranging
@@ -51,20 +51,21 @@ class VL6180X(object):
         self.reset.value(0)
 
     def write_reg(self, reg, byte):
-        self.i2c.writeto_mem(self.ADDR, reg, 1, byte, addrsize=16)
+        byte = struct.pack('B', byte)
+        self.i2c.writeto_mem(self.ADDR, reg, byte, addrsize=16)
 
     def read_reg(self, reg):
         data = self.i2c.readfrom_mem(self.ADDR, reg, 1, addrsize=16)
         (data, ) = struct.unpack('B', data)
         return data
 
-    def distance(self)
+    def distance(self):
         # Wait for device ready
         while self.read_reg(self.VL6180X_RESULT_RANGE_STATUS) & 1 == 0:
             pass
 
         # Start measurement
-        self.write_reg(VL6180X_SYSRANGE_START, 0x01)
+        self.write_reg(self.VL6180X_SYSRANGE_START, 0x01)
 
         # Wait for measurement ready
         while self.read_reg(self.VL6180X_RESULT_INTERRUPT_STATUS_GPIO) & 4 == 0:
