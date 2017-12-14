@@ -9,9 +9,12 @@
 
     <dimen name="description_spacing">24dp</dimen>
 
-    <!-- Summary -->
-    <dimen name="card_height">140dp</dimen>
+    <!-- Cards -->
+    <dimen name="summary_card_height">140dp</dimen>
+    <dimen name="pots_list_card_height">100dp</dimen>
     <dimen name="card_padding">8dp</dimen>
+
+    <dimen name="pot_icon_size">75dp</dimen>
 
     <!-- Tabs -->
     <dimen name="graph_height">200dp</dimen>

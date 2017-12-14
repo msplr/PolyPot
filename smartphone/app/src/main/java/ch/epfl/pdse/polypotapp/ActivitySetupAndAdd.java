@@ -31,14 +31,6 @@ public class ActivitySetupAndAdd extends AppCompatActivity {
 
         mSharedPreferencesSetup = getSharedPreferences("setup_and_add", Context.MODE_PRIVATE);
 
-        // If a pot was added, immediately go back to home screen
-        if(mSharedPreferencesSetup.getBoolean("pot_added", false)) {
-            SharedPreferences.Editor editor = mSharedPreferencesSetup.edit();
-            editor.putBoolean("pot_added", false);
-            editor.apply();
-            finish();
-        }
-
         mPots = Pot.getPots(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -51,6 +43,14 @@ public class ActivitySetupAndAdd extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // If a pot was added, immediately go back to home screen
+        if (mSharedPreferencesSetup.getBoolean("pot_added", false)) {
+            SharedPreferences.Editor editor = mSharedPreferencesSetup.edit();
+            editor.putBoolean("pot_added", false);
+            editor.apply();
+            finish();
+        }
 
         EventBus.getDefault().register(this);
     }
@@ -95,6 +95,7 @@ public class ActivitySetupAndAdd extends AppCompatActivity {
         String name = mSharedPreferencesSetup.getString("name", "").trim();
         String server = mSharedPreferencesSetup.getString("server", "").trim();
         String uuid = mSharedPreferencesSetup.getString("uuid", "").trim();
+        String color = mSharedPreferencesSetup.getString("color", "").trim();
 
         String ssid = mSharedPreferencesSetup.getString("ssid", "").trim();
         String password = mSharedPreferencesSetup.getString("password", "").trim();
@@ -125,7 +126,9 @@ public class ActivitySetupAndAdd extends AppCompatActivity {
                 return;
             }
 
-            potToAdd = new Pot(name, server, uuid);
+            potToAdd = new Pot(name, server, uuid, color);
+
+            Snackbar.make(findViewById(android.R.id.content), R.string.checking_server_uuid, Snackbar.LENGTH_INDEFINITE).show();
 
             // Check server and UUID
             EventBus.getDefault().post(new CommunicationManager.LatestRequest(server, uuid));
@@ -145,7 +148,7 @@ public class ActivitySetupAndAdd extends AppCompatActivity {
     }
 
     @Subscribe
-    public void handleLatestData(CommunicationManager.LatestDataReady event) {
+    public void handleLatestResponse(CommunicationManager.LatestResponse event) {
         if(event.response == null) {
             // The pot doesn't exist, or the server didn't respond.
             Snackbar.make(findViewById(android.R.id.content), R.string.uuid_or_server_not_found, Snackbar.LENGTH_LONG).show();

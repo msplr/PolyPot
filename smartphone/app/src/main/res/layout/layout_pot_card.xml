@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/pot_card"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="@dimen/pots_list_card_height"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?android:attr/selectableItemBackground"
@@ -24,16 +24,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <android.support.v7.widget.AppCompatImageView
             android:id="@+id/pot_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/pot_icon_size"
+            android:layout_height="@dimen/pot_icon_size"
+            android:background="@drawable/ic_round"
             android:contentDescription="@string/pot_icon"
             app:layout_column="0"
-            app:layout_columnWeight="0.3"
+            app:layout_gravity="left|center_vertical"
             app:layout_row="0"
             app:layout_rowSpan="3"
-            app:layout_rowWeight="1"
             app:srcCompat="@drawable/ic_pot" />
 
         <TextView
@@ -41,8 +41,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:gravity="end"
-            android:textAlignment="textEnd"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             app:autoSizeTextType="uniform"
             app:layout_column="1"
             app:layout_columnWeight="1"

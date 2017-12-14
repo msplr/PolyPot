@@ -24,23 +24,11 @@ import java.text.ParseException;
 public class TabFragmentSoilMoisture extends Fragment {
     private ActivityMain mActivity;
 
-    private String mServer;
-    private String mUUID;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private LineChart mChart;
     private int mColor;
     private TextView mDescription;
-
-    public static TabFragmentSoilMoisture newInstance(String server, String uuid) {
-        TabFragmentSoilMoisture f = new TabFragmentSoilMoisture();
-
-        Bundle args = new Bundle();
-        args.putString("server", server);
-        args.putString("uuid", uuid);
-        f.setArguments(args);
-
-        return f;
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -49,54 +37,53 @@ public class TabFragmentSoilMoisture extends Fragment {
        mActivity = (ActivityMain) context;
     }
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Bundle args = getArguments();
-        mServer = args.getString("server");
-        mUUID = args.getString("uuid");
-
         return inflater.inflate(R.layout.fragment_soil_moisture, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        final SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mSwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                CommunicationManager.getDefault(getActivity()).clearCache();
-                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mActivity.getFromDate(), mActivity.getToDate()));
-                swipeRefreshLayout.setRefreshing(false);
+                mActivity.forceRefresh();
             }
         });
 
         mChart = view.findViewById(R.id.graph_soil_moisture);
         mColor = getResources().getColor(R.color.lightBlue);
         mDescription = view.findViewById(R.id.description_soil_moisture);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        EventBus.getDefault().register(this);
 
         updateLimits();
 
         GraphHelper.configureChart(mChart, mColor, 0, 100);
-        EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mActivity.getFromDate(), mActivity.getToDate()));
 
         updateDescription();
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
+    public void onPause() {
         EventBus.getDefault().unregister(this);
-        super.onStop();
+
+        super.onPause();
     }
 
     @Subscribe
-    public void handleData(CommunicationManager.DataReady event) {
+    public void handleDataLoading(final CommunicationManager.DataLoading event) {
+        mSwipeRefreshLayout.setRefreshing(true);
+    }
+
+    @Subscribe(sticky = true)
+    public void handleDataResponse(CommunicationManager.DataResponse event) {
         try {
             GraphHelper.updateChartWithData(mChart, mColor, "soil_moisture", getString(R.string.label_soil_moisture), event.response, mActivity);
         } catch (NullPointerException|JSONException|ParseException e) {
@@ -107,13 +94,15 @@ public class TabFragmentSoilMoisture extends Fragment {
             // Show an error message
             Snackbar.make(getView(), R.string.reception_data_error, Snackbar.LENGTH_LONG).show();
         }
+
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Subscribe
-    public void handlePreferenceChange(ActivityMain.PreferenceChanged event) {
-        if(!event.failed && event.key.equals("plant")) {
+    public void handleConfigurationResponse(CommunicationManager.ConfigurationResponse event) {
+        if(event.response != null && event.hint.equals("plant")) {
             updateDescription();
-        } else if(!event.failed && event.key.equals("target_soil_moisture")) {
+        } else if(event.response != null && event.hint.equals("target_soil_moisture")) {
             updateLimits();
         }
     }
@@ -126,7 +115,7 @@ public class TabFragmentSoilMoisture extends Fragment {
         int target = mActivity.getSharedPreferences().getInt("target_soil_moisture", 0);
 
         YAxis leftAxis = mChart.getAxisLeft();
-        LimitLine limitLine = new LimitLine(target, getString(R.string.target_soil_moisture_limit));
+        LimitLine limitLine = new LimitLine(target, getString(R.string.limit_target_soil_moisture));
         limitLine.setLineWidth(1f);
         limitLine.enableDashedLine(2, 2, 0);
         limitLine.setTextSize(4f);

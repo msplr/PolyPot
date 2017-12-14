@@ -23,6 +23,12 @@
             android:title="@string/conf_uuid_title"
             android:summary="@string/conf_uuid_summary"
             app:hint="@string/conf_uuid_hint" />
+
+        <ch.epfl.pdse.polypotapp.PreferenceColor
+            android:defaultValue="@color/cardview_light_background"
+            android:key="color"
+            android:title="@string/conf_color_title"
+            android:summary="@string/conf_color_summary" />
     </android.support.v7.preference.PreferenceCategory>
 
     <android.support.v7.preference.PreferenceCategory

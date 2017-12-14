@@ -3,10 +3,13 @@ package ch.epfl.pdse.polypotapp;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -99,24 +102,28 @@ public class ActivityPotsList extends AppCompatActivity {
     }
 
     public void cardClick(View v) {
+        TextView name = v.findViewById(R.id.name);
         TextView uuid = v.findViewById(R.id.uuid);
         TextView server = v.findViewById(R.id.server);
 
         Intent intent = new Intent(this, ActivityMain.class);
         Bundle b = new Bundle();
-        b.putString("uuid", uuid.getText().toString());
+        b.putString("name", name.getText().toString());
         b.putString("server", server.getText().toString());
+        b.putString("uuid", uuid.getText().toString());
         intent.putExtras(b);
         startActivity(intent);
     }
 
     public static class PotViewHolder extends RecyclerView.ViewHolder {
+        final AppCompatImageView pot_icon;
         final TextView name;
         final TextView server;
         final TextView uuid;
 
         PotViewHolder(View itemView) {
             super(itemView);
+            pot_icon = itemView.findViewById(R.id.pot_icon);
             name = itemView.findViewById(R.id.name);
             server = itemView.findViewById(R.id.server);
             uuid = itemView.findViewById(R.id.uuid);
@@ -135,6 +142,7 @@ public class ActivityPotsList extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(PotViewHolder potViewHolder, int i) {
+            potViewHolder.pot_icon.setSupportBackgroundTintList(ColorStateList.valueOf(Color.parseColor(mPots.get(i).color)));
             potViewHolder.name.setText(mPots.get(i).name);
             potViewHolder.server.setText(mPots.get(i).server);
             potViewHolder.uuid.setText(mPots.get(i).uuid);

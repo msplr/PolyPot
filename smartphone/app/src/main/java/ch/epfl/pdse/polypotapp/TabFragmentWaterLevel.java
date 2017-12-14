@@ -22,23 +22,11 @@ import java.text.ParseException;
 public class TabFragmentWaterLevel extends Fragment {
     private ActivityMain mActivity;
 
-    private String mServer;
-    private String mUUID;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private LineChart mChart;
     private int mColor;
     private TextView mDescription;
-
-    public static TabFragmentWaterLevel newInstance(String server, String uuid) {
-        TabFragmentWaterLevel f = new TabFragmentWaterLevel();
-
-        Bundle args = new Bundle();
-        args.putString("server", server);
-        args.putString("uuid", uuid);
-        f.setArguments(args);
-
-        return f;
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -49,49 +37,49 @@ public class TabFragmentWaterLevel extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Bundle args = getArguments();
-        mServer = args.getString("server");
-        mUUID = args.getString("uuid");
-
         return inflater.inflate(R.layout.fragment_water_level, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        final SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mSwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                CommunicationManager.getDefault(getActivity()).clearCache();
-                EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mActivity.getFromDate(), mActivity.getToDate()));
-                swipeRefreshLayout.setRefreshing(false);
+                mActivity.forceRefresh();
             }
         });
 
         mChart = view.findViewById(R.id.graph_water_level);
         mColor = getResources().getColor(R.color.lightBlue);
         mDescription = view.findViewById(R.id.description_water_level);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        EventBus.getDefault().register(this);
 
         GraphHelper.configureChart(mChart, mColor, 0, 100);
-        EventBus.getDefault().post(new CommunicationManager.DataRequest(mServer, mUUID, mActivity.getFromDate(), mActivity.getToDate()));
 
         updateDescription();
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
+    public void onPause() {
         EventBus.getDefault().unregister(this);
-        super.onStop();
+
+        super.onPause();
     }
 
     @Subscribe
-    public void handleData(CommunicationManager.DataReady event) {
+    public void handleDataLoading(final CommunicationManager.DataLoading event) {
+        mSwipeRefreshLayout.setRefreshing(true);
+    }
+
+    @Subscribe(sticky = true)
+    public void handleDataResponse(CommunicationManager.DataResponse event) {
         try {
             GraphHelper.updateChartWithData(mChart, mColor, "water_level", getString(R.string.label_water_level), event.response, mActivity);
         } catch (NullPointerException|JSONException|ParseException e) {
@@ -102,11 +90,13 @@ public class TabFragmentWaterLevel extends Fragment {
             // Show an error message
             Snackbar.make(getView(), R.string.reception_data_error, Snackbar.LENGTH_LONG).show();
         }
+
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Subscribe
-    public void handlePreferenceChange(ActivityMain.PreferenceChanged event) {
-        if(!event.failed && event.key.equals("plant")) {
+    public void handleConfigurationResponse(CommunicationManager.ConfigurationResponse event) {
+        if(event.response != null && event.hint.equals("plant")) {
             updateDescription();
         }
     }

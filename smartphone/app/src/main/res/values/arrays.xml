@@ -7,5 +7,15 @@
     <string-array name="plants">
         <item>Unspecified</item>
         <item>None</item>
+        <item>Anthurium / Tailflower</item>
+        <item>Beaucarnea</item>
+        <item>Crocodile fern</item>
+        <item>Ficus</item>
+        <item>Moth orchids</item>
+        <item>Pachira</item>
+        <item>Philodendron</item>
+        <item>Satavar</item>
+        <item>Spath / Peace lilies</item>
+        <item>Umbrella tree</item>
     </string-array>
 </resources>

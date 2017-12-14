@@ -8,15 +8,12 @@ import android.util.AttributeSet;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-
-public class PreferenceSeekBar extends Preference {
+public class PreferenceSeekBar extends Preference implements Preference.OnPreferenceChangeListener {
     private SeekBar mSeekBar;
     private TextView mText;
 
     private final int mMax;
-    private int mPreviousValue = -1;
+
     private int mValue;
 
     public PreferenceSeekBar(Context context) {
@@ -36,6 +33,8 @@ public class PreferenceSeekBar extends Preference {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PreferenceSeekBar);
         mMax = a.getInt(R.styleable.PreferenceSeekBar_max, 100); //TODO: min,max,interval
         a.recycle();
+
+        setOnPreferenceChangeListener(this);
     }
 
     @Override
@@ -65,10 +64,6 @@ public class PreferenceSeekBar extends Preference {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if(mPreviousValue == -1) {
-                    mPreviousValue = mValue;
-                }
-
                 mValue = seekBar.getProgress();
                 persistInt(mValue);
             }
@@ -93,29 +88,12 @@ public class PreferenceSeekBar extends Preference {
     }
 
     @Override
-    public void onAttached() {
-        super.onAttached();
-        EventBus.getDefault().register(this);
-    }
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        mValue = (int) newValue;
 
-    @Override
-    public void onDetached() {
-        super.onDetached();
-        EventBus.getDefault().unregister(this);
-    }
+        mSeekBar.setProgress(mValue);
+        mText.setText(Integer.toString(mValue));
 
-    @Subscribe
-    public void handlePreferenceChange(ActivityMain.PreferenceChanged event) {
-        if(event.key.equals(getKey())) {
-            if(event.failed && mPreviousValue != -1) {
-                mValue = mPreviousValue;
-                persistInt(mValue);
-
-                mPreviousValue = -1;
-                notifyChanged();
-            } else if(!event.failed) {
-                mPreviousValue = -1;
-            }
-        }
+        return true;
     }
 }

@@ -45,7 +45,8 @@
                 android:value=".ActivityPotsList" />
         </activity>
         <activity
-            android:name=".ActivitySetupProgress">
+            android:name=".ActivitySetupProgress"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="ch.epfl.pdse.polypotapp.ActivityProgress" />
                 <category android:name="android.intent.category.DEFAULT" />

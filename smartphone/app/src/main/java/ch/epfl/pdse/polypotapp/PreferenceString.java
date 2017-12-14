@@ -2,7 +2,7 @@ package ch.epfl.pdse.polypotapp;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v7.preference.DialogPreference;
+import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.text.Editable;
 import android.text.InputType;
@@ -10,15 +10,12 @@ import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.widget.EditText;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-
-public class PreferenceString extends DialogPreference {
+public class PreferenceString extends Preference implements Preference.OnPreferenceChangeListener {
     private EditText mEditText;
 
     private final String mHint;
     private final String mType;
-    private String mPreviousValue;
+
     private String mValue;
 
     public PreferenceString(Context context) {
@@ -72,10 +69,6 @@ public class PreferenceString extends DialogPreference {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(mPreviousValue == null) {
-                    mPreviousValue = mValue;
-                }
-
                 mValue = editable.toString();
                 persistString(mValue);
             }
@@ -100,29 +93,11 @@ public class PreferenceString extends DialogPreference {
     }
 
     @Override
-    public void onAttached() {
-        super.onAttached();
-        EventBus.getDefault().register(this);
-    }
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        mValue = (String) newValue;
 
-    @Override
-    public void onDetached() {
-        super.onDetached();
-        EventBus.getDefault().unregister(this);
-    }
+        mEditText.setText(mValue);
 
-    @Subscribe
-    public void handlePreferenceChange(ActivityMain.PreferenceChanged event) {
-        if(event.key.equals(getKey())) {
-            if(event.failed && mPreviousValue != null) {
-                mValue = mPreviousValue;
-                persistString(mValue);
-
-                mPreviousValue = null;
-                notifyChanged();
-            } else if(!event.failed) {
-                mPreviousValue = null;
-            }
-        }
+        return true;
     }
 }

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/color"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <RadioGroup
+        android:id="@+id/color1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/white"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="true"
+            android:tag="@color/cardview_light_background"
+            app:buttonTint="#cccccc" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/red"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#f44336"
+            app:buttonTint="#f44336" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/pink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#e91e63"
+            app:buttonTint="#e91e63" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/purple"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#9c27b0"
+            app:buttonTint="#9c27b0" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/deepPurple"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#673ab7"
+            app:buttonTint="#673ab7" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/indigo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#3f51b5"
+            app:buttonTint="#3f51b5" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/blue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#2196f3"
+            app:buttonTint="#2196f3" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/lightBlue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#03a9f4"
+            app:buttonTint="#03a9f4" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/cyan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#00bcd4"
+            app:buttonTint="#00bcd4" />
+
+    </RadioGroup>
+    <RadioGroup
+        android:id="@+id/color2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/teal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#009688"
+            app:buttonTint="#009688" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/green"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#4caf50"
+            app:buttonTint="#4caf50" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/lightGreen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#8bc34a"
+            app:buttonTint="#8bc34a" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/lime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#cddc39"
+            app:buttonTint="#cddc39" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/yellow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#ffeb3b"
+            app:buttonTint="#ffeb3b" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/amber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#ffc107"
+            app:buttonTint="#ffc107" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/orange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#ff9800"
+            app:buttonTint="#ff9800" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/deepOrange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#ff5722"
+            app:buttonTint="#ff5722" />
+
+        <android.support.v7.widget.AppCompatRadioButton
+            android:id="@+id/brown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:checked="false"
+            android:tag="#795548"
+            app:buttonTint="#795548" />
+
+    </RadioGroup>
+</LinearLayout>

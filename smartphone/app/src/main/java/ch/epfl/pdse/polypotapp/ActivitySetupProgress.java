@@ -2,6 +2,7 @@ package ch.epfl.pdse.polypotapp;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -12,6 +13,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,11 +30,11 @@ import java.util.HashMap;
 public class ActivitySetupProgress extends AppCompatActivity {
 
     private SharedPreferences mSharedPreferencesSetup;
-    private BroadcastReceiver mReceiver;
 
     private String mName;
     private String mServer;
     private String mUUID;
+    private String mColor;
 
     private String mSSID;
     private String mPassword;
@@ -46,8 +48,13 @@ public class ActivitySetupProgress extends AppCompatActivity {
 
     private int mUserId;
     private int mPotId;
+
+    private Snackbar mErrorSnackbar;
+
     private WifiManager mWifiManager;
     private WifiState mState;
+    private BroadcastReceiver mReceiver;
+
     private boolean mSetupSuccessful;
 
     private ProgressBar mUUIDCheckOrGenerateProgressBar;
@@ -86,6 +93,7 @@ public class ActivitySetupProgress extends AppCompatActivity {
         mName = mSharedPreferencesSetup.getString("name", "").trim();
         mServer = mSharedPreferencesSetup.getString("server", "").trim();
         mUUID = mSharedPreferencesSetup.getString("uuid", "").trim();
+        mColor = mSharedPreferencesSetup.getString("color", "").trim();
 
         mSSID = mSharedPreferencesSetup.getString("ssid", "").trim();
         mPassword = mSharedPreferencesSetup.getString("password", "").trim();
@@ -97,7 +105,13 @@ public class ActivitySetupProgress extends AppCompatActivity {
         mWaterTank = mSharedPreferencesSetup.getString("water_tank", null);
         mPlant = mSharedPreferencesSetup.getString("plant", null);
 
-        mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        mErrorSnackbar = Snackbar.make(findViewById(android.R.id.content), R.string.setup_error, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.edit, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        finish();
+                    }
+                });
 
         mUUIDCheckOrGenerateProgressBar = findViewById(R.id.uuid_generate_progressBar);
         mUUIDCheckOrGenerateCross       = findViewById(R.id.uuid_generate_cross);
@@ -117,6 +131,8 @@ public class ActivitySetupProgress extends AppCompatActivity {
         mWifiConnectUserProgressBar     = findViewById(R.id.wifi_reconnect_user_progressBar);
         mWifiConnectUserCross           = findViewById(R.id.wifi_reconnect_user_cross);
         mWifiConnectUserTick            = findViewById(R.id.wifi_reconnect_user_tick);
+
+        mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         mState = WifiState.NONE;
 
@@ -157,7 +173,7 @@ public class ActivitySetupProgress extends AppCompatActivity {
                             // Wifi is connected
                             switch (mState) {
                                 case CONNECT_POT:
-                                    potWifiConnected(!mWifiManager.getConnectionInfo().getSSID().equals("PolyPot"));
+                                    potWifiConnected(!mWifiManager.getConnectionInfo().getSSID().equals("\"PolyPot\""));
                                     break;
 
                                 case RECONNECT_USER:
@@ -216,6 +232,8 @@ public class ActivitySetupProgress extends AppCompatActivity {
     }
 
     private void resetView() {
+        mErrorSnackbar.dismiss();
+
         mUUIDCheckOrGenerateProgressBar.setVisibility(View.INVISIBLE);
         mUUIDCheckOrGenerateCross.setVisibility(View.GONE);
         mUUIDCheckOrGenerateTick.setVisibility(View.GONE);
@@ -270,7 +288,7 @@ public class ActivitySetupProgress extends AppCompatActivity {
     }
 
     @Subscribe
-    public void handleSetupData(CommunicationManager.SetupDataReady event) {
+    public void handleSetupResponse(CommunicationManager.SetupResponse event) {
         mUUIDCheckOrGenerateProgressBar.setVisibility(View.GONE);
         if(event.response == null) {
             mUUIDCheckOrGenerateCross.setVisibility(View.VISIBLE);
@@ -314,7 +332,7 @@ public class ActivitySetupProgress extends AppCompatActivity {
     }
 
     @Subscribe
-    public void handleLatestData(CommunicationManager.LatestDataReady event) {
+    public void handleLatestResponse(CommunicationManager.LatestResponse event) {
         mUUIDCheckOrGenerateProgressBar.setVisibility(View.GONE);
         if(event.response == null) {
             mUUIDCheckOrGenerateCross.setVisibility(View.VISIBLE);
@@ -333,7 +351,7 @@ public class ActivitySetupProgress extends AppCompatActivity {
             userWifiReconnected(true);
         } else {
             //TODO: which configuration to use ? Smartphone or server ?
-            mConfigurationSendTick.setVisibility(View.VISIBLE);
+            mUUIDCheckOrGenerateTick.setVisibility(View.VISIBLE);
 
             disconnectUserWifi();
         }
@@ -439,7 +457,7 @@ public class ActivitySetupProgress extends AppCompatActivity {
     }
 
     @Subscribe
-    public void handleSetupPotData(CommunicationManager.SetupPotDataReady event) {
+    public void handleSetupPotResponse(CommunicationManager.SetupPotResponse event) {
         mConfigurationSendProgressBar.setVisibility(View.GONE);
         if(event.response == null) {
             mConfigurationSendCross.setVisibility(View.VISIBLE);
@@ -448,7 +466,7 @@ public class ActivitySetupProgress extends AppCompatActivity {
         } else {
             // Add pot to pots' list
             ArrayList<Pot> pots = Pot.getPots(this);
-            pots.add(new Pot(mName, mServer, mUUID));
+            pots.add(new Pot(mName, mServer, mUUID, mColor));
             Pot.savePots(this, pots);
 
             // Save config of pot in corresponding preference
@@ -526,21 +544,17 @@ public class ActivitySetupProgress extends AppCompatActivity {
         mState = WifiState.NONE;
 
         if(mSetupSuccessful) {
-            Snackbar.make(findViewById(android.R.id.content), R.string.setup_success, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.finish, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            finish();
-                        }
-                    }).show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage(R.string.setup_success_message).setTitle(R.string.setup_success);
+            builder.setPositiveButton(R.string.finish, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    finish();
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         } else {
-            Snackbar.make(findViewById(android.R.id.content), R.string.setup_error, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.edit, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            finish();
-                        }
-                    }).show();
+            mErrorSnackbar.show();
         }
     }
 }

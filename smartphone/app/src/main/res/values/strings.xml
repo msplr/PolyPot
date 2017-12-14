@@ -19,12 +19,15 @@
     <string name="label_temperature">Temperature for %s, in °C.</string>
     <string name="label_soil_moisture">Soil moisture for %s, in %%.</string>
     <string name="label_luminosity">Luminosity for %s, in lx.</string>
-    <string name="no_chart_data">No chart data available for %s.</string>
-    <string name="target_soil_moisture_limit">Target soil moisture</string>
+    <string name="chart_no_data">No chart data available for %s.</string>
+    <string name="limit_target_soil_moisture">Soil moisture threshold</string>
 
     <!-- Communication -->
-    <string name="reception_summary_error">An error occurred during the reception of the summary\'s data.</string>
+    <string name="reception_latest_error">An error occurred during the reception of the latest data.</string>
+    <string name="reception_watering_error">An error occurred during the reception of the watering data.</string>
+    <string name="reception_configuration_error">An error occurred during the reception of the configuration data.</string>
     <string name="reception_data_error">An error occurred during the reception of the data.</string>
+    <string name="reception_stats_error">An error occurred during the reception of the data for stats.</string>
 
     <string name="configuration_sending">Sending configuration&#8230;</string>
     <string name="configuration_update_error">An error occurred during the transmission of the configuration. Previous value restored.</string>
@@ -52,11 +55,28 @@
     <string name="plant_status_unknown">Unknown plant status.</string>
     <string name="latest_data_date_unknown">No data</string>
 
+    <string name="plant_status_good">Plant status:\n\nGood</string>
+    <string name="plant_status_bad">Plant status:\n\nBad</string>
+
     <string name="last_watering_format">\'Last watering:\n\'yyyy-MM-dd</string>
     <string name="latest_data_date_format">\'Data from \'yyyy-MM-dd\' \'HH:mm\'.\'</string>
 
+    <!-- Notifications -->
+    <string name="notif_water_level_title">Low water level</string>
+    <string name="notif_water_level_text">Water level low! Only %.0f %% remaining.</string>
+    <string name="notif_battery_level_title">Low battery level</string>
+    <string name="notif_battery_level_text">Battery level low! Only %.0f %% remaining.</string>
+    <string name="notif_data_title">No new data since more than one day</string>
+    <string name="notif_data_text">No new data since more than one day. Please check that your PolyPot is still working.</string>
+
     <!-- Plant status -->
-    <string name="plant_configured">Plant configured: %s</string>
+    <string name="plant_configured">Plant configured:\n%s</string>
+    <string name="title_stats">Stats for your plant based on the last seven days of data:</string>
+    <string name="description_stats">(Recommended minimum average value, current average value, recommended maximum average value)</string>
+    <string name="what">What?</string>
+    <string name="min">Min</string>
+    <string name="current">Current</string>
+    <string name="max">Max</string>
 
     <!-- Icons -->
     <string name="water_level_icon">Water level icon</string>
@@ -76,9 +96,10 @@
     <string name="empty_or_invalid_server">Please, enter a valid server URL.</string>
     <string name="invalid_uuid">Please, enter a valid UUID.</string>
     <string name="pot_already_exists">A pot with this server and UUID already exists.</string>
-    <string name="empty_uuid">Please, enter a UUID.</string>
+    <string name="empty_uuid">Please, enter an UUID. You can only add an existing pot with a known UUID.</string>
     <string name="empty_ssid">Please, enter a Wi-Fi SSID.</string>
     <string name="empty_password">Please, enter a Wi-Fi password.</string>
+    <string name="checking_server_uuid">Checking server and UUID&#8230;</string>
     <string name="uuid_or_server_not_found">The server and/or the UUID doesn\'t seem to exist.</string>
 
     <string name="setup_button">(Re)start setup</string>
@@ -95,6 +116,11 @@
 
     <string name="setup_success">Setup successful!</string>
     <string name="finish">finish</string>
+    <string name="setup_success_message">
+        The pot will now try to connect to your Wi-Fi and contact the server.
+        If the Wi-Fi \"PolyPot\" is still visible after some minutes, the pot failed to connect to your Wi-Fi or
+        to contact the server and you should restart the setup procedure.
+    </string>
     <string name="setup_error">Error during setup. Restart setup or edit setup settings.</string>
     <string name="edit">Edit</string>
 
@@ -113,6 +139,8 @@
     <string name="conf_uuid_title">Pot UUID</string>
     <string name="conf_uuid_summary">The unique identifier of your pot. Leave blank unless you want to add an already setup pot.</string>
     <string name="conf_uuid_hint">Leave blank or enter an UUID.</string>
+    <string name="conf_color_title">Background color</string>
+    <string name="conf_color_summary">The background color of the pot icon.</string>
 
     <string name="conf_category_wifi">Wi-Fi settings (for pot setup)</string>
 

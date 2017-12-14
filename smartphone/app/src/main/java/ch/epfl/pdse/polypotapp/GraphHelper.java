@@ -57,7 +57,7 @@ class GraphHelper {
 
         ArrayList<Entry> entries = new ArrayList<>();
 
-        for(int i = 0; i < data.length(); i++) {
+        for (int i = 0; i < data.length(); i++) {
             JSONObject point = data.getJSONObject(i);
 
             float value = Float.parseFloat(point.getString(keyword));
@@ -70,9 +70,9 @@ class GraphHelper {
 
         String date = activity.getDateFormat().format(fromDate.getTime());
 
-        if(entries.size() == 0) {
+        if (entries.size() == 0) {
             chart.clear();
-            chart.setNoDataText(String.format(activity.getString(R.string.no_chart_data), date));
+            chart.setNoDataText(String.format(activity.getString(R.string.chart_no_data), date));
         } else {
             LineDataSet dataSet = new LineDataSet(entries, String.format(label, date));
             dataSet.setColor(color);
@@ -86,7 +86,7 @@ class GraphHelper {
 
         XAxis xAxis = chart.getXAxis();
         xAxis.setValueFormatter(new GraphHelper.DateAxisFormatter(activity.getAxisDateFormat()));
-        xAxis.setLabelCount(activity.getLabelCount(),true);
+        xAxis.setLabelCount(activity.getLabelCount(), true);
         xAxis.setAxisMinimum(fromDate.getTimeInMillis());
         xAxis.setAxisMaximum(toDate.getTimeInMillis());
 
@@ -94,7 +94,7 @@ class GraphHelper {
     }
 
     public static class DateAxisFormatter implements IAxisValueFormatter {
-        private final Calendar mCalendar = Calendar.getInstance();
+        private final Calendar mCalendar = GregorianCalendar.getInstance();
         private final SimpleDateFormat mDateFormat;
 
         public DateAxisFormatter(SimpleDateFormat dateFormat) {

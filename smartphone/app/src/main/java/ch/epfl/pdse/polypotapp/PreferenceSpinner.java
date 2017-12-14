@@ -2,7 +2,7 @@ package ch.epfl.pdse.polypotapp;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v7.preference.DialogPreference;
+import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
@@ -10,14 +10,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-
-public class PreferenceSpinner extends DialogPreference implements AdapterView.OnItemSelectedListener {
+public class PreferenceSpinner extends Preference implements Preference.OnPreferenceChangeListener,AdapterView.OnItemSelectedListener  {
     private Spinner mSpinner;
+    private ArrayAdapter<CharSequence> mArrayAdapter;
 
     private final int mArray;
-    private String mPreviousValue;
+
     private String mValue;
 
     public PreferenceSpinner(Context context) {
@@ -66,10 +64,6 @@ public class PreferenceSpinner extends DialogPreference implements AdapterView.O
             focus.requestFocus();
         }
 
-        if(mPreviousValue == null) {
-            mPreviousValue = mValue;
-        }
-
         mValue = (String) adapterView.getItemAtPosition(pos);
         persistString(mValue);
     }
@@ -96,29 +90,11 @@ public class PreferenceSpinner extends DialogPreference implements AdapterView.O
     }
 
     @Override
-    public void onAttached() {
-        super.onAttached();
-        EventBus.getDefault().register(this);
-    }
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+        mValue = (String) newValue;
 
-    @Override
-    public void onDetached() {
-        super.onDetached();
-        EventBus.getDefault().unregister(this);
-    }
+        mSpinner.setSelection(mArrayAdapter.getPosition(mValue));
 
-    @Subscribe
-    public void handlePreferenceChange(ActivityMain.PreferenceChanged event) {
-        if(event.key.equals(getKey())) {
-            if(event.failed && mPreviousValue != null) {
-                mValue = mPreviousValue;
-                persistString(mValue);
-
-                mPreviousValue = null;
-                notifyChanged();
-            } else if(!event.failed) {
-                mPreviousValue = null;
-            }
-        }
+        return true;
     }
 }

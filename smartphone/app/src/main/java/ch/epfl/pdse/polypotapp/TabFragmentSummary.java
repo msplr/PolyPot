@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,40 +14,28 @@ import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Locale;
-import java.util.TimeZone;
 
 public class TabFragmentSummary extends Fragment {
     private ActivityMain mActivity;
 
-    private String mServer;
-    private String mUUID;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private boolean mLatestRefreshing;
+    private boolean mStatsRefreshing;
 
     private TextView mWaterLevelText;
     private TextView mTemperatureText;
-    private TextView mLuminosityText;
     private TextView mSoilMoistureText;
-    private TextView mLatestDataDateText;
+    private TextView mLuminosityText;
     private TextView mLastWateringText;
+    private TextView mPlantStatusText;
+    private TextView mLatestDataDateText;
 
-    public static TabFragmentSummary newInstance(String server, String uuid) {
-        TabFragmentSummary f = new TabFragmentSummary();
-
-        Bundle args = new Bundle();
-        args.putString("server", server);
-        args.putString("uuid", uuid);
-        f.setArguments(args);
-
-        return f;
-    }
+    private HashMap<String, Float> mStats;
 
     @Override
     public void onAttach(Context context) {
@@ -57,110 +46,145 @@ public class TabFragmentSummary extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Bundle args = getArguments();
-        mServer = args.getString("server");
-        mUUID = args.getString("uuid");
-
         return inflater.inflate(R.layout.fragment_summary, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        final SwipeRefreshLayout swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        mSwipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                CommunicationManager.getDefault(getActivity()).clearCache();
-                EventBus.getDefault().post(new CommunicationManager.LatestRequest(mServer, mUUID));
-                swipeRefreshLayout.setRefreshing(false);
+                mActivity.forceRefresh();
             }
         });
+
+        mLatestRefreshing = false;
+        mStatsRefreshing = false;
 
         // Save for later use
         mWaterLevelText = view.findViewById(R.id.water_level_text);
         mTemperatureText = view.findViewById(R.id.temperature_text);
-        mLuminosityText = view.findViewById(R.id.luminosity_text);
         mSoilMoistureText = view.findViewById(R.id.soil_moisture_text);
-        mLatestDataDateText = view.findViewById(R.id.latest_data_date_text);
+        mLuminosityText = view.findViewById(R.id.luminosity_text);
         mLastWateringText = view.findViewById(R.id.last_watering_text);
-
-        EventBus.getDefault().post(new CommunicationManager.LatestRequest(mServer, mUUID));
+        mPlantStatusText = view.findViewById(R.id.plant_status_text);
+        mLatestDataDateText = view.findViewById(R.id.latest_data_date_text);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
+
         EventBus.getDefault().register(this);
     }
 
     @Override
-    public void onStop() {
+    public void onPause() {
         EventBus.getDefault().unregister(this);
-        super.onStop();
+
+        super.onPause();
     }
 
     @Subscribe
-    public void handleLatestData(CommunicationManager.LatestDataReady event) {
+    public void handleLatestLoading(final CommunicationManager.LatestLoading event) {
+        mSwipeRefreshLayout.setRefreshing(true);
+        mLatestRefreshing = true;
+    }
+
+    @Subscribe
+    public void handleStatsLoading(final CommunicationManager.StatsLoading event) {
+        mSwipeRefreshLayout.setRefreshing(true);
+        mStatsRefreshing = true;
+    }
+
+    @Subscribe(sticky = true)
+    public void handleLatestResponse(CommunicationManager.LatestResponse event) {
         try {
             // Data part
-            JSONObject data = event.response.getJSONObject("data");
+            HashMap<String, Float> sensorsData = mActivity.getSensorsData();
 
-            // Soil Moisture
-            int soilMoisture = Math.round(Float.parseFloat(data.getString("soil_moisture")));
-            mSoilMoistureText.setText(Integer.toString(soilMoisture));
-
-            // Temperature
-            int temperature = Math.round(Float.parseFloat(data.getString("temperature")));
-            mTemperatureText.setText(Integer.toString(temperature));
-
-            // Water Level
-            int water_level = Math.round(Float.parseFloat(data.getString("water_level")));
-            mWaterLevelText.setText(Integer.toString(water_level));
-
-            // Luminosity
-            int luminosity = Math.round(Float.parseFloat(data.getString("luminosity")));
-            mLuminosityText.setText(Integer.toString(luminosity));
+            mWaterLevelText.setText(Integer.toString(Math.round(sensorsData.get("water_level"))));
+            mTemperatureText.setText(Integer.toString(Math.round(sensorsData.get("temperature"))));
+            mSoilMoistureText.setText(Integer.toString(Math.round(sensorsData.get("soil_moisture"))));
+            mLuminosityText.setText(Integer.toString(Math.round(sensorsData.get("luminosity"))));
 
             // Date and Time
-            SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
-            inputDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            HashMap<String, Calendar> datesData = mActivity.getDatesData();
+
             SimpleDateFormat outputDateFormat = new SimpleDateFormat(getString(R.string.latest_data_date_format), Locale.US);
-
-            Calendar date = GregorianCalendar.getInstance();
-            date.setTime(inputDateFormat.parse(data.getString("datetime")));
-            date.setTimeZone(TimeZone.getDefault());
-
-            mLatestDataDateText.setText(outputDateFormat.format(date.getTime()));
-
-            // Command part
-            JSONArray commands = event.response.getJSONArray("commands");
-
-            // Search last watering and display it
-            for(int i = 0; i < commands.length(); i++) {
-                JSONObject command = commands.getJSONObject(i);
-                if(command.getString("type").equals("water")) {
-                    // Date and Time
-                    outputDateFormat = new SimpleDateFormat(getString(R.string.last_watering_format), Locale.US);
-
-                    date.setTime(inputDateFormat.parse(command.getString("datetime")));
-                    date.setTimeZone(TimeZone.getDefault());
-
-                    mLastWateringText.setText(outputDateFormat.format(date.getTime()));
-
-                    mActivity.setWaterDate(date.getTime());
-                }
-            }
-        } catch (NullPointerException|JSONException|ParseException e) {
+            mLatestDataDateText.setText(outputDateFormat.format(datesData.get("latest").getTime()));;
+        } catch (NullPointerException e) {
             // Reset to default values
             mSoilMoistureText.setText("");
             mTemperatureText.setText("");
             mWaterLevelText.setText("");
             mLuminosityText.setText("");
             mLatestDataDateText.setText(getString(R.string.latest_data_date_unknown));
+
+            // Show an error message
+            Snackbar.make(getView(), R.string.reception_latest_error, Snackbar.LENGTH_LONG).show();
+        }
+
+        try {
+            // Date and Time
+            HashMap<String, Calendar> datesData = mActivity.getDatesData();
+
+            SimpleDateFormat outputDateFormat = new SimpleDateFormat(getString(R.string.last_watering_format), Locale.US);
+            mLastWateringText.setText(outputDateFormat.format(datesData.get("watering").getTime()));
+        } catch (NullPointerException e) {
+            // Reset to default values
             mLastWateringText.setText(R.string.last_watering_unknown);
 
             // Show an error message
-            Snackbar.make(getView(), R.string.reception_summary_error, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getView(), R.string.reception_watering_error, Snackbar.LENGTH_LONG).show();
+        }
+
+        mLatestRefreshing = false;
+        if(!mStatsRefreshing) {
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    @Subscribe(sticky = true)
+    public void handleStatsResponse(CommunicationManager.StatsResponse event) {
+        try {
+            mStats = mActivity.getStats();
+            updatePlantStatus();
+        } catch (NullPointerException e) {
+            mPlantStatusText.setText(R.string.plant_status_unknown);
+
+            Snackbar.make(getView(), R.string.reception_stats_error, Snackbar.LENGTH_LONG).show();
+        }
+
+        mStatsRefreshing = false;
+        if(!mLatestRefreshing) {
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    @Subscribe
+    public void handleConfigurationResponse(CommunicationManager.ConfigurationResponse event) {
+        if(event.response != null && event.hint.equals("plant")) {
+            try {
+                updatePlantStatus();
+            } catch (NullPointerException e) {
+                mPlantStatusText.setText(R.string.plant_status_unknown);
+
+            }
+        }
+    }
+
+    private void updatePlantStatus() {
+        Plant plant = mActivity.getPlant();
+
+        if(plant.waterLevelMin <= mStats.get("water_level") && mStats.get("water_level") <= plant.waterLevelMax
+                && plant.temperatureMin <= mStats.get("temperature") && mStats.get("temperature") <= plant.temperatureMax
+                && plant.soilMoistureMin <= mStats.get("soil_moisture") && mStats.get("soil_moisture") <= plant.soilMoistureMax
+                && plant.luminosityMin <= mStats.get("luminosity") && mStats.get("luminosity") <= plant.luminosityMax) {
+            mPlantStatusText.setText(R.string.plant_status_good);
+        } else {
+            mPlantStatusText.setText(R.string.plant_status_bad);
         }
     }
 }
