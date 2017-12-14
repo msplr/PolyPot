@@ -3,42 +3,70 @@ import urequests as requests
 import ujson as json
 import usocket as socket
 
+#TODO: use **kwarg to merge the functions
 
+#Re activates the AP
 def AP_activation(ap):
     ap.active(True)
     ap.config(essid="PolyPot", password="setupPolyPot", authmode=network.AUTH_WPA_WPA2_PSK)
 
-#Activates an AP. A WLAN object containint the active AP
+#Activates an AP. A WLAN object containig the active AP
 def AP_activation():
 
     ap = network.WLAN(network.AP_IF)
     ap.active(True)
+    ap.ifconfig(("192.168.1.1", "255.255.255.0", "192.168.4.1", "8.8.8.8"))
     ap.config(essid="PolyPot", password="setupPolyPot", authmode=network.AUTH_WPA_WPA2_PSK)
     return ap
 
-#Gets the wifi config in json format
+#Gets the wifi config in json format when the pot is in AP
 def get_post():
-
     addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
 
     s = socket.socket()
+
     s.bind(addr)
+
     s.listen(1)
 
     cl, addr = s.accept()
+
     cl_file = cl.makefile('rwb', 0)
+
     config_ini=""
+    content_length=0
+
+    #Discard first line with different format
+    line = cl_file.readline()
+
     while True:
+
         line = cl_file.readline()
-        config_ini+=line
         if not line or line == b'\r\n':
             break
-    response = json.dumps({})
+
+        print(str(line))
+        (header, value) = line.decode().split(":", 1)
+        print(header)
+        print(value)
+        if header == "Content-Length":
+            content_length=int(value)
+            print(content_length)
+
+
+    config_ini = cl_file.read(content_length).decode()
+    print(config_ini)
+    response="HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}"
+    print("reading over")
     cl.send(response)
+    print("response sent")
     cl.close()
+    print("tramission over\n")
+    s.close()
+    print("OVER\n")
     return config_ini
 
-#Downloads the setups from the phone and reds them. Returns a dictionnary with wifi parameters and a config object
+#Downloads the setups from the phone and returns them as a dictionnary
 def setup():
     wifi_param={}
 
@@ -49,7 +77,7 @@ def setup():
 
     return wifi_param
 
-
+#Creates the wifi
 def wifi_init():
     wlan = network.WLAN(network.STA_IF)
     return wlan
@@ -62,7 +90,7 @@ def wifi_connect(ap,wifi_param, wlan):
     ap.active(False)
     wlan.active(True)
 
-    for count in range(1,10):
+    for count in range(1,3):
         wlan.connect(wifi_param['ssid'],wifi_param['password'])
         if wlan.isconnected():
             break
@@ -71,7 +99,7 @@ def wifi_connect(ap,wifi_param, wlan):
         wlan.disconnect()
         status=False
 
-    return wlan,status
+    return status
 
 
 def wifi_disconnect(wlan):
@@ -79,13 +107,17 @@ def wifi_disconnect(wlan):
 
 #Get the config from the server
 def get_config(url):
-    config_json=requests.post(url, payload=json.dumps({}))
+    config_json=requests.post(url, data=json.dumps({}))
     config=json.loads(config_json)
     return config
 
 #Sends datas to the server, returns the configuration
 def send_datas(datas,url):
-    json.loads(datas)
-    response_json=requests.post(url, payload=json.dumps(datas))
+    response_json=requests.post(url, data=json.dumps(datas))
     response=json.loads(response_json)
     return response
+
+def test():
+    ap=AP_activation()
+    config=get_post()
+    return  ap,config
