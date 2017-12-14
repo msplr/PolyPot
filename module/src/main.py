@@ -3,7 +3,6 @@ import communication
 import lowpower
 import sensors
 import utime
-import ntptime
 
 # Pin definition:
 pin={"sens_moist":35,"sens_bat":32,"sens_lum":33,"PWM":27,"sens_en":12,"user_btn":23,"LED_green":22,"LED_red":21}
@@ -18,7 +17,10 @@ pin_list_out=[]
 pin_list_in=[]
 pin_list_unused=[]
 
-suffix_send="/datas/uuid:"
+#Where to send the datas
+suffix_send="/send-data/"
+
+#Nuber of wakeups since the last wifi connection
 wakeup_count=0
 send_datas=False
 data_array=()
@@ -50,12 +52,14 @@ while True:
 url_send=wifi_param["server"]+suffix_send+wifi_param["uuid"]
 config=communication.get_config(url_send)
 communication.wifi_disconnect(wlan)
-ntptime.settime()
+#TODO: add and correct the ntp.time module to settime
+
+
 while True:
     wakeup_time=utime.ticks_ms()
 
     # Reinitialise if the user presses the button
-    if utime.ticks_diff(wakeup_time, bed_time)< (config["logging_interval"]/1000): #TODO: add a bit of lfexibility in this condition
+    if utime.ticks_diff(wakeup_time, bed_time)< (config["logging_interval"]/1000): #TODO: add a bit of flexibility in this condition
         wakeup_count=0
         while True:
             communication.AP_activation()
@@ -74,13 +78,18 @@ while True:
 
     sensors.sensors_pwr(True)
     # Reading sensors
+    # MICHAEL: HERE GOES THE SENORS READING
+    sensors.sensors_pwr(False)
 
     # Updating time
     time=utime.localtime()
     time_iso=time[0]+"-"+time[1]+"-"+time[2]+"T"+time[3]+":"+time[4]+":"+time[5]+"Z"
     data["datetime"]=time_iso
+
     # Saving the datas
     data_array.append(data)
+
+    #Pump if needed and update the command object
 
     if send_datas:
         communication.wifi_connect(ap, wifi_param, wlan)
