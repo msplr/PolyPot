@@ -89,11 +89,11 @@ while True:
     # Saving the datas
     data_array.append(data)
 
-    #Pump if needed and update the command object
+    # TODO: Pump if needed and update the command object
 
     if send_datas:
         communication.wifi_connect(ap, wifi_param, wlan)
-        config=communication.send_datas()
+        config=communication.send_datas(data_array)
         communication.wifi_disconnect(wlan)
         data_array=[]
 
