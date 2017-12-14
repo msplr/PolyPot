@@ -3,6 +3,7 @@ import communication
 import lowpower
 import sensors
 import utime
+import ntptime
 
 # Pin definition:
 pin={"sens_moist":35,"sens_bat":32,"sens_lum":33,"PWM":27,"sens_en":12,"user_btn":23,"LED_green":22,"LED_red":21}
@@ -52,7 +53,7 @@ while True:
 url_send=wifi_param["server"]+suffix_send+wifi_param["uuid"]
 config=communication.get_config(url_send)
 communication.wifi_disconnect(wlan)
-#TODO: add and correct the ntp.time module to settime
+ntptime.setttime() #Should work. To test with a wifi connection
 
 
 while True:
