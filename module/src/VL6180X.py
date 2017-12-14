@@ -59,33 +59,33 @@ class VL6180X():
         (data, ) = struct.unpack('B', data)
         return data
 
-    def distance(self):
-        # Wait for device ready
-        while self.read_reg(self.VL6180X_RESULT_RANGE_STATUS) & 1 == 0:
-            pass
+    def wait_ready(self, timeout=100000):
+        while timeout > 0 and self.read_reg(self.VL6180X_RESULT_RANGE_STATUS) & 1 == 0:
+            timeout -= 1
+        if timeout <= 0:
+            return False
+        else:
+            return True
 
-        # Start measurement
+    def start_range(self):
         self.write_reg(self.VL6180X_SYSRANGE_START, 0x01)
 
-        # Wait for measurement ready
-        while self.read_reg(self.VL6180X_RESULT_INTERRUPT_STATUS_GPIO) & 4 == 0:
-            pass
+    def poll_range(self):
+        status = self.read_reg(self.VL6180X_RESULT_INTERRUPT_STATUS_GPIO)
+        while status & 0x07 != 4:
+            status = self.read_reg(self.VL6180X_RESULT_INTERRUPT_STATUS_GPIO)
 
-        # Read result
-        mm = self.read_reg(self.VL6180X_RESULT_RANGE_VAL);
+    def read_range(self):
+        return self.read_reg(self.VL6180X_RESULT_RANGE_VAL)
 
+    def clear_interrupts(self):
         # Clear interrupt flags
         self.write_reg(self.VL6180X_SYSTEM_INTERRUPT_CLEAR, 0x07)
 
-        # Wait for device ready
-        while True:
-            status = self.read_reg(self.VL6180X_RESULT_RANGE_STATUS)
-            if status & 1 == 0:
-                break
-
-        # error
-        if status >> 4 != 0:
-            # TODO: keep status code
-            return None
-
+    def distance(self):
+        self.wait_ready()
+        self.start_range()
+        self.poll_range()
+        mm = self.read_range()
+        self.clear_interrupts()
         return mm
