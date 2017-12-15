@@ -11,10 +11,11 @@ suffix_send="/send-data/"
 #Nuber of wakeups since the last wifi connection
 wakeup_count=0
 send_datas=False
-data_array=()
+data=[]
+command=[]
 
-data={}
-command={}
+single_data={}
+single_command={}
 
 # Establishing the first connection
 while True:
@@ -61,10 +62,10 @@ while True:
     # Updating time
     time=utime.localtime()
     time_iso=time[0]+"-"+time[1]+"-"+time[2]+"T"+time[3]+":"+time[4]+":"+time[5]+"Z"
-    data["datetime"]=time_iso
+    single_data["datetime"]=time_iso
 
     # Saving the datas
-    data_array.append(data)
+    data.append(single_data)
 
     # TODO: Pump if needed and update the command object
 
