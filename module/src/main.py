@@ -71,9 +71,15 @@ while True:
     data.append(single_data)
 
     # TODO: Pump if needed and update the command object
+    if len(recived_cmd)>0:
+        for cmd in recived_cmd:
+            board.water_pump.on()
+            utime.sleep(5)
+            board.water_pump.off()
+            recived_cmd[cmd]["status"]="executed"
+            recived_cmd[cmd]["datetime"]=time_iso
 
-    recived_cmd["status"]="executed"
-    recived_cmd["datetime"]=time_iso
+    commands.append(recived_cmd)
 
 
 
@@ -84,6 +90,7 @@ while True:
         recived_cmd = response["commands"]
         communication.wifi_disconnect(wlan)
         data=[]
+        commands=[]
 
     # Returning to sleep
     wakeup_count+=1
