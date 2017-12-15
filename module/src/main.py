@@ -14,65 +14,54 @@ wakeup_count=0
 send_datas=False
 data=[]
 commands=[]
+recived_cmd = []
 
 single_data={}
 single_command={}
 
 # # Establishing the first connection
-# while True:
-#     ap=communication.AP_activation()
-#     wifi_param=communication.setup()
-#     wlan=communication.wifi_init()
-#     status=communication.wifi_connect(ap,wifi_param, wlan)
-#     if status:
-#         break
-
-ap = network.WLAN(network.AP_IF)
-ap.active(False)
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
-wifi_param={
-    'ssid': 'test',
-    'password': 'PolyPot101',
-    'server': 'https://polypot.0xf00.ch',
-    'uuid': '01234567-89ab-cdef-0123-456789abcdef'
-}
-wlan.connect(wifi_param['ssid'],wifi_param['password'])
-while not wlan.isconnected():
-    utime.sleep(0.1)
+while True:
+     ap=communication.AP_activation()
+     wifi_param=communication.setup()
+     wlan=communication.wifi_init()
+     status=communication.wifi_connect(ap,wifi_param, wlan)
+     if status:
+         break
 
 # Initialising the moodule
 url_send=wifi_param["server"]+suffix_send+wifi_param["uuid"]
-response=communication.get_config(url_send)
+response=communication.send_datas(url_send)
 config = response['configuration']
-ntptime.settime() #Should work. To test with a wifi connection
+ntptime.settime() # TODO: solve the 30 years offset
 communication.wifi_disconnect(wlan)
 
-print(response)
-
-bed_time = None
 while True:
-    wakeup_time=utime.ticks_ms()
-    if bed_time is None:
-        bed_time = wakeup_time
-
-    recived_cmd = []
-    # Reinitialise if the user presses the button
-    # if utime.ticks_diff(wakeup_time, bed_time) < (config["logging_interval"]*1000) and utime.ticks_diff(wakeup_time, bed_time) > 0: #TODO: add a bit of flexibility in this condition
-    #     wakeup_count=0
-    #     while True:
-    #         communication.AP_activation()
-    #         wifi_param = communication.setup()
-    #         status = communication.wifi_connect(ap, wifi_param, wlan)
-    #         if status:
-    #             break
-    #     url_send = wifi_param["server"] + suffix_send + wifi_param["uuid"]
-    #     response = communication.get_config(url_send)
-    #     config=response["configuration"]
-    #     recived_cmd=response["commands"]
-    #     communication.wifi_disconnect(wlan)
+    #Reinitialise if the user presses the button
+    if machine.wake_reason()==machine.PIN_WAKE:
+        wakeup_count=0
+        while True:
+            communication.AP_activation()
+            wifi_param = communication.setup()
+            status = communication.wifi_connect(ap, wifi_param, wlan)
+            if status:
+                break
+        url_send = wifi_param["server"] + suffix_send + wifi_param["uuid"]
+        response = communication.get_config(url_send)
+        config=response["configuration"]
+        recived_cmd=response["commands"]
+        communication.wifi_disconnect(wlan)
 
     # Check if Wifi shall be activated
+    if True:
+        communication.wifi_connect(ap, wifi_param, wlan)
+        response=communication.get_config(url_send)
+        config = response["configuration"]
+        recived_cmd = response["commands"]
+        print(recived_cmd)
+        #communication.wifi_disconnect(wlan)
+        data=[]
+        commands=[]
+
     if wakeup_count*config["logging_interval"] >= config["sending_interval"]:
         send_datas=True
         wakeup_count=0
@@ -92,24 +81,28 @@ while True:
     data.append(single_data)
 
     # TODO: Pump if needed and update the command object
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n")
+    print(len(recived_cmd))
     if len(recived_cmd)>0:
+        print("treating command")
         for cmd in recived_cmd:
             board.water_pump.on()
             utime.sleep(5)
             board.water_pump.off()
-            recived_cmd[cmd]["status"]="executed"
-            recived_cmd[cmd]["datetime"]=time_iso
+            cmd["status"]="executed"
+            cmd["datetime"]=time_iso
+            commands.append(cmd)
 
-    commands.append(recived_cmd)
 
 
 
     # if send_datas:
     if True:
-        communication.wifi_connect(ap, wifi_param, wlan)
+        #communication.wifi_connect(ap, wifi_param, wlan)
         response=communication.send_datas(data,commands, url_send)
         config = response["configuration"]
         recived_cmd = response["commands"]
+        print(recived_cmd)
         communication.wifi_disconnect(wlan)
         data=[]
         commands=[]
@@ -117,5 +110,5 @@ while True:
     # Returning to sleep
     wakeup_count+=1
     bed_time=utime.ticks_ms()
-    board.sleep(5)
+    utime.sleep(5)
 
