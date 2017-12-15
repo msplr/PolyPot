@@ -55,15 +55,10 @@ def get_post():
 
 
     config_ini = cl_file.read(content_length).decode()
-    print(config_ini)
     response="HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}"
-    print("reading over")
     cl.send(response)
-    print("response sent")
     cl.close()
-    print("tramission over\n")
     s.close()
-    print("OVER\n")
     return config_ini
 
 #Downloads the setups from the phone and returns them as a dictionnary
