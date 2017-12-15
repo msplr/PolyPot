@@ -54,10 +54,11 @@ while True:
         send_datas=True
         wakeup_count=0
 
-    sensors.sensors_pwr(True)
+    sensors.power_enable()
     # Reading sensors
     # MICHAEL: HERE GOES THE SENORS READING
-    sensors.sensors_pwr(False)
+    data = sensors.read_all()
+    sensors.power_disable()
 
     # Updating time
     time=utime.localtime()
