@@ -4,6 +4,7 @@ import board
 import sensors
 import utime
 import ntptime
+import network
 
 #Where to send the datas
 suffix_send="/send-data/"
@@ -17,14 +18,28 @@ commands=[]
 single_data={}
 single_command={}
 
-# Establishing the first connection
-while True:
-    ap=communication.AP_activation()
-    wifi_param=communication.setup()
-    wlan=communication.wifi_init()
-    status=communication.wifi_connect(ap,wifi_param, wlan)
-    if status:
-        break
+# # Establishing the first connection
+# while True:
+#     ap=communication.AP_activation()
+#     wifi_param=communication.setup()
+#     wlan=communication.wifi_init()
+#     status=communication.wifi_connect(ap,wifi_param, wlan)
+#     if status:
+#         break
+
+ap = network.WLAN(network.AP_IF)
+ap.active(False)
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wifi_param={
+    'ssid': 'test',
+    'password': 'PolyPot101',
+    'server': 'https://polypot.0xf00.ch',
+    'uuid': '01234567-89ab-cdef-0123-456789abcdef'
+}
+wlan.connect(wifi_param['ssid'],wifi_param['password'])
+while not wlan.isconnected():
+    utime.sleep(0.1)
 
 # Initialising the moodule
 url_send=wifi_param["server"]+suffix_send+wifi_param["uuid"]
