@@ -61,5 +61,5 @@ class Pump():
         self.pin.value(0)
 
 PUMP_PWM = machine.Pin(27)
-water_pump = pump.Pump(PUMP_PWM)
+water_pump = Pump(PUMP_PWM)
 

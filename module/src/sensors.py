@@ -1,3 +1,4 @@
+import struct
 import machine
 import VL6180X
 import time
@@ -33,11 +34,14 @@ luminosity_pin = machine.Pin(33, machine.Pin.IN)
 luminosity_adc = machine.ADC(luminosity_pin) # ADC1 CH 5
 luminosity_adc.atten(machine.ADC.ATTN_11DB)
 
+LUMINOSITY_GAIN = 1/0.07 # [uW/cm2/V]
+
 def luminosity():
-    """Read the luminosity sensor voltage."""
-    return 3.3 * luminosity_adc.read()/1023
+    """Read the luminosity sensor in uW/cm2."""
+    return 3.3 * luminosity_adc.read()/1023 * LUMINOSITY_GAIN
 
 TOF_ADDR = 41
+TOF_RESETn = machine.Pin(17, machine.Pin.OUT)
 tof = VL6180X.VL6180X(i2c, TOF_RESETn)
 DIST_FULL = 20 # todo: calibrate
 DIST_EMPTY = 60
@@ -63,22 +67,22 @@ def temperature():
     temp = temp / 256
     return temp
 
-def read_all():
+def start():
     power_enable()
-    time.sleep(0.1)
+    tof.start()
+
     addr = i2c.scan()
     # todo: check if all sensor present
 
-    tof.start()
+def stop():
+    tof.stop()
+    power_disable()
 
+def read_all():
     data = {}
-    data['temperature'] = temperature()
     data['luminosity'] = luminosity()
     data['moisture'] = moisture()
     data['battery_voltage'] = battery_voltage()
     data['water_level'] = water_level()
-
-    tof.stop()
-    power_disable()
-
+    data['temperature'] = temperature()
     return data
