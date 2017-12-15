@@ -6,17 +6,20 @@ import utime
 import ntptime
 
 # Pin definition:
-pin={"sens_moist":35,"sens_bat":32,"sens_lum":33,"PWM":27,"sens_en":12,"user_btn":23,"LED_green":22,"LED_red":21}
+pin = {
+    "sens_moist": 35,
+    "sens_bat": 32,
+    "sens_lum": 33,
+    "PWM": 27,
+    "sens_en": 12,
+    "user_btn": 23,
+    "LED_green": 22,
+    "LED_red": 21
+}
 # Pin setting
-input_pin=[pin["sens_moist"],pin["sens_bat"],pin["sens_lum"],pin["user_btn"]]
-output_pin=[pin["PWM"],pin["sens_en"],pin["LED_green"], pin["LED_red"]]
+input_pin=["sens_moist","sens_bat","sens_lum","user_btn"]
+output_pin=["PWM","sens_en","LED_green", "LED_red"]
 unused_pin=[]
-nb_input_pin=len(input_pin)
-nb_output_pin=len(output_pin)
-nb_unused_pin=len(unused_pin)
-pin_list_out=[]
-pin_list_in=[]
-pin_list_unused=[]
 
 #Where to send the datas
 suffix_send="/send-data/"
@@ -30,14 +33,14 @@ data={}
 command={}
 
 # Pin initialisation
-for count in range(nb_output_pin):
-    pin_list_out.append(machine.pin(output_pin[count], machine.Pin.OUT))
+for p in output_pin:
+    machine.pin(pin[p], machine.Pin.OUT)
 
-for count in range(nb_input_pin):
-    pin_list_in.append(machine.pin(input_pin[count], machine.Pin.IN))
+for p in input_pin:
+    pin_list_in.append(machine.pin(pin[p], machine.Pin.IN))
 
-for count in range(nb_unused_pin):
-    pin_list_unused.append(machine.pin(unused_pin[count], machine.Pin.OUT))
+for p in unused_pin:
+    pin_list_unused.append(machine.pin(pin[p], machine.Pin.OUT))
 
 
 # Establishing the first connection
