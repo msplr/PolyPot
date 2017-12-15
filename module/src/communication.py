@@ -110,8 +110,9 @@ def get_config(url):
     return config
 
 #Sends datas to the server, returns the configuration
-def send_datas(datas,url):
-    response_json=requests.post(url, json=json.dumps(datas))
+def send_datas(data,commands,url):
+    payload={"data":data, "commands":commands}
+    response_json=requests.post(url, json=json.dumps(payload))
     response=json.loads(response_json)
     return response
 
