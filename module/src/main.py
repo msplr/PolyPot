@@ -56,10 +56,10 @@ while True:
         send_datas=True
         wakeup_count=0
 
-    sensors.power_enable()
+    sensors.start()
     # Reading sensors
     single_data = sensors.read_all()
-    sensors.power_disable()
+    sensors.stop()
 
     # Updating time
     time=utime.localtime()
