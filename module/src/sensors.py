@@ -81,8 +81,8 @@ def stop():
 def read_all():
     data = {}
     data['luminosity'] = luminosity()
-    data['moisture'] = moisture()
-    data['battery_voltage'] = battery_voltage()
+    data['soil_moisture'] = moisture()
+    data['battery_level'] = battery_voltage()
     data['water_level'] = water_level()
     data['temperature'] = temperature()
     return data

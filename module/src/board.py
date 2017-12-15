@@ -5,7 +5,7 @@ import esp32
 # fix: wire from pin 23 to pin 15
 
 def sleep(sec):
-    button = machine.Pin(23, machine.Pine.IN)
+    button = machine.Pin(23, machine.Pin.IN)
     button = machine.Pin(15)
     button.init(machine.Pin.IN, machine.Pin.PULL_UP)
     esp32.wake_on_ext0(button, level=0)
