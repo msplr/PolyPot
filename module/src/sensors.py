@@ -43,8 +43,8 @@ def luminosity():
 TOF_ADDR = 41
 TOF_RESETn = machine.Pin(17, machine.Pin.OUT)
 tof = VL6180X.VL6180X(i2c, TOF_RESETn)
-DIST_FULL = 20 # todo: calibrate
-DIST_EMPTY = 60
+DIST_FULL = 30
+DIST_EMPTY = 93
 
 def water_level():
     """Read water level, normalized between 0 and 1."""
