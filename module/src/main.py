@@ -1,25 +1,9 @@
 import machine
 import communication
-import lowpower
+import board
 import sensors
 import utime
 import ntptime
-
-# Pin definition:
-pin = {
-    "sens_moist": 35,
-    "sens_bat": 32,
-    "sens_lum": 33,
-    "PWM": 27,
-    "sens_en": 12,
-    "user_btn": 23,
-    "LED_green": 22,
-    "LED_red": 21
-}
-# Pin setting
-input_pin=["sens_moist","sens_bat","sens_lum","user_btn"]
-output_pin=["PWM","sens_en","LED_green", "LED_red"]
-unused_pin=[]
 
 #Where to send the datas
 suffix_send="/send-data/"
@@ -31,17 +15,6 @@ data_array=()
 
 data={}
 command={}
-
-# Pin initialisation
-for p in output_pin:
-    machine.pin(pin[p], machine.Pin.OUT)
-
-for p in input_pin:
-    pin_list_in.append(machine.pin(pin[p], machine.Pin.IN))
-
-for p in unused_pin:
-    pin_list_unused.append(machine.pin(pin[p], machine.Pin.OUT))
-
 
 # Establishing the first connection
 while True:
