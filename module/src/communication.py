@@ -106,14 +106,14 @@ def wifi_disconnect(wlan):
 #Get the config from the server
 def get_config(url):
     config_json=requests.post(url, json=json.dumps({}))
-    config=json.loads(config_json)
+    config=json.loads(config_json.text)
     return config
 
 #Sends datas to the server, returns the configuration
 def send_datas(data,commands,url):
     payload={"data":data, "commands":commands}
     response_json=requests.post(url, json=json.dumps(payload))
-    response=json.loads(response_json)
+    response=json.loads(response_json.text)
     return response
 
 def test():
