@@ -2,7 +2,7 @@ import network
 import urequests as requests
 import ujson as json
 import usocket as socket
-
+import time
 #TODO: use **kwarg to merge the functions
 
 #Re activates the AP
@@ -90,10 +90,13 @@ def wifi_connect(ap,wifi_param, wlan):
     ap.active(False)
     wlan.active(True)
 
-    for count in range(1,3):
-        wlan.connect(wifi_param['ssid'],wifi_param['password'])
-        if wlan.isconnected():
+    wlan.connect(wifi_param['ssid'], wifi_param['password'])
+    for i in range(1,10):
+        if not wlan.isconnected():
+            time.sleep(1)
+        else:
             break
+
 
     if not wlan.isconnected():
         wlan.disconnect()
@@ -107,13 +110,13 @@ def wifi_disconnect(wlan):
 
 #Get the config from the server
 def get_config(url):
-    config_json=requests.post(url, data=json.dumps({}))
+    config_json=requests.post(url, json=json.dumps({}))
     config=json.loads(config_json)
     return config
 
 #Sends datas to the server, returns the configuration
 def send_datas(datas,url):
-    response_json=requests.post(url, data=json.dumps(datas))
+    response_json=requests.post(url, json=json.dumps(datas))
     response=json.loads(response_json)
     return response
 
