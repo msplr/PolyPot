@@ -44,8 +44,8 @@ while not wlan.isconnected():
 # Initialising the moodule
 url_send=wifi_param["server"]+suffix_send+wifi_param["uuid"]
 config=communication.get_config(url_send)
+ntptime.settime() #Should work. To test with a wifi connection
 communication.wifi_disconnect(wlan)
-ntptime.setttime() #Should work. To test with a wifi connection
 
 
 while True:
