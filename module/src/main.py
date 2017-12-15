@@ -8,11 +8,11 @@ import ntptime
 #Where to send the datas
 suffix_send="/send-data/"
 
-#Nuber of wakeups since the last wifi connection
+#Number of wakeups since the last wifi connection
 wakeup_count=0
 send_datas=False
 data=[]
-command=[]
+commands=[]
 
 single_data={}
 single_command={}
@@ -46,7 +46,9 @@ while True:
             if status:
                 break
         url_send = wifi_param["server"] + suffix_send + wifi_param["uuid"]
-        config = communication.get_config(url_send)
+        response = communication.get_config(url_send)
+        config=response["configuration"]
+        recived_cmd=response["commands"]
         communication.wifi_disconnect(wlan)
 
     # Check if Wifi shall be activated
@@ -56,8 +58,7 @@ while True:
 
     sensors.power_enable()
     # Reading sensors
-    # MICHAEL: HERE GOES THE SENORS READING
-    data = sensors.read_all()
+    single_data = sensors.read_all()
     sensors.power_disable()
 
     # Updating time
@@ -65,16 +66,24 @@ while True:
     time_iso=time[0]+"-"+time[1]+"-"+time[2]+"T"+time[3]+":"+time[4]+":"+time[5]+"Z"
     single_data["datetime"]=time_iso
 
+
     # Saving the datas
     data.append(single_data)
 
     # TODO: Pump if needed and update the command object
 
+    recived_cmd["status"]="executed"
+    recived_cmd["datetime"]=time_iso
+
+
+
     if send_datas:
         communication.wifi_connect(ap, wifi_param, wlan)
-        config=communication.send_datas(data_array)
+        response=communication.send_datas(data,commands, url)
+        config = response["configuration"]
+        recived_cmd = response["commands"]
         communication.wifi_disconnect(wlan)
-        data_array=[]
+        data=[]
 
     # Returning to sleep
     wakeup_count+=1
