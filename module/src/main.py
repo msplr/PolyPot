@@ -43,28 +43,34 @@ while not wlan.isconnected():
 
 # Initialising the moodule
 url_send=wifi_param["server"]+suffix_send+wifi_param["uuid"]
-config=communication.get_config(url_send)
+response=communication.get_config(url_send)
+config = response['configuration']
 ntptime.settime() #Should work. To test with a wifi connection
 communication.wifi_disconnect(wlan)
 
+print(response)
 
+bed_time = None
 while True:
     wakeup_time=utime.ticks_ms()
+    if bed_time is None:
+        bed_time = wakeup_time
 
+    recived_cmd = []
     # Reinitialise if the user presses the button
-    if utime.ticks_diff(wakeup_time, bed_time)< (config["logging_interval"]/1000): #TODO: add a bit of flexibility in this condition
-        wakeup_count=0
-        while True:
-            communication.AP_activation()
-            wifi_param = communication.setup()
-            status = communication.wifi_connect(ap, wifi_param, wlan)
-            if status:
-                break
-        url_send = wifi_param["server"] + suffix_send + wifi_param["uuid"]
-        response = communication.get_config(url_send)
-        config=response["configuration"]
-        recived_cmd=response["commands"]
-        communication.wifi_disconnect(wlan)
+    # if utime.ticks_diff(wakeup_time, bed_time) < (config["logging_interval"]*1000) and utime.ticks_diff(wakeup_time, bed_time) > 0: #TODO: add a bit of flexibility in this condition
+    #     wakeup_count=0
+    #     while True:
+    #         communication.AP_activation()
+    #         wifi_param = communication.setup()
+    #         status = communication.wifi_connect(ap, wifi_param, wlan)
+    #         if status:
+    #             break
+    #     url_send = wifi_param["server"] + suffix_send + wifi_param["uuid"]
+    #     response = communication.get_config(url_send)
+    #     config=response["configuration"]
+    #     recived_cmd=response["commands"]
+    #     communication.wifi_disconnect(wlan)
 
     # Check if Wifi shall be activated
     if wakeup_count*config["logging_interval"] >= config["sending_interval"]:
@@ -78,7 +84,7 @@ while True:
 
     # Updating time
     time=utime.localtime()
-    time_iso=time[0]+"-"+time[1]+"-"+time[2]+"T"+time[3]+":"+time[4]+":"+time[5]+"Z"
+    time_iso='{}-{}-{}T{}:{}:{}Z'.format(time[0], time[1], time[2], time[3], time[4], time[5])
     single_data["datetime"]=time_iso
 
 
@@ -98,9 +104,10 @@ while True:
 
 
 
-    if send_datas:
+    # if send_datas:
+    if True:
         communication.wifi_connect(ap, wifi_param, wlan)
-        response=communication.send_datas(data,commands, url)
+        response=communication.send_datas(data,commands, url_send)
         config = response["configuration"]
         recived_cmd = response["commands"]
         communication.wifi_disconnect(wlan)
@@ -110,12 +117,5 @@ while True:
     # Returning to sleep
     wakeup_count+=1
     bed_time=utime.ticks_ms()
-    lowpower.sleep(config["logging_interval"])
-
-
-
-
-
-
-
+    board.sleep(5)
 

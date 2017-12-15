@@ -111,9 +111,15 @@ def get_config(url):
 
 #Sends datas to the server, returns the configuration
 def send_datas(data,commands,url):
-    payload={"data":data, "commands":commands}
-    response_json=requests.post(url, json=json.dumps(payload))
+    payload={"data":data}
+    if len(commands[0]) > 0:
+        payload["commands"] = commands
+    payload_json = json.dumps(payload)
+    print(payload_json)
+    response_json=requests.post(url, json=payload_json)
+    print(response_json.text)
     response=json.loads(response_json.text)
+    print(response)
     return response
 
 def test():
