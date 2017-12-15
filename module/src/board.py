@@ -43,23 +43,15 @@ class Pump():
     """Water Pump class"""
     def __init__(self, pin):
         self.pin = pin
-        self.pwm = None
+        self.pin.init(machine.Pin.OUT)
         self.off()
 
-    def on(self, duty=1.0):
-        duty = int(1023 * duty)
-        if self.pwm is None:
-            self.pwm = machine.PWM(self.pin, freq=1000, duty=duty)
-        else:
-            self.pwm.duty(duty)
+    def on(self):
+        self.pin.value(1)
 
     def off(self):
-        if self.pwm is not None:
-            self.pwm.deinit()
-
-        self.pin.init(machine.Pin.OUT)
         self.pin.value(0)
 
-PUMP_PWM = machine.Pin(27)
-water_pump = Pump(PUMP_PWM)
+pump_pin = machine.Pin(27)
+water_pump = Pump(pump_pin)
 
