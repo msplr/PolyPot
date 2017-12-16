@@ -3,7 +3,6 @@ import communication
 import board
 import sensors
 import utime
-import ntptime
 
 
 suffix_send    = "/send-data/" # Where to send the data

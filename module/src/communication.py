@@ -3,7 +3,7 @@ import urequests as requests
 import ujson as json
 import usocket as socket
 import time
-import ntptime
+import embeded_ntptime as ntptime
 
 WIFI_TIMEOUT = 5
 
@@ -117,4 +117,5 @@ def new_connection(ap=None, wlan=None):
         if status:
             break
         ntptime.settime()  # TODO: solve the 30 years offset
+        time_tuple
     return ap, wlan, wifi_param
