@@ -107,13 +107,13 @@ def send_data(url, data=None, commands=None):
 def new_connection(ap=None, wlan=None):
     while True:
         if ap:
-            communication.AP_activation(ap = ap)
+            AP_activation(ap = ap)
         else:
-            ap = communication.AP_activation()
-        wifi_param = communication.setup()
+            ap = AP_activation()
+        wifi_param = setup()
         if not wlan:
-            wlan = communication.wifi_init()
-        status = communication.wifi_connect(ap, wifi_param, wlan)
+            wlan = wifi_init()
+        status = wifi_connect(ap, wifi_param, wlan)
         if status:
             break
         ntptime.settime()  # TODO: solve the 30 years offset
