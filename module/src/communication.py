@@ -115,7 +115,7 @@ def new_connection(ap=None, wlan=None):
             wlan = wifi_init()
         status = wifi_connect(ap, wifi_param, wlan)
         if status:
+            ntptime.settime()
             break
-        ntptime.settime()  # TODO: solve the 30 years offset
-        time_tuple
+
     return ap, wlan, wifi_param
