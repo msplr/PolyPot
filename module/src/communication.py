@@ -4,6 +4,7 @@ import ujson as json
 import usocket as socket
 import time
 import embeded_ntptime as ntptime
+import board
 
 WIFI_TIMEOUT = 5
 
@@ -128,13 +129,19 @@ def send_data(url, data=None, commands=None):
     return config, cmd
 
 def new_connection():
+
     while True:
         ap = AP_activation()
         wifi_param = setup()
+        board.led_orange()
+        time.sleep(2)
         wlan = wifi_init()
         status = wifi_connect(wifi_param, wlan)
         if status:
+            board.led_green()
             ntptime.settime()
             break
+        board.led_red()
+
 
     return wlan, wifi_param
