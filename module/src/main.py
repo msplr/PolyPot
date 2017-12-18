@@ -4,7 +4,7 @@ import board
 import sensors
 import utime
 
-
+master_dict    = {}            # A master dictionnary to help writing and reading datass in flash memory
 suffix_send    = "/send-data/" # Where to send the data
 wakeup_count   = 0             # Number of wake-ups since the last wifi connection
 server_connect = False         # Whether a WLAN connection is required or not
@@ -15,7 +15,7 @@ single_data    = {}            # Structure for a single data point
 single_command = {}            # Structure for a single command
 
 # Module initialization
-ap, wlan, wifi_param  = communication.new_connection()
+wlan, wifi_param  = communication.new_connection()
 url_send              = wifi_param["server"]+suffix_send+wifi_param["uuid"]
 config, received_cmd  = communication.send_data(url_send)
 communication.wifi_disconnect(wlan)
@@ -24,14 +24,14 @@ while True:
     # Reinitialise if the user presses the button
     if machine.wake_reason() == machine.PIN_WAKE:
         wakeup_count         = 0
-        ap, wlan, wifi_param = communication.new_connection(ap=ap,wlan=wlan)
+        wlan, wifi_param = communication.new_connection()
         url_send             = wifi_param["server"] + suffix_send + wifi_param["uuid"]
         config, received_cmd = communication.send_data(url_send)
         communication.wifi_disconnect(wlan)
 
     # Check if Wifi shall be activated, and activates it if needed and possible
     if wakeup_count*config["logging_interval"] >= config["sending_interval"]:
-        if communication.wifi_connect(ap, wifi_param, wlan):
+        if communication.wifi_connect(wifi_param, wlan):
             server_connect = True
             wakeup_count   = 0
             config, received_cmd = communication.send_data(url_send)

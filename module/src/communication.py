@@ -86,9 +86,11 @@ def wifi_init():
     return wlan
 
 # Tries to connect to the wifi
-def wifi_connect(ap, wifi_param, wlan):
+def wifi_connect(wifi_param, wlan, ap=None):
     status = True
-    ap.active(False)
+    if ap:
+        ap.active(False)
+        del(ap)
     wlan.active(True)
 
     # Try connection
@@ -96,12 +98,16 @@ def wifi_connect(ap, wifi_param, wlan):
     time.sleep(WIFI_TIMEOUT)
     if not wlan.isconnected():
         wlan.disconnect()
+        wlan.active(Flase)
+        del(wlan)
         status = False
     return status
 
 
 def wifi_disconnect(wlan):
     wlan.disconnect()
+    wlan.active(False)
+    del(wlan)
 
 # Sends datas to the server, returns the configuration
 def send_data(url, data=None, commands=None):
@@ -121,18 +127,14 @@ def send_data(url, data=None, commands=None):
     cmd    = response["commands"]
     return config, cmd
 
-def new_connection(ap=None, wlan=None):
+def new_connection():
     while True:
-        if ap:
-            AP_activation(ap = ap)
-        else:
-            ap = AP_activation()
+        ap = AP_activation()
         wifi_param = setup()
-        if not wlan:
-            wlan = wifi_init()
-        status = wifi_connect(ap, wifi_param, wlan)
+        wlan = wifi_init()
+        status = wifi_connect(wifi_param, wlan,ap)
         if status:
             ntptime.settime()
             break
 
-    return ap, wlan, wifi_param
+    return wlan, wifi_param
