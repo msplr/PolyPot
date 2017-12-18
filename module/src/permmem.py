@@ -5,9 +5,9 @@ import os
 def write_in_flash(filename, dict):
     #Check the file extension
     if filename.find(".txt", len(filename)-4,len(filename))<0:
-        filename+=".txt"
-    file=open(filename, "w")
-    text=json.dumps(dict)
+        filename += ".txt"
+    file = open(filename, "w")
+    text = json.dumps(dict)
     file.write(text)
     file.close()
     return filename
@@ -33,8 +33,7 @@ def delete_file(filename):
         print("ERROR: could not delete file, please check that the file exists\n")
         raise
 
-def create_dict(suffix_send, wakeup_count, data, commands, received_cmd, url, wifi_param, config):
-    master_dict["suffix_send"]  = suffix_send
+def create_dict(wakeup_count, data, commands, received_cmd, url, wifi_param, config):
     master_dict["wakeup_count"] = wakeup_count
     master_dict["data"]         = data
     master_dict["commands"]     = commands
@@ -45,7 +44,6 @@ def create_dict(suffix_send, wakeup_count, data, commands, received_cmd, url, wi
     return master_dict
 
 def open_dict(master_dict):
-    suffix_send  = master_dict["suffix_send"]
     wakeup_count = master_dict["wakeup_count"]
     data         = master_dict["data"]
     commands     = master_dict["commands"]
@@ -53,4 +51,4 @@ def open_dict(master_dict):
     url          = master_dict["url"]
     wifi_param   = master_dict["wifi_param"]
     config       = master_dict["config"]
-    return suffix_send, wakeup_count, data, commands, received_cmd, url, wifi_param, config
+    return wakeup_count, data, commands, received_cmd, url, wifi_param, config
