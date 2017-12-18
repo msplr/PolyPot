@@ -21,15 +21,18 @@ except OSError:
     first_boot = True
 else:
     if not machine.wake_reason() == machine.PIN_WAKE:
+        board.led_green()
         wakeup_count, data, commands, received_cmd, url, wifi_param, config = permmem.open_dict(master_dict)
     else:
         reinit = True
 
 # Initilization if needed
 if reinit or first_boot:
+    board.led_red()
     master_dict, wakeup_count, data, commands, received_cmd = variables_init()
     # Module initialization
     wlan, wifi_param = communication.new_connection()
+    board.led_green()
     url_send = wifi_param["server"] + suffix_send + wifi_param["uuid"]
     config, received_cmd = communication.send_data(url_send)
     communication.wifi_disconnect(wlan)
@@ -72,6 +75,7 @@ if server_connect:
     communication.wifi_disconnect(wlan)
     data     = []
     commands = []
+wakeup_count += 1
 
 # Flash storage:
 try:
@@ -82,8 +86,8 @@ master_dict=create_dict(wakeup_count, data, commands, received_cmd, url, wifi_pa
 permmem.write_in_flash(filename, master_dict)
 
 # Returning to sleep
-wakeup_count += 1
-utime.sleep(config["logging_interval"])
+board.led_off()
+board.sleep(config["logging_interval"])
 
 def variables_init():
     master_dict  = {} # A master dictionary to help writing and reading data in flash memory
