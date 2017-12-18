@@ -120,8 +120,11 @@ def send_data(url, data=None, commands=None):
         payload["commands"] = commands
 
     # Server communication
-    response_json = requests.post(url, json=payload)
-    response      = json.loads(response_json.text)
+    try:
+        response_json = requests.post(url, json=payload)
+    except:
+        raise
+    response = json.loads(response_json.text)
 
     # Parsing answer
     config = response["configuration"]

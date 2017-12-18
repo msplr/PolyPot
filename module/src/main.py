@@ -10,6 +10,7 @@ filename           = "log.txt"      # File storing the parameters in flash memor
 reinit             = False          # If the module has been resinitilized
 first_boot         = False          # If this is the first boot
 server_connect     = False          # If a server connection is required at this point
+contact            = False          # If the module successfully contacted the server
 single_data        = {}             # Structure for a single data point
 single_command     = {}             # Structure for a single command
 suffix_send        = "/send-data/"  # Extension of the url to send data to the server
@@ -31,20 +32,33 @@ if reinit or first_boot:
     board.led_red()
     master_dict, wakeup_count, data, commands, received_cmd = variables_init()
     # Module initialization
-    wlan, wifi_param = communication.new_connection()
-    url_send = wifi_param["server"] + suffix_send + wifi_param["uuid"]
-    config, received_cmd = communication.send_data(url_send)
+    while not contact:
+        wlan, wifi_param = communication.new_connection()
+        url_send = wifi_param["server"] + suffix_send + wifi_param["uuid"]
+        #Tries to contact server
+        for count in range(0,5):
+            try:
+                config, received_cmd = communication.send_data(url_send)
+            except:
+                print("Couldn't reach server\n")
+            else:
+                contact = True
+                break
     communication.wifi_disconnect(wlan)
 
 # Check if Wifi shall be activated, and activates it if needed and possible
 if wakeup_count*config["logging_interval"] >= config["sending_interval"]:
     if communication.wifi_connect(wifi_param, wlan):
-        server_connect = True
-        wakeup_count   = 0
-        config, received_cmd = communication.send_data(url_send)
+        try:
+            config, received_cmd = communication.send_data(url_send)
+        except:
+            board.led_red()
+            communication.wifi_disconnect(wlan)
+        else:
+            server_connect = True
     else:
         board.led_red()
-        
+
 # Reading sensors
 sensors.start()
 utime.sleep(SENSORS_START_TIME)
@@ -72,10 +86,18 @@ if len(received_cmd)>0:
 
 # Sending the data and executed commands if required
 if server_connect:
-    config, received_cmd = communication.send_data(url_send,data=data,commands=commands)
-    communication.wifi_disconnect(wlan)
-    data     = []
-    commands = []
+    try:
+        config, received_cmd = communication.send_data(url_send,data=data,commands=commands)
+    except:
+        board.led_red()
+        utime.sleep(1)
+    else:
+        data = []
+        commands = []
+        wakeup_count = 0
+    finally:
+        communication.wifi_disconnect(wlan)
+
 wakeup_count += 1
 
 # Flash storage:
