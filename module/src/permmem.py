@@ -16,7 +16,7 @@ def write_in_flash(filename, dict):
 def read_in_flash(filename):
     try:
         file=open(filename,"r")
-    except:
+    except OSError:
         print ("ERROR: could not read file, please check that the file exists\n")
         raise
     else:
@@ -32,3 +32,25 @@ def delete_file(filename):
     except:
         print("ERROR: could not delete file, please check that the file exists\n")
         raise
+
+def create_dict(suffix_send, wakeup_count, data, commands, received_cmd, url, wifi_param, config):
+    master_dict["suffix_send"]  = suffix_send
+    master_dict["wakeup_count"] = wakeup_count
+    master_dict["data"]         = data
+    master_dict["commands"]     = commands
+    master_dict["received_cmd"] = received_cmd
+    master_dict["url"]          = url
+    master_dict["wifi_param"]   = wifi_param
+    master_dict["config"]       = config
+    return master_dict
+
+def open_dict(master_dict):
+    suffix_send  = master_dict["suffix_send"]
+    wakeup_count = master_dict["wakeup_count"]
+    data         = master_dict["data"]
+    commands     = master_dict["commands"]
+    received_cmd = master_dict["received_cmd"]
+    url          = master_dict["url"]
+    wifi_param   = master_dict["wifi_param"]
+    config       = master_dict["config"]
+    return suffix_send, wakeup_count, data, commands, received_cmd, url, wifi_param, config

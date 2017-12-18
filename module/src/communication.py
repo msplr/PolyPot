@@ -132,7 +132,7 @@ def new_connection():
         ap = AP_activation()
         wifi_param = setup()
         wlan = wifi_init()
-        status = wifi_connect(wifi_param, wlan,ap)
+        status = wifi_connect(wifi_param, wlan)
         if status:
             ntptime.settime()
             break
