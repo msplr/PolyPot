@@ -21,10 +21,20 @@ def AP_activation(ap=None):
 
 # Gets the wifi config in json format when the pot is in AP
 def get_post():
-    #Setup the socket
+    Loop=False
+    # Setup the socket
     addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
     s    = socket.socket()
-    s.bind(addr)
+
+    # Some error might appear at this point if the antenna surrounded by too much material
+    while True:
+        try:
+            s.bind(addr)
+        except:
+            print("ERROR: Check if the antenna is free\n")
+            continue
+        else:
+            break
 
     # Reciving the post request
     s.listen(1)
@@ -52,7 +62,14 @@ def get_post():
 
     # Answer and closing socket
     response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}"
-    cl.send(response)
+    while True:
+        try:
+            cl.send(response)
+        except:
+            print("ERROR while responding to the post request, check teh antenna exposure\n")
+            continue
+        else:
+            break
     cl.close()
     s.close()
     return config_ini
@@ -63,7 +80,7 @@ def setup():
     wifi_param      = json.loads(wifi_param_json)
     return wifi_param
 
-#Creates the wifi
+# Creates the wifi
 def wifi_init():
     wlan = network.WLAN(network.STA_IF)
     return wlan
@@ -86,20 +103,20 @@ def wifi_connect(ap, wifi_param, wlan):
 def wifi_disconnect(wlan):
     wlan.disconnect()
 
-#Sends datas to the server, returns the configuration
+# Sends datas to the server, returns the configuration
 def send_data(url, data=None, commands=None):
-    #Formating payload
+    # Formating payload
     payload = {}
     if data and len(data) > 0:
         payload["data"] = data
     if commands and len(commands) > 0:
         payload["commands"] = commands
 
-    #Server communication
+    # Server communication
     response_json = requests.post(url, json=payload)
     response      = json.loads(response_json.text)
 
-    #Parsing answer
+    # Parsing answer
     config = response["configuration"]
     cmd    = response["commands"]
     return config, cmd

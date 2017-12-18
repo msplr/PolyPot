@@ -29,12 +29,12 @@ while True:
         config, received_cmd = communication.send_data(url_send)
         communication.wifi_disconnect(wlan)
 
-    # Check if Wifi shall be activated
+    # Check if Wifi shall be activated, and activates it if needed and possible
     if wakeup_count*config["logging_interval"] >= config["sending_interval"]:
-        server_connect = True
-        wakeup_count   = 0
-        communication.wifi_connect(ap, wifi_param, wlan)
-        config, received_cmd = communication.send_data(url_send)
+        if communication.wifi_connect(ap, wifi_param, wlan):
+            server_connect = True
+            wakeup_count   = 0
+            config, received_cmd = communication.send_data(url_send)
 
     # Reading sensors
     sensors.start()
