@@ -22,17 +22,19 @@ def AP_activation(ap=None):
 
 # Gets the wifi config in json format when the pot is in AP
 def get_post():
-    Loop=False
     # Setup the socket
+    # Some error might appear at this point if the antenna surrounded by too much material
+
     addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
     s    = socket.socket()
 
-    # Some error might appear at this point if the antenna surrounded by too much material
+
     while True:
         try:
             s.bind(addr)
         except:
             print("ERROR: Check if the antenna is free\n")
+
             continue
         else:
             break
@@ -146,7 +148,13 @@ def new_connection():
         status = wifi_connect(wifi_param, wlan)
         if status:
             board.led_green()
-            ntptime.settime()
+            while True:
+                try:
+                    ntptime.settime()
+                except:
+                    print("Faile ntp\n")
+                else:
+                    break
             break
         board.led_red()
 

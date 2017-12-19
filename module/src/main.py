@@ -36,7 +36,7 @@ else:
         print('normal wakeup')
         print(master_dict)
         board.led_green()
-        wakeup_count, data, commands, received_cmd, url, wifi_param, config = permmem.open_dict(master_dict)
+        wakeup_count, data, commands, received_cmd, url_send, wifi_param, config = permmem.open_dict(master_dict)
     else:
         reinit = True
 
@@ -118,12 +118,12 @@ if server_connect:
 
 wakeup_count += 1
 
+master_dict=permmem.create_dict(wakeup_count, data, commands, received_cmd, url_send, wifi_param, config)
 # Flash storage:
 try:
     permmem.delete_file(filename)
 except:
     print("WARNING: The log file couldn't be erased. This might lead to further errors\n")
-master_dict=permmem.create_dict(wakeup_count, data, commands, received_cmd, url, wifi_param, config)
 permmem.write_in_flash(filename, master_dict)
 
 # Returning to sleep
