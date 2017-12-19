@@ -34,7 +34,7 @@ luminosity_pin = machine.Pin(33, machine.Pin.IN)
 luminosity_adc = machine.ADC(luminosity_pin) # ADC1 CH 5
 luminosity_adc.atten(machine.ADC.ATTN_11DB)
 
-LUMINOSITY_GAIN = 1/0.07 # [uW/cm2/V]
+LUMINOSITY_GAIN = 1/0.07*6 # [uW/cm2/V]
 
 def luminosity():
     """Read the luminosity sensor in uW/cm2."""
@@ -47,9 +47,10 @@ DIST_FULL = 30
 DIST_EMPTY = 93
 
 def water_level():
+    print("Hello world\n")
     """Read water level in percent."""
     dist = tof.distance()
-    level = 100*(dist - DIST_EMPTY)/(DIST_FULL - DIST_EMPTY)
+    level = 10000*(dist - DIST_EMPTY)/(DIST_FULL - DIST_EMPTY)
     if level > 100.0:
         level = 100.0
     elif level < 0.0:
