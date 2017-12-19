@@ -60,6 +60,8 @@ def get_post():
 
     # Reading json file
     config_ini = cl_file.read(content_length).decode()
+    print('config received')
+    print(config_ini)
 
     # Answer and closing socket
     response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 2\r\n\r\n{}"
@@ -70,6 +72,7 @@ def get_post():
             print("ERROR while responding to the post request, check teh antenna exposure\n")
             continue
         else:
+            print('response sent')
             break
     cl.close()
     s.close()
@@ -77,6 +80,7 @@ def get_post():
 
 # Downloads the setups from the phone and returns them as a dictionnary
 def setup():
+    print('communication.py setup')
     wifi_param_json = get_post()
     wifi_param      = json.loads(wifi_param_json)
     return wifi_param
@@ -99,7 +103,7 @@ def wifi_connect(wifi_param, wlan, ap=None):
     time.sleep(WIFI_TIMEOUT)
     if not wlan.isconnected():
         wlan.disconnect()
-        wlan.active(Flase)
+        wlan.active(False)
         del(wlan)
         status = False
     return status

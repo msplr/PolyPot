@@ -47,11 +47,11 @@ DIST_FULL = 30
 DIST_EMPTY = 93
 
 def water_level():
-    """Read water level, normalized between 0 and 1."""
+    """Read water level in percent."""
     dist = tof.distance()
-    level = (dist - DIST_EMPTY)/(DIST_FULL - DIST_EMPTY)
-    if level > 1.0:
-        level = 1.0
+    level = 100*(dist - DIST_EMPTY)/(DIST_FULL - DIST_EMPTY)
+    if level > 100.0:
+        level = 100.0
     elif level < 0.0:
         level = 0.0
     return level

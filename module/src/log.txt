@@ -1,0 +1,1 @@
+{"commands": [], "wifi_param": {"password": "glhv7012", "ssid": "AndroidAP", "server": "https://polypot.0xf00.ch", "uuid": "01234567-89ab-cdef-0123-456789abcdef"}, "received_cmd": [], "config": {"sending_interval": 10, "logging_interval": 10}, "wakeup_count": 0, "url": "https://polypot.0xf00.ch/send-data/01234567-89ab-cdef-0123-456789abcdef", "data": []}

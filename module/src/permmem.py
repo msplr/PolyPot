@@ -34,6 +34,7 @@ def delete_file(filename):
         raise
 
 def create_dict(wakeup_count, data, commands, received_cmd, url, wifi_param, config):
+    master_dict = {}
     master_dict["wakeup_count"] = wakeup_count
     master_dict["data"]         = data
     master_dict["commands"]     = commands
