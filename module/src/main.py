@@ -4,8 +4,10 @@ import board
 import sensors
 import utime
 import permmem
+import embeded_ntptime as ntptime
 
 # Variables with no flash storage needed
+pump_flow          = const(1)       # Average pump flow
 filename           = "log.txt"      # File storing the parameters in flash memory
 reinit             = False          # If the module has been resinitilized
 first_boot         = False          # If this is the first boot
@@ -15,7 +17,7 @@ single_data        = {}             # Structure for a single data point
 single_command     = {}             # Structure for a single command
 master_dict        = {}
 suffix_send        = "/send-data/"  # Extension of the url to send data to the server
-SENSORS_START_TIME = const(1)
+SENSORS_START_TIME = 1
 
 def variables_init():
     master_dict  = {} # A master dictionary to help writing and reading data in flash memory
@@ -48,22 +50,34 @@ if reinit or first_boot:
     # Module initialization
     while not contact:
         wlan, wifi_param = communication.new_connection()
+        print("connection")
         url_send = wifi_param["server"] + suffix_send + wifi_param["uuid"]
+        print("url done")
         #Tries to contact server
-        for count in range(0,5):
-            try:
-                config, received_cmd = communication.send_data(url_send)
-            except:
-                print("Couldn't reach server\n")
-            else:
-                contact = True
-                break
+        try:
+            config, received_cmd = communication.send_data(url_send)
+        except:
+            print("Couldn't reach server\n")
+        else:
+            print("GOT A NEW CONFIG AND COMMAND")
+            print(received_cmd)
+
+    while True:
+        try:
+            ntptime.settime()
+        except:
+            print("Faile ntp\n")
+        else:
+            break
     communication.wifi_disconnect(wlan)
 
 # Check if Wifi shall be activated, and activates it if needed and possible
 if wakeup_count*config["logging_interval"] >= config["sending_interval"]:
     wlan = communication.wifi_init()
-    if communication.wifi_connect(wifi_param, wlan):
+    print("Trying a normal connection")
+    co_status = communication.wifi_connect(wifi_param, wlan)
+    if co_status:
+        print("Normal connaection OK")
         try:
             config, received_cmd = communication.send_data(url_send)
         except:
@@ -72,61 +86,90 @@ if wakeup_count*config["logging_interval"] >= config["sending_interval"]:
         else:
             server_connect = True
     else:
+        print("Normal connection failed")
         board.led_red()
 
 # Reading sensors
 sensors.start()
-print('read sensors')
+print("wait for sensor start")
 utime.sleep(SENSORS_START_TIME)
+print('read sensors')
 single_data = sensors.read_all()
+print("sensors red")
 sensors.stop()
-print(single_data)
+
 
 # Updating time
+print("Build time")
 time=utime.localtime()
 time_iso='{}-{}-{}T{}:{}:{}Z'.format(time[0], time[1], time[2], time[3], time[4], time[5])
 single_data["datetime"] = time_iso
+print("Time added")
+print(single_data)
 
 # Saving the data
 data.append(single_data)
+print("Data added")
 
 # Treating the commands
 if len(received_cmd)>0:
     for cmd in received_cmd:
         print('water plant')
         board.water_pump.on()
+        print ()
         utime.sleep(5)  # TODO: Empiracaly adjust the time
         board.water_pump.off()
         cmd["status"]   = "executed"
         cmd["datetime"] = time_iso
+        print("Finished water")
         commands.append(cmd)
     received_cmd = []
+    print("Commands cleared")
 
 # Sending the data and executed commands if required
 if server_connect:
+    print("Second Connextion to sever")
     try:
         config, received_cmd = communication.send_data(url_send,data=data,commands=commands)
     except:
         board.led_red()
+        print("Failed sending")
         utime.sleep(1)
     else:
         data = []
         commands = []
         wakeup_count = 0
+        print("SENDING OK!!!!")
     finally:
         communication.wifi_disconnect(wlan)
 
 wakeup_count += 1
-
-master_dict=permmem.create_dict(wakeup_count, data, commands, received_cmd, url_send, wifi_param, config)
+print("Building the master dict")
+master_dict = permmem.create_dict(wakeup_count, data, commands, received_cmd, url_send, wifi_param, config)
 # Flash storage:
 try:
     permmem.delete_file(filename)
 except:
-    print("WARNING: The log file couldn't be erased. This might lead to further errors\n")
-permmem.write_in_flash(filename, master_dict)
+    print("FAILED DELETION")
+    if not first_boot:
+        print("WARNING: The log file couldn't be erased. This might lead to further errors\n")
+try:
+    permmem.write_in_flash(filename, master_dict)
+except:
+    print("ERROR: failure to write in flash")
+    master_dict={}
+    data=[]
+    received_cmd={}
+    master_dict=permmem.create_dict(wakeup_count, data, commands, received_cmd, url_send, wifi_param, config)
+    try:
+        permmem.write_in_flash(filename, master_dict)
+    except:
+        print("FATAL ERROR: REBOOT")
 
 # Returning to sleep
 print('go to deepseleep')
 board.led_off()
 board.sleep(config["logging_interval"])
+
+
+#TODO: IMPLEMENT A MASTER TRY

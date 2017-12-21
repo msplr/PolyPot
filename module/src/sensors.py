@@ -83,7 +83,7 @@ def read_all():
     data = {}
     data['luminosity'] = luminosity()
     data['soil_moisture'] = moisture()
-    data['battery_level'] = battery_voltage()
-    data['water_level'] = water_level()
-    data['temperature'] = temperature()
+    data['battery_level'] = 52 # battery_voltage() POOF OF CONCEPT
+    data['water_level'] = 67 #water_level() PROOF of concept
+    data['temperature'] = 23 #temperature()
     return data

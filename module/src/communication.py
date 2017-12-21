@@ -34,7 +34,8 @@ def get_post():
             s.bind(addr)
         except:
             print("ERROR: Check if the antenna is free\n")
-
+            board.led_off()
+            board.sleep(1)
             continue
         else:
             break
@@ -124,6 +125,10 @@ def send_data(url, data=None, commands=None):
         payload["data"] = data
     if commands and len(commands) > 0:
         payload["commands"] = commands
+    timetuple=time.localtime()
+
+    if not timetuple[1]==2000:
+        ntptime.settime()
 
     # Server communication
     try:
