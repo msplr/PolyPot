@@ -39,12 +39,12 @@ def get_post():
             continue
         else:
             break
-
+    print("READY TO LISTEN")
     # Reciving the post request
     s.listen(1)
     cl, addr = s.accept()
     cl_file  = cl.makefile('rwb', 0)
-
+    print("COM IS READY")
     # Start reading
     config_ini     = ""
     content_length = 0
@@ -60,7 +60,7 @@ def get_post():
         (header, value) = line.decode().split(":", 1)
         if header == "Content-Length":
             content_length = int(value)
-
+    print("Header received")
     # Reading json file
     config_ini = cl_file.read(content_length).decode()
     print('config received')
