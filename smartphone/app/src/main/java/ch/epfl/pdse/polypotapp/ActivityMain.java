@@ -1,7 +1,10 @@
 package ch.epfl.pdse.polypotapp;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -15,8 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-import com.google.gson.internal.LinkedTreeMap;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -77,7 +78,6 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
     private Snackbar mConfigurationSnackbar;
     private int mConfigurationBeingSent;
 
-    private LinkedTreeMap<String, Object> mPlants;
     private Plant mPlant;
 
     @Override
@@ -114,8 +114,10 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
         mConfigTypeMap.put("water_tank", "string");
         mConfigTypeMap.put("plant", "string");
 
-        mPlants = Plant.getPlantsList(this);
-        mPlant = new Plant(mPlants, getSharedPreferences().getString("plant", "Unspecified"));
+        Plant.getPlantsList(getResources().openRawResource(R.raw.plants));
+        mPlant = new Plant(getSharedPreferences().getString("plant", "Unspecified"));
+
+        Ad.getAdsList(getResources().openRawResource(R.raw.ads));
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -342,12 +344,28 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
 
     @Subscribe(sticky = true, priority = 1)
     public void handleLatestResponse(CommunicationManager.LatestResponse event) {
+        if(event.response == null) {
+            Snackbar.make(mViewPager, R.string.reception_data_error, Snackbar.LENGTH_LONG).show();
+            mSensorsData = null;
+            mDatesData = null;
+
+            EventBus.getDefault().post(new CommunicationManager.StatsRequest(mServer, mUUID, mStatsFromDate.getTime(), mStatsToDate.getTime()));
+            return;
+        }
+
         mSensorsData = new HashMap<>();
         mDatesData = new HashMap<>();
 
-        try {
+        data: try {
             // Data part
             JSONObject data = event.response.getJSONObject("data");
+
+            if(data.isNull("water_level")) {
+                Snackbar.make(mViewPager, R.string.parsing_no_data, Snackbar.LENGTH_LONG).show();
+
+                mSensorsData = null;
+                break data;
+            }
 
             mSensorsData.put("water_level", Float.parseFloat(data.getString("water_level")));
             mSensorsData.put("temperature", Float.parseFloat(data.getString("temperature")));
@@ -375,15 +393,21 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             mStatsFromDate.setTime(latestDataDate.getTime());
             mStatsFromDate.add(Calendar.WEEK_OF_YEAR, -1);
             mStatsToDate.setTime(latestDataDate.getTime());
+            mStatsToDate.add(Calendar.SECOND, 1);
 
             // Notifications
             if(mSensorsData.get("water_level") < 25) {
+                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(), 0);
+                String message = String.format(getString(R.string.notif_water_level_text), mSensorsData.get("water_level"));
+
                 NotificationCompat.Builder builder =
                         new NotificationCompat.Builder(this, "PolyPotNotificationChannel")
                                 .setSmallIcon(R.drawable.ic_pot)
                                 .setContentTitle(mName + " - " + getString(R.string.notif_water_level_title))
-                                .setContentText(String.format(getString(R.string.notif_water_level_text), mSensorsData.get("water_level")))
-                                .setAutoCancel(true);
+                                .setContentText(message)
+                                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                                .setAutoCancel(true)
+                                .setContentIntent(pendingIntent);
 
                 mNotificationManager.notify(1, builder.build());
             } else {
@@ -391,12 +415,17 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             }
 
             if(mSensorsData.get("battery_level") < 25) {
+                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(), 0);
+                String message = String.format(getString(R.string.notif_battery_level_text), mSensorsData.get("battery_level"));
+
                 NotificationCompat.Builder builder =
                         new NotificationCompat.Builder(this, "PolyPotNotificationChannel")
                                 .setSmallIcon(R.drawable.ic_pot)
                                 .setContentTitle(mName + " - " + getString(R.string.notif_battery_level_title))
-                                .setContentText(String.format(getString(R.string.notif_battery_level_text), mSensorsData.get("battery_level")))
-                                .setAutoCancel(true);
+                                .setContentText(message)
+                                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                                .setAutoCancel(true)
+                                .setContentIntent(pendingIntent);
 
                 mNotificationManager.notify(2, builder.build());
             } else {
@@ -407,20 +436,27 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             limitDate.add(Calendar.DAY_OF_MONTH, -1);
 
             if(latestDataDate.before(limitDate)) {
+                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, new Intent(), 0);
+                String message = getString(R.string.notif_data_text);
+
                 NotificationCompat.Builder builder =
                         new NotificationCompat.Builder(this, "PolyPotNotificationChannel")
                                 .setSmallIcon(R.drawable.ic_pot)
                                 .setContentTitle(mName + " - " + getString(R.string.notif_data_title))
-                                .setContentText(getString(R.string.notif_data_text))
-                                .setAutoCancel(true);
+                                .setContentText(message)
+                                .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
+                                .setAutoCancel(true)
+                                .setContentIntent(pendingIntent);
 
                 mNotificationManager.notify(3, builder.build());
             } else {
                 mNotificationManager.cancel(3);
             }
         } catch (NullPointerException | JSONException | ParseException e) {
-            Snackbar.make(mViewPager, R.string.reception_latest_error, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mViewPager, R.string.parsing_latest_error, Snackbar.LENGTH_LONG).show();
         }
+
+        EventBus.getDefault().post(new CommunicationManager.StatsRequest(mServer, mUUID, mStatsFromDate.getTime(), mStatsToDate.getTime()));
 
         try {
             // Command part
@@ -441,10 +477,8 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 }
             }
         } catch (NullPointerException | JSONException | ParseException e) {
-            Snackbar.make(mViewPager, R.string.reception_watering_error, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mViewPager, R.string.parsing_watering_error, Snackbar.LENGTH_LONG).show();
         }
-
-        EventBus.getDefault().post(new CommunicationManager.StatsRequest(mServer, mUUID, mStatsFromDate.getTime(), mStatsToDate.getTime()));
 
         if(mFirstConfigLoad) {
             try {
@@ -474,7 +508,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 // Only update the local configuration once
                 mFirstConfigLoad = false;
             } catch (NullPointerException | JSONException e) {
-                Snackbar.make(mViewPager, R.string.reception_configuration_error, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mViewPager, R.string.parsing_configuration_error, Snackbar.LENGTH_LONG).show();
             }
         }
     }
@@ -489,10 +523,21 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
 
     @Subscribe(sticky = true, priority = 1)
     public void handleStatsResponse(CommunicationManager.StatsResponse event) {
+        if(event.response == null) {
+            Snackbar.make(mViewPager, R.string.reception_data_error, Snackbar.LENGTH_LONG).show();
+            mStats = null;
+            return;
+        }
+
         mStats = new HashMap<>();
 
         try {
             JSONArray data = event.response.getJSONArray("data");
+
+            if(data.length() == 0) {
+                mStats = null;
+                return;
+            }
 
             float waterLevel = 0;
             float temperature = 0;
@@ -500,7 +545,6 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             float luminosity = 0;
 
             for(int i = 0; i<data.length();i++)
-
             {
                 JSONObject point = data.getJSONObject(i);
 
@@ -510,12 +554,12 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 luminosity += Float.parseFloat(point.getString("luminosity"));
             }
 
-            mStats.put("water_level",waterLevel /data.length());
-            mStats.put("temperature",temperature /data.length());
-            mStats.put("soil_moisture",soilMoisture /data.length());
-            mStats.put("luminosity",luminosity /data.length());
+            mStats.put("water_level", waterLevel/data.length());
+            mStats.put("temperature", temperature/data.length());
+            mStats.put("soil_moisture", soilMoisture/data.length());
+            mStats.put("luminosity", luminosity/data.length());
         } catch (NullPointerException | JSONException e) {
-            Snackbar.make(mViewPager, R.string.reception_stats_error, Snackbar.LENGTH_LONG).show();
+            Snackbar.make(mViewPager, R.string.parsing_stats_error, Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -596,8 +640,8 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
     }
 
     // Switch to the good tab when the user press on a CardView
-    public void cardClick(View v) {
-        switch(v.getId()) {
+    public void cardClick(View view) {
+        switch(view.getId()) {
             case R.id.water_level_card:
                 mViewPager.setCurrentItem(Tabs.WATER_LEVEL);
                 break;
@@ -622,6 +666,11 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 mViewPager.setCurrentItem(Tabs.PLANT);
                 break;
         }
+    }
+
+    public void adClick(View view) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(view.getTag().toString()));
+        startActivity(browserIntent);
     }
 
     /********** Commands **********/
@@ -658,7 +707,7 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
 
     @Subscribe(priority = 1)
     public void handleCommandsResponse(CommunicationManager.CommandsResponse event) {
-        if(event.hint.equals("water")) {
+        if(event.key.equals("water")) {
             if (event.response != null) {
                 long time = Long.decode(mSharedPreferences.getString("sending_interval", "0"));
 
@@ -714,10 +763,10 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
                 }
             }).show();
 
-            mPreviousPreferences.put(event.hint, event.value);
+            mPreviousPreferences.put(event.key, event.value);
 
-            if(event.hint.equals("plant")) {
-                mPlant = new Plant(mPlants, mSharedPreferences.getString("plant", "Unspecified"));
+            if(event.key.equals("plant")) {
+                mPlant = new Plant(mSharedPreferences.getString("plant", "Unspecified"));
             }
         } else {
             Snackbar.make(mViewPager, R.string.configuration_update_error, Snackbar.LENGTH_LONG).addCallback(new Snackbar.Callback() {
@@ -730,12 +779,12 @@ public class ActivityMain extends AppCompatActivity implements SharedPreferences
             }).show();
 
             SharedPreferences.Editor editor = mSharedPreferences.edit();
-            switch (mConfigTypeMap.get(event.hint)) {
+            switch (mConfigTypeMap.get(event.key)) {
                 case "int":
-                    editor.putInt(event.hint, (Integer) mPreviousPreferences.get(event.hint));
+                    editor.putInt(event.key, (Integer) mPreviousPreferences.get(event.key));
                     break;
                 case "string":
-                    editor.putString(event.hint, (String) mPreviousPreferences.get(event.hint));
+                    editor.putString(event.key, (String) mPreviousPreferences.get(event.key));
                     break;
             }
 

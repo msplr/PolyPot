@@ -1,7 +1,5 @@
 package ch.epfl.pdse.polypotapp;
 
-import android.content.Context;
-
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
@@ -12,6 +10,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public class Plant {
+    private static LinkedTreeMap<String, Object> mPlantsList;
+
     public final String name;
     public final String description;
 
@@ -31,10 +31,8 @@ public class Plant {
     public final float luminosityMax;
     public final String luminosityDescription;
 
-    public static LinkedTreeMap<String, Object> getPlantsList(Context context) {
+    public static boolean getPlantsList(InputStream inputStream) {
         try {
-            InputStream inputStream = context.getResources().openRawResource(R.raw.plants);
-
             BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
             StringBuilder total = new StringBuilder();
             String line;
@@ -43,14 +41,15 @@ public class Plant {
             }
             String jsonString = total.toString();
 
-            return new Gson().fromJson(jsonString, new TypeToken<LinkedTreeMap<String, Object>>() {}.getType());
+            mPlantsList = new Gson().fromJson(jsonString, new TypeToken<LinkedTreeMap<String, Object>>() {}.getType());
+            return true;
         } catch (IOException e) {
-            return null;
+            return false;
         }
     }
 
-    public Plant(LinkedTreeMap<String, Object> plantsList, String specie) {
-        LinkedTreeMap<String, Object> plant = (LinkedTreeMap<String, Object>) plantsList.get(specie);
+    public Plant(String specie) {
+        LinkedTreeMap<String, Object> plant = (LinkedTreeMap<String, Object>) mPlantsList.get(specie);
 
         name = specie;
         description = (String) plant.get("description");

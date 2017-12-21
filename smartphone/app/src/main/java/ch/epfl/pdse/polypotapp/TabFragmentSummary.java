@@ -3,10 +3,8 @@ package ch.epfl.pdse.polypotapp;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,13 +84,13 @@ public class TabFragmentSummary extends Fragment {
         super.onPause();
     }
 
-    @Subscribe
+    @Subscribe(sticky = true)
     public void handleLatestLoading(final CommunicationManager.LatestLoading event) {
         mSwipeRefreshLayout.setRefreshing(true);
         mLatestRefreshing = true;
     }
 
-    @Subscribe
+    @Subscribe(sticky = true)
     public void handleStatsLoading(final CommunicationManager.StatsLoading event) {
         mSwipeRefreshLayout.setRefreshing(true);
         mStatsRefreshing = true;
@@ -121,9 +119,6 @@ public class TabFragmentSummary extends Fragment {
             mWaterLevelText.setText("");
             mLuminosityText.setText("");
             mLatestDataDateText.setText(getString(R.string.latest_data_date_unknown));
-
-            // Show an error message
-            Snackbar.make(getView(), R.string.reception_latest_error, Snackbar.LENGTH_LONG).show();
         }
 
         try {
@@ -135,12 +130,10 @@ public class TabFragmentSummary extends Fragment {
         } catch (NullPointerException e) {
             // Reset to default values
             mLastWateringText.setText(R.string.last_watering_unknown);
-
-            // Show an error message
-            Snackbar.make(getView(), R.string.reception_watering_error, Snackbar.LENGTH_LONG).show();
         }
 
         mLatestRefreshing = false;
+        EventBus.getDefault().removeStickyEvent(CommunicationManager.LatestLoading.class);
         if(!mStatsRefreshing) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
@@ -153,11 +146,10 @@ public class TabFragmentSummary extends Fragment {
             updatePlantStatus();
         } catch (NullPointerException e) {
             mPlantStatusText.setText(R.string.plant_status_unknown);
-
-            Snackbar.make(getView(), R.string.reception_stats_error, Snackbar.LENGTH_LONG).show();
         }
 
         mStatsRefreshing = false;
+        EventBus.getDefault().removeStickyEvent(CommunicationManager.StatsLoading.class);
         if(!mLatestRefreshing) {
             mSwipeRefreshLayout.setRefreshing(false);
         }
@@ -165,12 +157,11 @@ public class TabFragmentSummary extends Fragment {
 
     @Subscribe
     public void handleConfigurationResponse(CommunicationManager.ConfigurationResponse event) {
-        if(event.response != null && event.hint.equals("plant")) {
+        if(event.response != null && event.key.equals("plant")) {
             try {
                 updatePlantStatus();
             } catch (NullPointerException e) {
                 mPlantStatusText.setText(R.string.plant_status_unknown);
-
             }
         }
     }

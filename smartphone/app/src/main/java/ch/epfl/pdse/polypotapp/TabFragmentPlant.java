@@ -3,7 +3,6 @@ package ch.epfl.pdse.polypotapp;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -13,7 +12,6 @@ import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.json.JSONException;
 
 import java.util.HashMap;
 
@@ -94,7 +92,7 @@ public class TabFragmentPlant extends Fragment {
         super.onPause();
     }
 
-    @Subscribe
+    @Subscribe(sticky = true)
     public void handleStatsLoading(final CommunicationManager.StatsLoading event) {
         mSwipeRefreshLayout.setRefreshing(true);
     }
@@ -113,16 +111,15 @@ public class TabFragmentPlant extends Fragment {
             mCurrentTemperature.setText("");
             mCurrentSoilMoisture.setText("");
             mCurrentLuminosity.setText("");
-
-            Snackbar.make(getView(), R.string.reception_stats_error, Snackbar.LENGTH_LONG).show();
         }
 
+        EventBus.getDefault().removeStickyEvent(CommunicationManager.StatsLoading.class);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Subscribe
     public void handleConfigurationResponse(CommunicationManager.ConfigurationResponse event) {
-        if(event.response != null && event.hint.equals("plant")) {
+        if(event.response != null && event.key.equals("plant")) {
             updateDescription();
         }
     }
@@ -133,16 +130,25 @@ public class TabFragmentPlant extends Fragment {
         mPlantConfigured.setText(String.format(getString(R.string.plant_configured), plant.name));
         mPlantDescription.setText(plant.description);
 
-        mMinWaterLevel.setText(Float.toString(plant.waterLevelMin));
-        mMaxWaterLevel.setText(Float.toString(plant.waterLevelMax));
 
-        mMinTemperature.setText(Float.toString(plant.temperatureMin));
-        mMaxTemperature.setText(Float.toString(plant.temperatureMax));
+        mMinWaterLevel.setText(valueToText(plant.waterLevelMin));
+        mMaxWaterLevel.setText(valueToText(plant.waterLevelMax));
 
-        mMinSoilMoisture.setText(Float.toString(plant.soilMoistureMin));
-        mMaxSoilMoisture.setText(Float.toString(plant.soilMoistureMax));
+        mMinTemperature.setText(valueToText(plant.temperatureMin));
+        mMaxTemperature.setText(valueToText(plant.temperatureMax));
 
-        mMinLuminosity.setText(Float.toString(plant.luminosityMin));
-        mMaxLuminosity.setText(Float.toString(plant.luminosityMax));
+        mMinSoilMoisture.setText(valueToText(plant.soilMoistureMin));
+        mMaxSoilMoisture.setText(valueToText(plant.soilMoistureMax));
+
+        mMinLuminosity.setText(valueToText(plant.luminosityMin));
+        mMaxLuminosity.setText(valueToText(plant.luminosityMax));
+    }
+
+    private String valueToText(float value) {
+        if(Float.isInfinite(value)) {
+            return "N/A";
+        } else {
+            return Float.toString(value);
+        }
     }
 }

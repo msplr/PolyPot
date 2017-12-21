@@ -7,4 +7,8 @@
         android:icon="@drawable/ic_add"
         android:title="@string/add"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/about"
+        android:title="@string/about"
+        app:showAsAction="always" />
 </menu>

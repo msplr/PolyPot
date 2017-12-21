@@ -87,9 +87,16 @@ public class ActivityPotsList extends AppCompatActivity {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+        Intent intent;
         switch (item.getItemId()) {
             case R.id.add:
-                Intent intent = new Intent(this, ActivitySetupAndAdd.class);
+                intent = new Intent(this, ActivitySetupAndAdd.class);
+                startActivity(intent);
+
+                return true;
+
+            case R.id.about:
+                intent = new Intent(this, ActivityAbout.class);
                 startActivity(intent);
 
                 return true;

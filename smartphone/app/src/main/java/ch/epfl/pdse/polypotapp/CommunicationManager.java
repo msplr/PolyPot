@@ -29,7 +29,7 @@ public class CommunicationManager {
         public String server;
         public String uuid;
         public JSONObject jsonRequest;
-        public String hint;
+        public String key;
         public Object value;
         public Date fromDate;
         public Date toDate;
@@ -37,8 +37,7 @@ public class CommunicationManager {
     abstract class GenericLoading {}
     abstract class GenericResponse {
         public JSONObject response = null;
-        public VolleyError error = null;
-        public String hint = "";
+        public String key = "";
         public Object value = null;
     }
 
@@ -78,7 +77,7 @@ public class CommunicationManager {
             this.server = server;
             this.uuid = uuid;
             this.jsonRequest = jsonRequest;
-            this.hint = hint;
+            this.key = hint;
             this.value = value;
         }
     }
@@ -89,7 +88,7 @@ public class CommunicationManager {
             this.server = server;
             this.uuid = uuid;
             this.jsonRequest = jsonRequest;
-            this.hint = hint;
+            this.key = hint;
         }
     }
     class CommandsResponse extends GenericResponse {}
@@ -179,7 +178,7 @@ public class CommunicationManager {
 
         Cache.Entry cached = mRequestQueue.getCache().get(url);
         if(loading != null && (cached == null || cached.isExpired())) {
-            EventBus.getDefault().post(loading);
+            EventBus.getDefault().postSticky(loading);
         }
 
         JsonObjectRequest dataRequest = new JsonObjectRequest(method, url, event.jsonRequest,
@@ -187,15 +186,14 @@ public class CommunicationManager {
                     @Override
                     public void onResponse(JSONObject response) {
                         dataReady.response = response;
-                        dataReady.hint = event.hint;
+                        dataReady.key = event.key;
                         dataReady.value = event.value;
                         EventBus.getDefault().postSticky(dataReady);
                     }
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        dataReady.error = error;
-                        dataReady.hint = event.hint;
+                        dataReady.key = event.key;
                         dataReady.value = event.value;
                         EventBus.getDefault().postSticky(dataReady);
                     }

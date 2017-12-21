@@ -9,6 +9,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -55,6 +56,11 @@ public class TabFragmentSoilMoisture extends Fragment {
         mChart = view.findViewById(R.id.graph_soil_moisture);
         mColor = getResources().getColor(R.color.lightBlue);
         mDescription = view.findViewById(R.id.description_soil_moisture);
+
+        Ad ad = new Ad();
+        Button mAdButton = view.findViewById(R.id.ad_button_soil_moisture);
+        mAdButton.setText(ad.text);
+        mAdButton.setTag(ad.url);
     }
 
     @Override
@@ -77,32 +83,44 @@ public class TabFragmentSoilMoisture extends Fragment {
         super.onPause();
     }
 
-    @Subscribe
+    @Subscribe(sticky = true)
     public void handleDataLoading(final CommunicationManager.DataLoading event) {
         mSwipeRefreshLayout.setRefreshing(true);
     }
 
     @Subscribe(sticky = true)
     public void handleDataResponse(CommunicationManager.DataResponse event) {
-        try {
-            GraphHelper.updateChartWithData(mChart, mColor, "soil_moisture", getString(R.string.label_soil_moisture), event.response, mActivity);
-        } catch (NullPointerException|JSONException|ParseException e) {
-            // Display error on chart
+        if(event.response == null) {
             mChart.clear();
             mChart.setNoDataText(getString(R.string.reception_data_error));
 
             // Show an error message
             Snackbar.make(getView(), R.string.reception_data_error, Snackbar.LENGTH_LONG).show();
+
+            mSwipeRefreshLayout.setRefreshing(false);
+            return;
         }
 
+        try {
+            GraphHelper.updateChartWithData(mChart, mColor, "soil_moisture", getString(R.string.label_soil_moisture), event.response, mActivity);
+        } catch (NullPointerException|JSONException|ParseException e) {
+            // Display error on chart
+            mChart.clear();
+            mChart.setNoDataText(getString(R.string.parsing_data_error));
+
+            // Show an error message
+            Snackbar.make(getView(), R.string.parsing_data_error, Snackbar.LENGTH_LONG).show();
+        }
+
+        EventBus.getDefault().removeStickyEvent(CommunicationManager.DataLoading.class);
         mSwipeRefreshLayout.setRefreshing(false);
     }
 
     @Subscribe
     public void handleConfigurationResponse(CommunicationManager.ConfigurationResponse event) {
-        if(event.response != null && event.hint.equals("plant")) {
+        if(event.response != null && event.key.equals("plant")) {
             updateDescription();
-        } else if(event.response != null && event.hint.equals("target_soil_moisture")) {
+        } else if(event.response != null && event.key.equals("target_soil_moisture")) {
             updateLimits();
         }
     }

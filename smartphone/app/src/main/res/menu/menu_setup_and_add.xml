@@ -3,12 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="ch.epfl.pdse.polypotapp.ActivityMain">
     <item
+        android:id="@+id/add_only"
+        android:title="@string/add_existing"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/setup_and_add"
         android:title="@string/setup_pot_and_add"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/add_only"
-        android:title="@string/add_only"
         app:showAsAction="always" />
 </menu>

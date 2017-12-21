@@ -37,7 +37,7 @@
         <activity
             android:name=".ActivitySetupAndAdd">
             <intent-filter>
-                <action android:name="ch.epfl.pdse.polypotapp.ActivitySetup" />
+                <action android:name="ch.epfl.pdse.polypotapp.ActivitySetupAndAdd" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <meta-data
@@ -48,14 +48,23 @@
             android:name=".ActivitySetupProgress"
             android:screenOrientation="portrait">
             <intent-filter>
-                <action android:name="ch.epfl.pdse.polypotapp.ActivityProgress" />
+                <action android:name="ch.epfl.pdse.polypotapp.ActivitySetupProgress" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ActivitySetupAndAdd" />
         </activity>
-
+        <activity
+            android:name=".ActivityAbout">
+            <intent-filter>
+                <action android:name="ch.epfl.pdse.polypotapp.ActivityAbout" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ActivityPotsList" />
+        </activity>
     </application>
 
 </manifest>

@@ -8,6 +8,7 @@
     <dimen name="inter_element_spacing_half">4dp</dimen>
 
     <dimen name="description_spacing">24dp</dimen>
+    <dimen name="description_spacing_half">12dp</dimen>
 
     <!-- Cards -->
     <dimen name="summary_card_height">140dp</dimen>

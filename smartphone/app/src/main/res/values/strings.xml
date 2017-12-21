@@ -23,11 +23,14 @@
     <string name="limit_target_soil_moisture">Soil moisture threshold</string>
 
     <!-- Communication -->
-    <string name="reception_latest_error">An error occurred during the reception of the latest data.</string>
-    <string name="reception_watering_error">An error occurred during the reception of the watering data.</string>
-    <string name="reception_configuration_error">An error occurred during the reception of the configuration data.</string>
     <string name="reception_data_error">An error occurred during the reception of the data.</string>
-    <string name="reception_stats_error">An error occurred during the reception of the data for stats.</string>
+
+    <string name="parsing_latest_error">An error occurred during the parsing of the latest data.</string>
+    <string name="parsing_no_data">No data for this pot.</string>
+    <string name="parsing_watering_error">An error occurred during the parsing of the watering data.</string>
+    <string name="parsing_configuration_error">An error occurred during the parsing of the configuration data.</string>
+    <string name="parsing_data_error">An error occurred during the parsing of the data.</string>
+    <string name="parsing_stats_error">An error occurred during the parsing of the data for stats.</string>
 
     <string name="configuration_sending">Sending configuration&#8230;</string>
     <string name="configuration_update_error">An error occurred during the transmission of the configuration. Previous value restored.</string>
@@ -71,7 +74,7 @@
 
     <!-- Plant status -->
     <string name="plant_configured">Plant configured:\n%s</string>
-    <string name="title_stats">Stats for your plant based on the last seven days of data:</string>
+    <string name="title_stats">Stats for your plant based on the last seven days:</string>
     <string name="description_stats">(Recommended minimum average value, current average value, recommended maximum average value)</string>
     <string name="what">What?</string>
     <string name="min">Min</string>
@@ -85,11 +88,34 @@
     <string name="luminosity_icon">Luminosity icon</string>
     <string name="plant_icon">Plant icon</string>
     <string name="pot_icon">Pot icon</string>
+    <string name="logo_title_icon">Logo and title icon</string>
 
     <!-- Pots' list -->
     <string name="add">Add</string>
+    <string name="about">About</string>
     <string name="pot_deleted">Pot deleted.</string>
     <string name="undo">Undo</string>
+
+    <string name="title_about">About</string>
+    <string name="description_about">
+        PolyPot is a student project created in the context of the course "Product Design &amp; System Engineering" at EPFL.\n
+    </string>
+    <string name="authors_about">
+        Authors:\n
+        \t&#8226; Lénaïc​ ​Frehner\n
+        \t&#8226; Nicolas​ ​Maalouly\n
+        \t&#8226; Loïc​ ​Niederhauser\n
+        \t&#8226; Nathanaël​ ​Restori\n
+        \t&#8226; Guillaume​ ​Rivérieulx​ ​de​ ​Varax\n
+        \t&#8226; Michael​ ​Spieler
+    </string>
+    <string name="acknowledgement_about">
+        Acknowledgement:\n
+        \t&#8226; Jean Cattin - Advisor\n
+        \t&#8226; Kamal Gasser - Plant specialist\n
+        \t&#8226; Loïc Gandini - Photographer
+    </string>
+    <string name="button_visit_webiste">Visit our website!</string>
 
     <!-- Setup pot -->
     <string name="empty_name">Please, enter a name.</string>
@@ -117,15 +143,16 @@
     <string name="setup_success">Setup successful!</string>
     <string name="finish">finish</string>
     <string name="setup_success_message">
-        The pot will now try to connect to your Wi-Fi and contact the server.
-        If the Wi-Fi \"PolyPot\" is still visible after some minutes, the pot failed to connect to your Wi-Fi or
-        to contact the server and you should restart the setup procedure.
+        The pot will now try to connect to your Wi-Fi and contact the server.\n\n
+        If the LED on the control module switch back to red, the pot failed to connect to your Wi-Fi or
+        to contact the server and you should restart the setup procedure.\n\n
+        If the LED on the control module switch to green and then off, the pot is now working.
     </string>
     <string name="setup_error">Error during setup. Restart setup or edit setup settings.</string>
     <string name="edit">Edit</string>
 
     <!-- Configuration -->
-    <string name="add_only">Add only</string>
+    <string name="add_existing">Add exist.</string>
     <string name="setup_pot_and_add">Setup Pot &amp; Add</string>
 
     <string name="conf_category_general">General settings (for add and pot setup)</string>
@@ -137,7 +164,7 @@
     <string name="conf_server_summary">The address of the server you want to use.</string>
     <string name="conf_server_hint">Enter a server URL.</string>
     <string name="conf_uuid_title">Pot UUID</string>
-    <string name="conf_uuid_summary">The unique identifier of your pot. Leave blank unless you want to add an already setup pot.</string>
+    <string name="conf_uuid_summary">The unique identifier of your pot. Leave blank unless you want to add an existing pot.</string>
     <string name="conf_uuid_hint">Leave blank or enter an UUID.</string>
     <string name="conf_color_title">Background color</string>
     <string name="conf_color_summary">The background color of the pot icon.</string>
@@ -145,7 +172,7 @@
     <string name="conf_category_wifi">Wi-Fi settings (for pot setup)</string>
 
     <string name="conf_ssid_title">Wi-Fi SSID</string>
-    <string name="conf_ssid_summary">The SSID of the Wi-Fi the pot will use.</string>
+    <string name="conf_ssid_summary">The SSID (or name) of the Wi-Fi the pot will use.</string>
     <string name="conf_ssid_hint">Enter an SSID for setup.</string>
     <string name="conf_password_title">Wi-Fi password</string>
     <string name="conf_password_summary">The password of the Wi-Fi the pot will use.</string>
