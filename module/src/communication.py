@@ -127,7 +127,7 @@ def send_data(url, data=None, commands=None):
         payload["commands"] = commands
     timetuple=time.localtime()
 
-    if not timetuple[1]==2000:
+    if timetuple[0]==2000:
         ntptime.settime()
 
     # Server communication
