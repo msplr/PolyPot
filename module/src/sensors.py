@@ -1,4 +1,4 @@
-import struct
+mport struct
 import machine
 import VL6180X
 import time
@@ -34,23 +34,22 @@ luminosity_pin = machine.Pin(33, machine.Pin.IN)
 luminosity_adc = machine.ADC(luminosity_pin) # ADC1 CH 5
 luminosity_adc.atten(machine.ADC.ATTN_11DB)
 
-LUMINOSITY_GAIN = 1/0.07*6 # [uW/cm2/V]
+LUMINOSITY_GAIN = 6/0.07 # [Lux/V]
 
 def luminosity():
-    """Read the luminosity sensor in uW/cm2."""
+    """Read the luminosity sensor in Lux (approximatively)."""
     return 3.3 * luminosity_adc.read()/1023 * LUMINOSITY_GAIN
 
 TOF_ADDR = 41
 TOF_RESETn = machine.Pin(17, machine.Pin.OUT)
 tof = VL6180X.VL6180X(i2c, TOF_RESETn)
-DIST_FULL = 30
-DIST_EMPTY = 93
+DIST_FULL = 20
+DIST_EMPTY = 118
 
 def water_level():
-    print("Hello world\n")
     """Read water level in percent."""
     dist = tof.distance()
-    level = 10000*(dist - DIST_EMPTY)/(DIST_FULL - DIST_EMPTY)
+    level = 100*(dist - DIST_EMPTY)/(DIST_FULL - DIST_EMPTY)
     if level > 100.0:
         level = 100.0
     elif level < 0.0:
@@ -83,7 +82,8 @@ def read_all():
     data = {}
     data['luminosity'] = luminosity()
     data['soil_moisture'] = moisture()
-    data['battery_level'] = 52 # battery_voltage() POOF OF CONCEPT
-    data['water_level'] = 67 #water_level() PROOF of concept
-    data['temperature'] = 23 #temperature()
+    #data['battery_level'] = battery_voltage()
+    data['battery_level'] = 56
+    data['water_level'] = water_level()
+    data['temperature'] = temperature()
     return data
