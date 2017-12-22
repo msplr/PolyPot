@@ -1,4 +1,4 @@
-mport struct
+import struct
 import machine
 import VL6180X
 import time
