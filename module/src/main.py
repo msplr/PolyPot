@@ -7,7 +7,7 @@ import permmem
 import embeded_ntptime as ntptime
 
 # Variables with no flash storage needed
-pump_flow          = const(1)       # Average pump flow
+PUMP_FLOW          = const(1)       # Average pump flow in [ml/s]
 filename           = "log.txt"      # File storing the parameters in flash memory
 reinit             = False          # If the module has been resinitilized
 first_boot         = False          # If this is the first boot
@@ -62,17 +62,10 @@ try:
             except:
                 print("Couldn't reach server\n")
             else:
+                contact = True
                 print("GOT A NEW CONFIG AND COMMAND")
                 print(received_cmd)
-
-        while True:
-            try:
-                ntptime.settime()
-            except:
-                print("Faile ntp\n")
-            else:
-                break
-        communication.wifi_disconnect(wlan)
+            communication.wifi_disconnect(wlan)
 
     # Check if Wifi shall be activated, and activates it if needed and possible
     if wakeup_count*config["logging_interval"] >= config["sending_interval"]:
@@ -113,6 +106,15 @@ try:
     # Saving the data
     data.append(single_data)
     print("Data added")
+
+    #Trigering automatic watering
+    #if data['soil_moisture']<config["target_soil_moisture"]:
+    #    board.water_pump.on()
+    #    utime.sleep(config["water_volume_pumped"]/PUMP_FLOW)
+    #    board.water_pump.off()
+    #    single_command = {"type":"water","status":"executed","datetime":time_iso}
+    #    commands.append(single_command)
+    #    single_command = {}
 
     # Treating the commands
     if len(received_cmd)>0:
@@ -185,5 +187,5 @@ except:
     finally:
         print("FATAL ERROR: REBOOTING")
         board.sleep(5)
-    
+
 
