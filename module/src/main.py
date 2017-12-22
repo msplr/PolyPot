@@ -7,7 +7,7 @@ import permmem
 import embeded_ntptime as ntptime
 
 # Variables with no flash storage needed
-PUMP_FLOW          = const(1)       # Average pump flow in [ml/s]
+PUMP_FLOW          = const(50)       # Average pump flow in [ml/s]
 filename           = "log.txt"      # File storing the parameters in flash memory
 reinit             = False          # If the module has been resinitilized
 first_boot         = False          # If this is the first boot
@@ -107,10 +107,11 @@ try:
     data.append(single_data)
     print("Data added")
 
+    water_time = int(config["water_volume_pumped"] / PUMP_FLOW)
     #Trigering automatic watering
     #if data['soil_moisture']<config["target_soil_moisture"]:
     #    board.water_pump.on()
-    #    utime.sleep(config["water_volume_pumped"]/PUMP_FLOW)
+    #    utime.sleep(water_time)
     #    board.water_pump.off()
     #    single_command = {"type":"water","status":"executed","datetime":time_iso}
     #    commands.append(single_command)
@@ -121,8 +122,7 @@ try:
         for cmd in received_cmd:
             print('water plant')
             board.water_pump.on()
-            print ()
-            utime.sleep(5)  # TODO: Empiracaly adjust the time
+            utime.sleep(water_time)  # TODO: Empiracaly adjust the time
             board.water_pump.off()
             cmd["status"]   = "executed"
             cmd["datetime"] = time_iso
