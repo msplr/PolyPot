@@ -6,7 +6,10 @@ import time
 import embeded_ntptime as ntptime
 import board
 
-WIFI_TIMEOUT = 5
+WIFI_TIMEOUT   = const(5)   # Time for which the module tries to connect to the wifi in seconds
+TIME_LED_FLASH = const(2)   # The minimal time a LED is flashed in seconds
+RESET_TIME     = const(1)   # The time the board stays in deep sleep when it has to reboot in seconds
+NTP_ATTEMPTS   = const(100) # Number of try to get time through NTP
 
 # Activates or reactivates the AP
 def AP_activation(ap=None):
@@ -23,8 +26,6 @@ def AP_activation(ap=None):
 # Gets the wifi config in json format when the pot is in AP
 def get_post():
     # Setup the socket
-    # Some error might appear at this point if the antenna surrounded by too much material
-
     addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
     s    = socket.socket()
 
@@ -33,18 +34,18 @@ def get_post():
         try:
             s.bind(addr)
         except:
-            print("ERROR: Check if the antenna is free\n")
-            board.led_off()
-            board.sleep(1)
-            continue
+            print("ERROR: s.bind failed, rebooting the module.\n")
+            raise
         else:
             break
-    print("READY TO LISTEN")
+    print("Ready to listen.\n")
+
     # Reciving the post request
     s.listen(1)
     cl, addr = s.accept()
     cl_file  = cl.makefile('rwb', 0)
-    print("COM IS READY")
+    print("Ready to read the file.\n")
+
     # Start reading
     config_ini     = ""
     content_length = 0
@@ -60,10 +61,11 @@ def get_post():
         (header, value) = line.decode().split(":", 1)
         if header == "Content-Length":
             content_length = int(value)
-    print("Header received")
+    print("Header received.\n")
+
     # Reading json file
     config_ini = cl_file.read(content_length).decode()
-    print('config received')
+    print('Config received:\n')
     print(config_ini)
 
     # Answer and closing socket
@@ -72,10 +74,10 @@ def get_post():
         try:
             cl.send(response)
         except:
-            print("ERROR while responding to the post request, check teh antenna exposure\n")
+            print("ERROR: Couldn't respond to the POST request.\n")
             continue
         else:
-            print('response sent')
+            print('Response sent.\n')
             break
     cl.close()
     s.close()
@@ -83,10 +85,15 @@ def get_post():
 
 # Downloads the setups from the phone and returns them as a dictionnary
 def setup():
-    print('communication.py setup')
-    wifi_param_json = get_post()
-    wifi_param      = json.loads(wifi_param_json)
-    return wifi_param
+    print('AP mode: initialising server loop.\n')
+    try:
+        wifi_param_json = get_post()
+    except:
+        print("ERROR: AP mode failed. Rebboting to try agine.\n")
+        raise
+    else:
+        wifi_param      = json.loads(wifi_param_json)
+        return wifi_param
 
 # Creates the wifi
 def wifi_init():
@@ -143,25 +150,35 @@ def send_data(url, data=None, commands=None):
     return config, cmd
 
 def new_connection():
+    ntp_count = 0
 
     while True:
         ap = AP_activation()
-        wifi_param = setup()
-        board.led_orange()
-        time.sleep(2)
-        wlan = wifi_init()
-        status = wifi_connect(wifi_param, wlan)
-        if status:
-            board.led_green()
-            while True:
-                try:
-                    ntptime.settime()
-                except:
-                    print("Faile ntp\n")
-                else:
-                    break
-            break
-        board.led_red()
-
-
-    return wlan, wifi_param
+        try:
+            wifi_param = setup()
+        except:
+            print("ERROR: setup failed, rebooting.\n")
+            raise
+        else:
+            board.led_orange()
+            time.sleep(TIME_LED_FLASH)
+            wlan = wifi_init()
+            status = wifi_connect(wifi_param, wlan, ap)
+            if status:
+                board.led_green()
+                while True:
+                    try:
+                        ntptime.settime()
+                    except:
+                        if ntp_count >= NTP_ATTEMPTS:
+                            print("ERROR: failed ntp. Your data won't have the right time stamp."
+                                  "Will retry during the next connection.\n")
+                            break
+                        else:
+                            print("WARNING: failed ntp, retry.\n")
+                            ntp_count += 1
+                    else:
+                        break
+                break
+            board.led_red()
+            return wlan, wifi_param
